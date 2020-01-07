@@ -1,11 +1,9 @@
 package technopolisspring.technopolis.model.daos;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Offer;
 import technopolisspring.technopolis.model.pojos.Product;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,26 +14,7 @@ import java.util.Map;
 @Component
 public class OfferDao extends Dao {
 
-    @Autowired
-    private ProductDao productDao;
-
     protected OfferDao() throws SQLException {
-    }
-
-    public Offer getOfferById(int id) throws SQLException {
-        String sql = "SELECT name, discount_percent, start_date, end_date\n" +
-                "FROM offers\n" +
-                "WHERE id = " + id + ";";
-        try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
-            ResultSet result = ps.executeQuery();
-            Offer offer = new Offer(id,
-                    result.getString("name"),
-                    result.getDouble("discount_percent"),
-                    result.getTimestamp("start_date").toLocalDateTime(),
-                    result.getTimestamp("end_date").toLocalDateTime(),
-                    addOfferProducts(id));
-            return offer;
-        }
     }
 
     private Map<Product, Double> addOfferProducts(int id) throws SQLException {
@@ -45,7 +24,7 @@ public class OfferDao extends Dao {
                 "JOIN brands AS b ON p.brand_id = b.id\n" +
                 "WHERE ohp.offer_id = " + id + ";";
         Map<Product, Double> favorites = new HashMap<>();
-        List<Product> products = jdbcTemplate.query(sql, (result, i) -> productDao.toProduct(result));
+        List<Product> products = jdbcTemplate.query(sql, (result, i) -> toProduct(result));
         for (Product product : products) {
             favorites.put(product, product.getPrice());
         }
@@ -69,6 +48,18 @@ public class OfferDao extends Dao {
                 addOfferProducts(result.getInt("id"))
         );
         return offer;
+    }
+
+    private Product toProduct(ResultSet result) throws SQLException {
+        Product product = new Product(
+                result.getInt("p.id"),
+                result.getString("p.description"),
+                result.getDouble("p.price"),
+                result.getString("p.picture_url"),
+                result.getString("b.name"),
+                result.getInt("p.sub_category_id")
+        );
+        return product;
     }
 
 }

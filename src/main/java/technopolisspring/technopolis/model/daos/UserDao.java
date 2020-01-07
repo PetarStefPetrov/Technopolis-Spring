@@ -3,14 +3,11 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.*;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class UserDao extends Dao {
@@ -103,56 +100,6 @@ public class UserDao extends Dao {
                 orders.add(order);
             }
             return orders;
-        }
-    }
-
-    public void registerUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (first_name, last_name, email, password, phone, address)\n" +
-                "VALUES (?,?,?,?,?);";
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.setString(1, user.getFirstName());
-            statement.setString(2, user.getLastName());
-            statement.setString(3, user.getEmail());
-            statement.setString(4, user.getPassword());
-            statement.setString(5, user.getPhone());
-            int changes = statement.executeUpdate();
-            if (changes == 0){
-                // throw new no changes exception
-            }
-        }
-    }
-
-    public void addAddress(int id, String address) throws SQLException {
-        String sql = "UPDATE users\n" +
-                "SET \n" +
-                "address = '" + address + "'\n" +
-                "WHERE id = " + id + ";";
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.executeUpdate();
-        }
-    }
-
-    public void deleteUser(int id) throws SQLException {
-        String sql = "DELETE FROM users WHERE id = " + id;
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.execute();
-        }
-    }
-
-    public void editUser(int id,
-                         String newFirstName,
-                         String newLastName,
-                         String newEmail,
-                         String newPhone) throws SQLException {
-        String sql = "UPDATE users\n" +
-                "SET \n" +
-                "first_name = '" + newFirstName + "',\n" +
-                "last_name = '" + newLastName + "',\n" +
-                "email = '" + newEmail + "',\n" +
-                "phone = '" + newPhone + "'\n" +
-                "WHERE id = " + id + ";";
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.executeUpdate();
         }
     }
 
