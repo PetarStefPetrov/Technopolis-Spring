@@ -9,6 +9,9 @@ import java.sql.SQLException;
 @Component
 public class ProductDao extends Dao {
 
+    protected ProductDao() throws SQLException {
+    }
+
     Product toProduct(ResultSet result) throws SQLException {
         Product product = new Product(
                 result.getInt("p.id"),

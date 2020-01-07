@@ -12,6 +12,9 @@ import java.util.Map;
 @Component
 public class StoreDao extends Dao {
 
+    protected StoreDao() throws SQLException {
+    }
+
     public Store getStoreById(int id) throws SQLException {
         String sql = "SELECT name, address, work_hours, phone, free_parking, location_coordinates\n" +
                 "FROM stores\n" +

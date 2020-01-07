@@ -8,6 +8,9 @@ import java.sql.SQLException;
 @Component
 public class ReviewDao extends Dao {
 
+    protected ReviewDao() throws SQLException {
+    }
+
     public void addReview(String name,
                           String title,
                           String comment,

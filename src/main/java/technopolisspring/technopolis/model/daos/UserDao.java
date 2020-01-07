@@ -3,6 +3,7 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.*;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,12 +13,14 @@ import java.util.Map;
 @Component
 public class UserDao extends Dao {
 
+    protected UserDao() throws SQLException {
+    }
+
     public User getUserById(int id) throws SQLException {
         String sql = "SELECT first_name, last_name, email, password, phone, create_time, address\n" +
                 "FROM users\n" +
                 "WHERE id = " + id + ";";
         try (PreparedStatement statement = this.connection.prepareStatement(sql)){
-            this.connection.setAutoCommit(false);
             ResultSet result = statement.executeQuery();
             User user = new User(id,
                     result.getString("first_name"),
@@ -30,14 +33,7 @@ public class UserDao extends Dao {
                     getReviews(id),
                     getFavourites(id),
                     getOrders(id));
-            this.connection.commit();
             return user;
-        } catch (SQLException e) {
-            this.connection.rollback();
-            throw e;
-        }
-        finally {
-            this.connection.setAutoCommit(true);
         }
     }
 

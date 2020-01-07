@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Offer;
 import technopolisspring.technopolis.model.pojos.Product;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,18 +19,23 @@ public class OfferDao extends Dao {
     @Autowired
     private ProductDao productDao;
 
+    protected OfferDao() throws SQLException {
+    }
+
     public Offer getOfferById(int id) throws SQLException {
         String sql = "SELECT name, discount_percent, start_date, end_date\n" +
                 "FROM offers\n" +
                 "WHERE id = " + id + ";";
-        // result = jdbcTemplate.. //todo
-        Offer offer = new Offer(id,
-                result.getString("name"),
-                result.getDouble("discount_percent"),
-                result.getTimestamp("start_date").toLocalDateTime(),
-                result.getTimestamp("end_date").toLocalDateTime(),
-                addOfferProducts(id));
-        return offer;
+        try(PreparedStatement ps = this.connection.prepareStatement(sql)) {
+            ResultSet result = ps.executeQuery();
+            Offer offer = new Offer(id,
+                    result.getString("name"),
+                    result.getDouble("discount_percent"),
+                    result.getTimestamp("start_date").toLocalDateTime(),
+                    result.getTimestamp("end_date").toLocalDateTime(),
+                    addOfferProducts(id));
+            return offer;
+        }
     }
 
     private Map<Product, Double> addOfferProducts(int id) throws SQLException {
