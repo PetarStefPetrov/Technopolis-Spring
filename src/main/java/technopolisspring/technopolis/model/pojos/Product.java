@@ -4,21 +4,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@Entity
+@Table(name = "products")
 public class Product {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+    @Column
     private String description;
+    @Column
     private double price;
+    @Column
     private String pictureUrl;
+    @Column
     private String brand;
+    @Column
     private int subCategoryId;
-    private ConcurrentHashMap<Integer, Review> reviews; // <review_id, review>
+    @Column
+    @OneToMany(mappedBy = "reviews")
+    private List<Review> reviews; // <review_id, review>
 
     public Product(int id, String description, double price, String pictureUrl, String brand, int subCategoryId) {
         this.id = id;
@@ -27,17 +39,17 @@ public class Product {
         this.pictureUrl = pictureUrl;
         this.brand = brand;
         this.subCategoryId = subCategoryId;
-        this.reviews = new ConcurrentHashMap<>();
+        this.reviews = new ArrayList<>();
     }
 
     public Product(int id, String description, double price, String pictureUrl, String brand,
-                   int subCategoryId, Map<Integer, Review> reviews) {
+                   int subCategoryId, List<Review> reviews) {
         this(id, description, price, pictureUrl, brand, subCategoryId);
-        this.reviews.putAll(reviews);
+        this.reviews.addAll(reviews);
     }
 
     public void addReview(Review review){
-        this.reviews.put(review.getId(), review);
+        this.reviews.add(review);
     }
 
     public double getPrice() {

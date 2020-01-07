@@ -4,6 +4,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -12,17 +15,24 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public class Order {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column
     private long userId;
+    @Column
     private String address;
+    @Column
     private double price;
-    private ConcurrentHashMap<Product, Integer> products; // products and quantity
+    @Column
+    @OneToMany(mappedBy = "products")
+    private List<Product> products;
 
     private Order(long id, long userId, String address) {
         this.id = id;
         this.userId = userId;
         this.address = address;
-        this.products = new ConcurrentHashMap<>();
+        this.products = new ArrayList<>();
     }
 
     public Order(int id, long userId, String address, double price) {
@@ -32,17 +42,16 @@ public class Order {
 
     // Second one is because I'm not sure if we would only create orders by getting them from the db.
     // In that case the first one is not needed.
-    public Order(int id, int userId, String address, Map<Product, Integer> products){
+    public Order(int id, int userId, String address, List<Product> products){
         this(id, userId, address);
-        this.products.putAll(products);
-        for (Map.Entry<Product, Integer> entry : products.entrySet()){
-            this.price += entry.getKey().getPrice() * entry.getValue();
+        this.products.addAll(products);
+        for (Product product : products) {
+            this.price += product.getPrice();
         }
     }
 
     public void addProduct(Product product){
-        this.products.putIfAbsent(product, 0); // because Integer default is null
-        this.products.put(product, this.products.get(product) + 1);
+        this.products.add(product);
         this.price += product.getPrice();
     }
 
