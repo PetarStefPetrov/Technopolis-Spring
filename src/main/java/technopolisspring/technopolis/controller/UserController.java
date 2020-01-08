@@ -5,10 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
+import technopolisspring.technopolis.model.exception.GlobalException;
 import technopolisspring.technopolis.model.exception.InvalidArguments;
-import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 import technopolisspring.technopolis.model.repository.IUserRepository;
 
@@ -19,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-public class UserController {
+public class UserController extends GlobalException {
     @Autowired
     private IUserRepository userRepository;
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
@@ -90,7 +88,7 @@ public class UserController {
             throw new AuthorizationException("Must be admin");
         }
         Optional<User> save = userRepository.findById(id);
-        if(save == null){
+        if(!save.isPresent()){
             throw new BadRequestException("Invalid id");
         }
         return  save.get();
