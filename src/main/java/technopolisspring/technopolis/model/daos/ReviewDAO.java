@@ -15,7 +15,7 @@ public class ReviewDAO {
     JdbcTemplate jdbcTemplate;
 
     public Review addReview(Review review, Product product, User user) throws SQLException {
-        String sql = "INSERT INTO reviews (name, title, comment, product_id, user_id)\n" +
+        String sql = "INSERT INTO `technopolis`.reviews (name, title, comment, product_id, user_id)\n" +
                 "VALUES (?,?,?,?,?);";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -32,7 +32,7 @@ public class ReviewDAO {
     }
 
     public void editReview(Review review) throws SQLException {
-        String sql = "UPDATE reviews\n" +
+        String sql = "UPDATE `technopolis`.reviews\n" +
                 "SET \n" +
                 "name = ?,\n" +
                 "title = ?,\n" +
@@ -49,7 +49,7 @@ public class ReviewDAO {
     }
 
     public void deleteReview(int id) throws SQLException {
-        String sql = "DELETE FROM reviews WHERE id = ?";
+        String sql = "DELETE FROM `technopolis`.reviews WHERE id = ?";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
