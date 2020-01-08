@@ -13,7 +13,7 @@ public class UserRegistrableDto {
     private String lastName;
     private String email;
     private String password;
-    private String checkPassword;
+    private String confirmPassword;
     private String phone;
     private String address;
 }
