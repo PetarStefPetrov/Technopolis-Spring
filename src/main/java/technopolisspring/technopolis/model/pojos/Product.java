@@ -19,7 +19,7 @@ public class Product {
     private String pictureUrl;
     private long brandId;
     private long subCategoryId;
-    private List<Review> reviews; // <review_id, review>
+    private List<Review> reviews;
 
     public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId) {
         this.id = id;
