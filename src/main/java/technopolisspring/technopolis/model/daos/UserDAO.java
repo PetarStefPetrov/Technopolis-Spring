@@ -76,8 +76,8 @@ public class UserDAO {
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
                 "FROM `technopolis`.reviews AS r\n" +
-                "JOIN `technopolis`.products AS p\n" +
-                "JOIN `technopolis`.users AS u\n" +
+                "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
+                "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
                 "WHERE r.user_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -90,7 +90,7 @@ public class UserDAO {
                         result.getString("p.description"),
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
-                        result.getString("p.brand_id"),
+                        result.getLong("p.brand_id"),
                         result.getLong("p.sub_category_id")
                 );
                 User user = new User(
@@ -119,10 +119,9 @@ public class UserDAO {
     }
 
     public List<Product> getFavourites(long userId) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, b.name, p.sub_category_id\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
-                "JOIN `technopolis`.brands AS b ON p.brand_id = b.id\n" +
                 "WHERE ulp.user_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -135,7 +134,7 @@ public class UserDAO {
                         result.getString("p.description"),
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
-                        result.getString("b.name"),
+                        result.getLong("p.brand_id"),
                         result.getInt("p.sub_category_id")
                 );
                 favorites.add(product);
