@@ -30,7 +30,7 @@ public class UserWithAllAttributesDto {
         private List<Review> reviews; // <review>
         private List<Product> favorites; // <product>
         private List<Order> orders; // <order>
-        UserWithAllAttributesDto(User user) throws SQLException {
+        public UserWithAllAttributesDto(User user) throws SQLException {
             id= user.getId();
             firstName = user.getFirstName();
             lastName = user.getLastName();

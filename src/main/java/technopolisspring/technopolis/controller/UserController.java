@@ -1,15 +1,9 @@
 package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.UserDao;
-import technopolisspring.technopolis.model.dto.ChangePasswordDto;
-import technopolisspring.technopolis.model.dto.LoginUserDto;
-import technopolisspring.technopolis.model.dto.UserRegistrableDto;
-import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
+import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.InvalidArguments;
 import technopolisspring.technopolis.model.pojos.User;
@@ -17,11 +11,10 @@ import technopolisspring.technopolis.model.repository.IUserRepository;
 
 
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 
 @RestController
 public class UserController {
-    @Autowired
-    private UserDao userDao;
     @Autowired
     private IUserRepository userRepository;
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
@@ -38,8 +31,9 @@ public class UserController {
     }
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto,HttpSession session){
-        //TODO Validation email and password
+        //TODO Validation email and password ( is name and email is exist)
         User user = new User(userRegistrableDto);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         userRepository.save(user);
         return new UserWithoutPasswordDto(user);
     }
@@ -72,6 +66,23 @@ public class UserController {
         user.setPassword(changePasswordDto.getNewPassword());
         userRepository.save(user);
         return new UserWithoutPasswordDto(user);
+    }
+    @PostMapping("users/profile")
+    public UserWithAllAttributesDto getProfile(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        return new UserWithAllAttributesDto(user);
+    }
+    @GetMapping("users/{?}")
+    public UserWithoutPasswordDto getUserById(HttpSession session, @PathVariable("?") int id){
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        return null;
+        //TODO
     }
 
 
