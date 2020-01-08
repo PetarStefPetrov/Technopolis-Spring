@@ -142,6 +142,27 @@ public class UserDAO {
             return favorites;
         }
     }
+
+    public void addToFavorites(long productId, long userId) throws SQLException {
+        String sql = "INSERT INTO `technopolis`.`users_like_products` (`product_id`, `user_id`) VALUES (?, ?);";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, productId);
+            statement.setLong(2, userId);
+            statement.execute();
+        }
+    }
+
+    public boolean isAdmin(long userId) throws SQLException {
+        String sql = "SELECT is_admin FROM `technopolis`.users WHERE id = ?";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, userId);
+            ResultSet result = statement.executeQuery();
+            return result.getBoolean("is_admin");
+        }
+    }
+
     public List<Order> getOrders(long userId) throws SQLException {
         String sql = "SELECT id, address, price\n" +
                 "FROM `technopolis`.orders \n" +
