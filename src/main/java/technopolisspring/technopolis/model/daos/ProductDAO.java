@@ -5,10 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Product;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Component
 public class ProductDAO {
@@ -36,6 +33,20 @@ public class ProductDAO {
                     result.getString("b.name"),
                     result.getLong("p.sub_category_id")
             );
+            return product;
+        }
+    }
+
+    public Product addProduct(Product product) throws SQLException {
+        String sql = "";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            if(!resultSet.next()){
+                return null;
+            }
+            product.setId(resultSet.getInt(1));
             return product;
         }
     }

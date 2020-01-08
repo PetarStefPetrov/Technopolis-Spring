@@ -14,6 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class User {
+
     private long id;
     private String firstName;
     private String lastName;
@@ -23,7 +24,6 @@ public class User {
     private LocalDateTime createTime;
     private String address;
     private boolean isAdmin = false;
-    private List<Review> reviews;
 
     public User (UserRegistrableDto reg){
         this.firstName = reg.getFirstName();
