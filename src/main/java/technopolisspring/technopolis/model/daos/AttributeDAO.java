@@ -20,26 +20,25 @@ public class AttributeDAO {
     JdbcTemplate jdbcTemplate;
 
     public Attribute getAttributeById(long id) throws SQLException {
-        String sql = "SELECT a.id, a.name, sc.name\n" +
-                "FROM `technopolis`.attributes AS a\n" +
-                "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n" +
-                "WHERE a.id = ?;";
+        String sql = "SELECT id, name, sub_category_id\n" +
+                "FROM `technopolis`.attributes\n" +
+                "WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
             return new Attribute(
                     id,
-                    result.getString("a.name"),
-                    result.getString("sc.name")
+                    result.getString("name"),
+                    result.getLong("sub_category_id")
             );
         }
     }
 
     public List<Attribute> getAllAttributes() throws SQLException {
-        String sql = "SELECT a.id, a.name, sc.name\n" +
-                "FROM `technopolis`.attributes AS a\n" +
-                "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n";
+        String sql = "SELECT id, name, sub_category_id\n" +
+                "FROM `technopolis`.attributes\n" +
+                "WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
@@ -47,8 +46,8 @@ public class AttributeDAO {
             while (result.next()){
                 Attribute attribute = new Attribute(
                         result.getLong("id"),
-                        result.getString("a.name"),
-                        result.getString("sc.name")
+                        result.getString("name"),
+                        result.getLong("sub_category_id")
                 );
                 attributes.add(attribute);
             }

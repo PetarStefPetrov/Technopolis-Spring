@@ -11,6 +11,7 @@ import java.sql.SQLException;
 
     @Component
     public class OfferDAO {
+
         @Autowired
         private ProductDAO productDao;
 

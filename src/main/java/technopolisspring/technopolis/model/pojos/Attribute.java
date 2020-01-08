@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.model.pojos;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -7,16 +8,21 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class Attribute {
 
     private long id;
     private String name;
-    private String subCategory;
+    private long subCategoryId;
+    private String value;
 
-    public Attribute(long id, String name, String subCategory) {
-        this.id = id;
+    public Attribute(String name, long subCategoryId) {
         this.name = name;
-        this.subCategory = subCategory;
+        this.subCategoryId = subCategoryId;
     }
 
+    public Attribute(long id, String name, long subCategoryId) {
+        this(name, subCategoryId);
+        this.id = id;
+    }
 }
