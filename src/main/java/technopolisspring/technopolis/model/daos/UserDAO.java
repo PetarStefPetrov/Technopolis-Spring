@@ -162,4 +162,64 @@ public class UserDAO {
         }
     }
 
+    public User getUserByEmail(String email) throws SQLException {
+        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+                "FROM users\n" +
+                "WHERE email = ?;";
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, email);
+            ResultSet result = statement.executeQuery();
+            return new User(
+                    result.getLong("id"),
+                    result.getString("first_name"),
+                    result.getString("last_name"),
+                    result.getString("email"),
+                    result.getString("password"),
+                    result.getString("phone"),
+                    result.getTimestamp("create_time").toLocalDateTime(),
+                    result.getString("address"),
+                    result.getBoolean("is_admin")
+            );
+        }
+    }
+
+    public User getUserById(long id) throws SQLException {
+        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+                "FROM users\n" +
+                "WHERE id = ?;";
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            ResultSet result = statement.executeQuery();
+            return new User(
+                    result.getLong("id"),
+                    result.getString("first_name"),
+                    result.getString("last_name"),
+                    result.getString("email"),
+                    result.getString("password"),
+                    result.getString("phone"),
+                    result.getTimestamp("create_time").toLocalDateTime(),
+                    result.getString("address"),
+                    result.getBoolean("is_admin")
+            );
+        }
+    }
+
+    public List<User> getAll() {
+        String sql = "SELECT * FROM users;";
+        List<User> users = jdbcTemplate.query(sql, (result, i) -> new User(
+                result.getLong("id"),
+                result.getString("first_name"),
+                result.getString("last_name"),
+                result.getString("email"),
+                result.getString("password"),
+                result.getString("phone"),
+                result.getTimestamp("create_time").toLocalDateTime(),
+                result.getString("address"),
+                result.getBoolean("is_admin")
+        ));
+        return users;
+    }
+
 }
