@@ -10,31 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserDao extends Dao {
+public class UserDao extends Dao  {
 
     protected UserDao() throws SQLException {
-    }
-
-    public User getUserById(long id) throws SQLException {
-        String sql = "SELECT first_name, last_name, email, password, phone, create_time, address\n" +
-                "FROM users\n" +
-                "WHERE id = " + id + ";";
-        try (PreparedStatement statement = this.connection.prepareStatement(sql)){
-            ResultSet result = statement.executeQuery();
-            if(result.next()) {
-                User user = new User(id,
-                        result.getString("first_name"),
-                        result.getString("last_name"),
-                        result.getString("email"),
-                        result.getString("password"),
-                        result.getString("phone"),
-                        result.getTimestamp("create_time").toLocalDateTime(),
-                        result.getString("address"));
-                return user;
-            } else {
-                return null;
-            }
-        }
     }
 
     public List<Review> getReviews(long userId) throws SQLException {

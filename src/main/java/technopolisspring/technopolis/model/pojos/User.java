@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.model.pojos;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +25,7 @@ public class User {
     @Column
     private String email;
     @Column
+    @JsonIgnore
     private String password;
     @Column
     private String phone;
@@ -31,6 +33,9 @@ public class User {
     private LocalDateTime createTime;
     @Column
     private String address;
+    @Column
+    private boolean isAdmin;
+
     public User (UserRegistrableDto reg){
         firstName = reg.getFirstName();
         lastName = reg.getLastName();
@@ -40,23 +45,4 @@ public class User {
         createTime = LocalDateTime.now();
         address = reg.getAddress();
     }
-    public User(long id,
-                String firstName,
-                String lastName,
-                String email,
-                String password,
-                String phone,
-                LocalDateTime createTime,
-                String address) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.createTime = createTime; // create time is now only the first time the user gets into db
-        this.address = address;
-    }
-
-
 }

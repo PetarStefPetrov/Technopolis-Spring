@@ -5,16 +5,24 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
+import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.InvalidArguments;
+import technopolisspring.technopolis.model.pojos.Order;
+import technopolisspring.technopolis.model.pojos.Product;
+import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 import technopolisspring.technopolis.model.repository.IUserRepository;
 
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
+    @Autowired
+    private UserDao userDao;
     @Autowired
     private IUserRepository userRepository;
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
@@ -75,16 +83,60 @@ public class UserController {
         }
         return new UserWithAllAttributesDto(user);
     }
-    @GetMapping("users/{?}")
-    public UserWithoutPasswordDto getUserById(HttpSession session, @PathVariable("?") int id){
+    @GetMapping("users/{id}")
+    public User getUserById(HttpSession session,@PathVariable(name = "id") long id){
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be login");
         }
-        return null;
+        if(!user.isAdmin()){
+            throw new AuthorizationException("Must be admin");
+        }
+        Optional<User> save = userRepository.findById(id);
+        if(save == null){
+            throw new BadRequestException("Invalid id");
+        }
+        return  save.get();
+    }
+    @GetMapping("users/")
+    public List<User> allUsers(HttpSession session){
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        if(!user.isAdmin()){
+            throw new AuthorizationException("Must be admin");
+        }
+        return userRepository.findAll();
+    }
+    @GetMapping("users/reviews")
+    public List<Review> getReview(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        return userDao.getReviews(user.getId());
+    }
+    @GetMapping("users/orders")
+    public List<Order> getOrders(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        return userDao.getOrders(user.getId());
+    }
+    @GetMapping("users/favorites")
+    public List<Product> getFavourites(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be login");
+        }
+        return userDao.getFavourites(user.getId());
+    }
+    @PostMapping("users/add_review/{id}")
+    public void addReview(HttpSession session,@PathVariable(name = "id") long id){
         //TODO
     }
-
 
 
 }
