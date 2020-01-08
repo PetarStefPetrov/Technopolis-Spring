@@ -12,20 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public class Order {
 
-    private int id;
-    private int userId;
+    private long id;
+    private long userId;
     private String address;
     private double price;
     private ConcurrentHashMap<Product, Integer> products; // products and quantity
 
-    private Order(int id, int userId, String address) {
+    private Order(long id, long userId, String address) {
         this.id = id;
         this.userId = userId;
         this.address = address;
         this.products = new ConcurrentHashMap<>();
     }
 
-    public Order(int id, int userId, String address, double price) {
+    public Order(int id, long userId, String address, double price) {
         this(id, userId, address);
         this.price = price;
     }
@@ -46,7 +46,7 @@ public class Order {
         this.price += product.getPrice();
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

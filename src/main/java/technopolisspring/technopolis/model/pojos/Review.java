@@ -14,9 +14,9 @@ public class Review {
     private String title;
     private String comment;
     private int productID;
-    private int userID;
+    private long userID;
 
-    public Review(int id, String name, String title, String comment, int productID, int userID) {
+    public Review(int id, String name, String title, String comment, int productID, long userID) {
         this.id = id;
         this.name = name;
         this.title = title;
