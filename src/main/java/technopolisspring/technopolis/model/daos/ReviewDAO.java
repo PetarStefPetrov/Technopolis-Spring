@@ -31,26 +31,28 @@ public class ReviewDAO {
         }
     }
 
-    public void editReview(int id,
-                           String name,
-                           String title,
-                           String comment) throws SQLException {
+    public void editReview(Review review) throws SQLException {
         String sql = "UPDATE reviews\n" +
                 "SET \n" +
-                "name = '" + name + "',\n" +
-                "title = '" + title + "',\n" +
-                "comment = '" + comment + "'\n" +
-                "WHERE id = " + id + ";";
+                "name = ?,\n" +
+                "title = ?,\n" +
+                "comment = ?\n" +
+                "WHERE id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, review.getName());
+            statement.setString(2, review.getTitle());
+            statement.setString(3, review.getComment());
+            statement.setLong(4, review.getId());
             statement.executeUpdate();
         }
     }
 
     public void deleteReview(int id) throws SQLException {
-        String sql = "DELETE FROM reviews WHERE id = " + id;
+        String sql = "DELETE FROM reviews WHERE id = ?";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, id);
             statement.execute();
         }
     }
