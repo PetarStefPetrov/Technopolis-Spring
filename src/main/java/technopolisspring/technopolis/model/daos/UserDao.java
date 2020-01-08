@@ -106,19 +106,15 @@ public class UserDao extends Dao {
         }
     }
 
-    public void registerUser(String firstName,
-                             String lastName,
-                             String email,
-                             String password,
-                             String phone) throws SQLException {
-        String sql = "INSERT INTO users (first_name, last_name, email, password, phone)\n" +
+    public void registerUser(User user) throws SQLException {
+        String sql = "INSERT INTO users (first_name, last_name, email, password, phone,)\n" +
                 "VALUES (?,?,?,?,?);";
         try (PreparedStatement statement = this.connection.prepareStatement(sql)) {
-            statement.setString(1, firstName);
-            statement.setString(2, lastName);
-            statement.setString(3, email);
-            statement.setString(4, password);
-            statement.setString(5, phone);
+            statement.setString(1, user.getFirstName());
+            statement.setString(2, user.getLastName());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, user.getPassword());
+            statement.setString(5, user.getPhone());
             int changes = statement.executeUpdate();
             if (changes == 0){
                 // throw new no changes exception
