@@ -8,6 +8,7 @@ import technopolisspring.technopolis.model.dto.UserRegistrableDto;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -35,6 +36,9 @@ public class User {
     private String address;
     @Column
     private boolean isAdmin;
+    @Column
+    @OneToMany(mappedBy = "reviews")
+    private List<Review> reviews;
 
     public User (UserRegistrableDto reg){
         firstName = reg.getFirstName();
