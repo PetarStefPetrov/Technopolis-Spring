@@ -2,7 +2,6 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
@@ -21,8 +20,6 @@ import java.util.Optional;
 
 @RestController
 public class UserController {
-    @Autowired
-    private UserDao userDao;
     @Autowired
     private IUserRepository userRepository;
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
@@ -109,30 +106,30 @@ public class UserController {
         }
         return userRepository.findAll();
     }
-    @GetMapping("users/reviews")
-    public List<Review> getReview(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be login");
-        }
-        return userDao.getReviews(user.getId());
-    }
-    @GetMapping("users/orders")
-    public List<Order> getOrders(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be login");
-        }
-        return userDao.getOrders(user.getId());
-    }
-    @GetMapping("users/favorites")
-    public List<Product> getFavourites(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be login");
-        }
-        return userDao.getFavourites(user.getId());
-    }
+//    @GetMapping("users/reviews")
+//    public List<Review> getReview(HttpSession session) throws SQLException {
+//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+//        if(user == null){
+//            throw new AuthorizationException("Must be login");
+//        }
+//        return userDao.getReviews(user.getId());
+//    }
+//    @GetMapping("users/orders")
+//    public List<Order> getOrders(HttpSession session) throws SQLException {
+//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+//        if(user == null){
+//            throw new AuthorizationException("Must be login");
+//        }
+//        return userDao.getOrders(user.getId());
+//    }
+//    @GetMapping("users/favorites")
+//    public List<Product> getFavourites(HttpSession session) throws SQLException {
+//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+//        if(user == null){
+//            throw new AuthorizationException("Must be login");
+//        }
+//        return userDao.getFavourites(user.getId());
+//    }
     @PostMapping("users/add_review/{id}")
     public void addReview(HttpSession session,@PathVariable(name = "id") long id){
         //TODO
