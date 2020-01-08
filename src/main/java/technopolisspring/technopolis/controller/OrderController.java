@@ -29,7 +29,7 @@ public class OrderController extends GlobalException {
     public OrderDao orderDao;
 
     @GetMapping("/orders/add")
-    public Order addOrder(HttpSession session){
+    public Order addOrder(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -38,11 +38,12 @@ public class OrderController extends GlobalException {
         if(basket == null){
             throw new BadRequestException("Basket is empty");
         }
-        Order order = new Order(user.getId(),user.getAddress(),basket);
-        //Order orderWithId = orderDao.addOrder(Order);
+        Order order = new Order(user.getId(), user.getAddress(), basket);
+        Order orderWithId = orderDao.addOrder(order);
        //TODO return orderWithID after fix
         return order;
     }
+
     @PostMapping("orders/products/add/{product_id}")
     public Map<Product, Integer> addProductToBuy(@PathVariable long product_id,HttpSession session) throws SQLException {
         Product product = productDAO.getProductById(product_id);
@@ -63,6 +64,7 @@ public class OrderController extends GlobalException {
         session.setAttribute(SESSION_KEY_BASKET_USER,basket);
         return basket;
     }
+
     @DeleteMapping("orders/products/remove/{product_id}")
     public Map<Product, Integer> removeProductToBuy(@PathVariable long product_id,HttpSession session) throws SQLException {
         Product product = productDAO.getProductById(product_id);
@@ -82,6 +84,7 @@ public class OrderController extends GlobalException {
         session.setAttribute(SESSION_KEY_BASKET_USER,basket);
         return basket;
     }
+
     @GetMapping("orders/products")
     public Map<Product, Integer> removeProductToBuy(HttpSession session) throws SQLException {
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);

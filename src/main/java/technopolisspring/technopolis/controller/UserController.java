@@ -36,7 +36,7 @@ public class UserController extends GlobalException {
     public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
         //TODO Cript password
       User user = userDAO.getUserByEmail(userDTO.getEmail());
-        if(user == null || user.getPassword().equals(userDTO.getPassword())){
+        if(user == null || user.getPassword().equals(userDTO.getPassword())){ // not equal?
             throw new InvalidArguments("Invalid email or password");
         }
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);

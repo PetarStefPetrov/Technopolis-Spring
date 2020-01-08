@@ -18,6 +18,9 @@ public class UserDAO {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    OrderDao orderDao;
+
     public User registerUser(User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.users (first_name, last_name, email, password, phone, address,is_admin)\n" +
                 "VALUES (?,?,?,?,?,?,?);";
@@ -179,7 +182,7 @@ public class UserDAO {
     }
 
     public List<Order> getOrders(long userId) throws SQLException {
-        String sql = "SELECT id, address, price\n" +
+        String sql = "SELECT id\n" +
                 "FROM `technopolis`.orders \n" +
                 "WHERE user_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -188,12 +191,7 @@ public class UserDAO {
             List<Order> orders = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()) {
-                Order order = new Order(
-                        result.getLong("id"),
-                        userId,
-                        result.getString("address"),
-                        result.getDouble("price")
-                );
+                Order order = orderDao.getOrderById(result.getLong("id"));
                 orders.add(order);
             }
             return orders;

@@ -20,24 +20,22 @@ public class Order {
     private long userId;
     private String address;
     private double price;
-    private Map<Product,Integer> products; // < product_id , quantity >
+    private Map<Product, Integer> products; // < product , quantity >
 
 
-    public Order(long userId, String address, Map<Product,Integer> products){
+    public Order(long userId, String address, Map<Product, Integer> products){
         this.userId = userId;
         this.address = address;
         this.products = products;
-        //TODO PESGO FIX MAP FOR EACH ELEMENT  * PRICE
-//        for (Product product : products) {
-//            this.price += product.getPrice();
-//        }
+        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+            this.price = entry.getKey().getPrice() * entry.getValue();
+        }
     }
 
-    public Order(long id, long userId, String address, double price) {
+    public Order(long id, long userId, String address, Map<Product, Integer> products) {
+        this(userId, address, products);
         this.id = id;
-        this.userId = userId;
-        this.address = address;
-        this.price = price;
     }
+
 }
 

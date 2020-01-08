@@ -35,13 +35,13 @@ public class UserWithAllAttributesDto {
     private List<Order> orders;
 
     public UserWithAllAttributesDto(User user, List<Review> reviews, List<Product> favorites, List<Order> orders) throws SQLException {
-        id = user.getId();
-        firstName = user.getFirstName();
-        lastName = user.getLastName();
-        email = user.getEmail();
-        phone = user.getPhone();
-        createTime = user.getCreateTime();
-        address = user.getAddress();
+        this.id = user.getId();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.email = user.getEmail();
+        this.phone = user.getPhone();
+        this.createTime = user.getCreateTime();
+        this.address = user.getAddress();
         this.orders = orders;
         this.favorites = favorites;
         this.reviews = reviews;

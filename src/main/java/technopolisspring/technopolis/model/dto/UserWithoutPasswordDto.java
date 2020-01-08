@@ -21,10 +21,10 @@ public class UserWithoutPasswordDto {
     private String address;
         public UserWithoutPasswordDto(User user){
             this.id = user.getId();
-            firstName = user.getFirstName();
-            lastName = user.getLastName();
-            email = user.getEmail();
-            phone = user.getPhone();
-            address = user.getAddress();
+            this.firstName = user.getFirstName();
+            this.lastName = user.getLastName();
+            this.email = user.getEmail();
+            this.phone = user.getPhone();
+            this.address = user.getAddress();
         }
 }
