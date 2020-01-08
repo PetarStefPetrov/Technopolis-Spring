@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Product;
+import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
 
@@ -42,7 +43,12 @@ public class ProductDAO {
                 "VALUES (?, ?, ?, ?, ?, ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            // todo set values
+            statement.setLong(1, product.getId());
+            statement.setString(2, product.getDescription());
+            statement.setDouble(3, product.getPrice());
+            statement.setString(4, product.getPictureUrl());
+            statement.setLong(5, product.getBrandId());
+            statement.setLong(6, product.getSubCategoryId());
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             if(!resultSet.next()){
@@ -51,6 +57,16 @@ public class ProductDAO {
             product.setId(resultSet.getInt(1));
             return product;
         }
+    }
+
+    public Product deleteProduct(Product product) throws SQLException {
+        String sql = "DELETE FROM `technopolis`.products WHERE id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, product.getId());
+            statement.execute();
+        }
+        return product;
     }
 
 }

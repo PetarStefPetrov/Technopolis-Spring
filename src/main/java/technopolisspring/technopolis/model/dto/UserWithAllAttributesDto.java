@@ -17,6 +17,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserWithAllAttributesDto {
+
     @Autowired
     private UserDAO userDao;
         private long id;
@@ -31,13 +32,13 @@ public class UserWithAllAttributesDto {
         private List<Order> orders; // <order>
 
         public UserWithAllAttributesDto(User user) throws SQLException {
-            id= user.getId();
-            firstName = user.getFirstName();
-            lastName = user.getLastName();
-            email = user.getEmail();
-            phone = user.getPhone();
-            createTime = user.getCreateTime();
-            address = user.getAddress();
+            this.id = user.getId();
+            this.firstName = user.getFirstName();
+            this.lastName = user.getLastName();
+            this.email = user.getEmail();
+            this.phone = user.getPhone();
+            this.createTime = user.getCreateTime();
+            this.address = user.getAddress();
             this.reviews = userDao.getReviews(this.id);
             this.favorites = userDao.getFavourites(this.id);
             this.orders = userDao.getOrders(this.id);
