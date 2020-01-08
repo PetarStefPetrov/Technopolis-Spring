@@ -37,9 +37,7 @@ public class OrderDao {
             orderStatement.setDouble(3, order.getPrice());
             orderStatement.execute();
             ResultSet resultSet = orderStatement.getGeneratedKeys();
-            if(!resultSet.next()){
-                return null;
-            }
+            resultSet.next();
             order.setId(resultSet.getInt(1));
             for (Map.Entry<Product, Integer> entry : order.getProducts().entrySet()) {
                 orderProductsStatement.setLong(1, entry.getKey().getId());
@@ -48,6 +46,7 @@ public class OrderDao {
                 orderProductsStatement.execute();
             }
             connection.commit();
+            return order;
         } catch (SQLException e) {
             connection.setAutoCommit(true);
             connection.rollback();
@@ -56,7 +55,6 @@ public class OrderDao {
         finally {
             connection.close();
         }
-        return order;
     }
 
     public Order getOrderById(long orderId) throws SQLException {
@@ -91,7 +89,7 @@ public class OrderDao {
             Map<Product, Integer> products = new HashMap<>();
             while (result.next()){
                 products.put(productDAO.getProductById(result.getLong("product_id")),
-                        result.getInt("quantity"));
+                                                       result.getInt("quantity"));
             }
             return products;
         }
