@@ -21,8 +21,8 @@ public class UserDAO {
     public User registerUser(User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.users (first_name, last_name, email, password, phone, address,is_admin)\n" +
                 "VALUES (?,?,?,?,?,?,?);";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
@@ -42,8 +42,8 @@ public class UserDAO {
 
     public User deleteUser(User user) throws SQLException {
         String sql = "DELETE FROM `technopolis`.users WHERE id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, user.getId());
             statement.execute();
         }
@@ -58,8 +58,8 @@ public class UserDAO {
                 "email = ?,\n" +
                 "phone = ?\n" +
                 "WHERE id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
@@ -79,8 +79,8 @@ public class UserDAO {
                 "JOIN `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users AS u\n" +
                 "WHERE r.user_id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
             List<Review> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
@@ -124,8 +124,8 @@ public class UserDAO {
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
                 "JOIN `technopolis`.brands AS b ON p.brand_id = b.id\n" +
                 "WHERE ulp.user_id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
             List<Product> favorites = new ArrayList<>();
             ResultSet result = statement.executeQuery();
@@ -147,8 +147,8 @@ public class UserDAO {
         String sql = "SELECT id, address, price\n" +
                 "FROM `technopolis`.orders \n" +
                 "WHERE user_id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
             List<Order> orders = new ArrayList<>();
             ResultSet result = statement.executeQuery();
@@ -169,8 +169,8 @@ public class UserDAO {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
                 "FROM `technopolis`.users\n" +
                 "WHERE email = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
             if(!result.next()){
@@ -194,8 +194,8 @@ public class UserDAO {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
                 "FROM `technopolis`.users\n" +
                 "WHERE id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
             if(!result.next()){
@@ -233,8 +233,8 @@ public class UserDAO {
 
     public void makeAdmin(String email) throws SQLException {
         String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, true);
             statement.setString(2, email);
         }
@@ -242,8 +242,8 @@ public class UserDAO {
 
     public void removeAdmin(String email) throws SQLException {
         String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, false);
             statement.setString(2, email);
         }

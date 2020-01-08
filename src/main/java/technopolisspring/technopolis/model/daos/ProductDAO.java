@@ -21,8 +21,8 @@ public class ProductDAO {
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.brands AS b ON brand_id = b.id\n" +
                 "WHERE p.id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
             if(!result.next()){

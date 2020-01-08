@@ -24,8 +24,8 @@ public class AttributeDAO {
                 "FROM `technopolis`.attributes AS a\n" +
                 "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n" +
                 "WHERE a.id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
             return new Attribute(
@@ -40,8 +40,8 @@ public class AttributeDAO {
         String sql = "SELECT a.id, a.name, sc.name\n" +
                 "FROM `technopolis`.attributes AS a\n" +
                 "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
             List<Attribute> attributes = new ArrayList<>();
             while (result.next()){

@@ -17,8 +17,8 @@ public class ReviewDAO {
     public Review addReview(Review review, Product product, User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.reviews (name, title, comment, product_id, user_id)\n" +
                 "VALUES (?,?,?,?,?);";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, review.getName());
             statement.setString(2, review.getTitle());
             statement.setString(3, review.getComment());
@@ -38,8 +38,8 @@ public class ReviewDAO {
                 "title = ?,\n" +
                 "comment = ?\n" +
                 "WHERE id = ?;";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, review.getName());
             statement.setString(2, review.getTitle());
             statement.setString(3, review.getComment());
@@ -50,8 +50,8 @@ public class ReviewDAO {
 
     public void deleteReview(int id) throws SQLException {
         String sql = "DELETE FROM `technopolis`.reviews WHERE id = ?";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             statement.execute();
         }
