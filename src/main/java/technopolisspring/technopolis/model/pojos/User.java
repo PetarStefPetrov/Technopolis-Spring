@@ -41,12 +41,12 @@ public class User {
     private List<Review> reviews;
 
     public User (UserRegistrableDto reg){
-        firstName = reg.getFirstName();
-        lastName = reg.getLastName();
-        email = reg.getEmail();
-        password = reg.getPassword();
-        phone = reg.getPhone();
-        createTime = LocalDateTime.now();
-        address = reg.getAddress();
+        this.firstName = reg.getFirstName();
+        this.lastName = reg.getLastName();
+        this.email = reg.getEmail();
+        this.password = reg.getPassword();
+        this.phone = reg.getPhone();
+        this.createTime = LocalDateTime.now();
+        this.address = reg.getAddress();
     }
 }

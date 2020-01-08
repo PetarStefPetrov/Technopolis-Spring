@@ -13,14 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public class Offer {
 
-    private int id;
+    private long id;
     private String name;
     private double discountPercent;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private ConcurrentHashMap<Product, Double> products; // <product, price after discount>
 
-    public Offer(int id, String name, double discountPercent, LocalDateTime startDate, LocalDateTime endDate) {
+    public Offer(long id, String name, double discountPercent, LocalDateTime startDate, LocalDateTime endDate) {
         this.id = id;
         this.name = name;
         this.discountPercent = discountPercent;
@@ -29,7 +29,7 @@ public class Offer {
         this.products = new ConcurrentHashMap<>();
     }
 
-    public Offer(int id, String name, double discountPercent, LocalDateTime startDate, LocalDateTime endDate, Map<Product, Double> products) {
+    public Offer(long id, String name, double discountPercent, LocalDateTime startDate, LocalDateTime endDate, Map<Product, Double> products) {
         this(id, name, discountPercent, startDate, endDate);
         this.products.putAll(products);
     }
@@ -39,7 +39,7 @@ public class Offer {
         this.products.put(product, discountedPrice);
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 }

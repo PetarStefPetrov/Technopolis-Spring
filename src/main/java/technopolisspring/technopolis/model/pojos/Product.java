@@ -17,7 +17,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @Column
     private String description;
     @Column
@@ -32,7 +32,7 @@ public class Product {
     @OneToMany(mappedBy = "reviews")
     private List<Review> reviews; // <review_id, review>
 
-    public Product(int id, String description, double price, String pictureUrl, String brand, int subCategoryId) {
+    public Product(long id, String description, double price, String pictureUrl, String brand, int subCategoryId) {
         this.id = id;
         this.description = description;
         this.price = price;
@@ -42,7 +42,7 @@ public class Product {
         this.reviews = new ArrayList<>();
     }
 
-    public Product(int id, String description, double price, String pictureUrl, String brand,
+    public Product(long id, String description, double price, String pictureUrl, String brand,
                    int subCategoryId, List<Review> reviews) {
         this(id, description, price, pictureUrl, brand, subCategoryId);
         this.reviews.addAll(reviews);
@@ -56,7 +56,7 @@ public class Product {
         return price;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 }

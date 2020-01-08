@@ -35,14 +35,14 @@ public class Order {
         this.products = new ArrayList<>();
     }
 
-    public Order(int id, long userId, String address, double price) {
+    public Order(long id, long userId, String address, double price) {
         this(id, userId, address);
         this.price = price;
     }
 
     // Second one is because I'm not sure if we would only create orders by getting them from the db.
     // In that case the first one is not needed.
-    public Order(int id, int userId, String address, List<Product> products){
+    public Order(long id, int userId, String address, List<Product> products){
         this(id, userId, address);
         this.products.addAll(products);
         for (Product product : products) {

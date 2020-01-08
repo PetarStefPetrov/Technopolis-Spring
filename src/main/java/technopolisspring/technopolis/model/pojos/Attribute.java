@@ -9,11 +9,11 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Attribute {
 
-    private int id;
+    private long id;
     private String name;
     private String subCategory;
 
-    public Attribute(int id, String name, String subCategory) {
+    public Attribute(long id, String name, String subCategory) {
         this.id = id;
         this.name = name;
         this.subCategory = subCategory;
