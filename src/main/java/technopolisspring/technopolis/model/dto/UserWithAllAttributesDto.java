@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import technopolisspring.technopolis.model.daos.UserDAO;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -16,6 +17,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserWithAllAttributesDto {
+    @Autowired
+    private UserDAO userDao;
         private long id;
         private String firstName;
         private String lastName;
@@ -34,9 +37,8 @@ public class UserWithAllAttributesDto {
             phone = user.getPhone();
             createTime = user.getCreateTime();
             address = user.getAddress();
-            //TODO
-//            this.reviews = userDao.getReviews(this.id);
-//            this.favorites = userDao.getFavourites(this.id);
-//            this.orders = userDao.getOrders(this.id);
+            this.reviews = userDao.getReviews(this.id);
+            this.favorites = userDao.getFavourites(this.id);
+            this.orders = userDao.getOrders(this.id);
         }
 }

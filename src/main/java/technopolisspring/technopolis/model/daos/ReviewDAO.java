@@ -2,12 +2,13 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
-
+@Component
 public class ReviewDAO {
 
     @Autowired
