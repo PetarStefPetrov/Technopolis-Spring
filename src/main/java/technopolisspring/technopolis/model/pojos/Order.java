@@ -15,24 +15,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @NoArgsConstructor
 public class Order {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
     private long userId;
-    @Column
     private String address;
-    @Column
     private double price;
-    @Column
-    @OneToMany(mappedBy = "products")
-    private List<Product> products;
 
     private Order(long id, long userId, String address) {
         this.id = id;
         this.userId = userId;
         this.address = address;
-        this.products = new ArrayList<>();
     }
 
     public Order(long id, long userId, String address, double price) {
@@ -44,14 +35,12 @@ public class Order {
     // In that case the first one is not needed.
     public Order(long id, int userId, String address, List<Product> products){
         this(id, userId, address);
-        this.products.addAll(products);
         for (Product product : products) {
             this.price += product.getPrice();
         }
     }
 
     public void addProduct(Product product){
-        this.products.add(product);
         this.price += product.getPrice();
     }
 

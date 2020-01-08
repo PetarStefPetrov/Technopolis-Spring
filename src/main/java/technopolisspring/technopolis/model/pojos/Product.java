@@ -11,25 +11,14 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity
-@Table(name = "products")
 public class Product {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column
     private String description;
-    @Column
     private double price;
-    @Column
     private String pictureUrl;
-    @Column
     private String brand;
-    @Column
     private int subCategoryId;
-    @Column
-    @OneToMany(mappedBy = "reviews")
     private List<Review> reviews; // <review_id, review>
 
     public Product(long id, String description, double price, String pictureUrl, String brand, int subCategoryId) {
