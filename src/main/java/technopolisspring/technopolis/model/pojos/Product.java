@@ -18,10 +18,10 @@ public class Product {
     private double price;
     private String pictureUrl;
     private String brand;
-    private int subCategoryId;
+    private long subCategoryId;
     private List<Review> reviews; // <review_id, review>
 
-    public Product(long id, String description, double price, String pictureUrl, String brand, int subCategoryId) {
+    public Product(long id, String description, double price, String pictureUrl, String brand, long subCategoryId) {
         this.id = id;
         this.description = description;
         this.price = price;
@@ -32,7 +32,7 @@ public class Product {
     }
 
     public Product(long id, String description, double price, String pictureUrl, String brand,
-                   int subCategoryId, List<Review> reviews) {
+                   long subCategoryId, List<Review> reviews) {
         this(id, description, price, pictureUrl, brand, subCategoryId);
         this.reviews.addAll(reviews);
     }
@@ -48,4 +48,7 @@ public class Product {
     public long getId() {
         return id;
     }
+
+
+
 }
