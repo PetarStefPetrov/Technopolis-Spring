@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.dto.FilterForProductsDto;
+import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
@@ -13,8 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ProductDAO {
+public class ProductDao {
 
+    public static final int PAGE_SIZE = 20;
     @Autowired
     JdbcTemplate jdbcTemplate;
 
@@ -220,6 +223,85 @@ public class ProductDAO {
                         result.getLong("sub_category_id")
                 ));
         return products;
+    }
+
+    public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
+                "FROM technopolis.products AS p\n" +
+                "JOIN technopolis.brands AS b ON b.id = p.brand_id\n" +
+                "JOIN technopolis.sub_categories AS sc ON sc.id = p.sub_category_id\n" +
+                "WHERE ?\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
+        return jdbcTemplate.query(sql,
+                preparedStatement -> {
+                    preparedStatement.setString(1, filterSql(filterForProductsDto));
+                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
+                },
+                (result, i) -> new Product(
+                        result.getLong("id"),
+                        result.getString("description"),
+                        result.getDouble("price"),
+                        result.getString("picture_url"),
+                        result.getLong("brand_id"),
+                        result.getLong("sub_category_id")
+                )
+        );
+    }
+
+    private String filterSql(FilterForProductsDto filterForProductsDto) {
+        StringBuilder filters = new StringBuilder();
+        double minPrice = filterForProductsDto.getMinPrice();
+        double maxPrice = filterForProductsDto.getMaxPrice();
+        long subCategoryId = filterForProductsDto.getSubCategoryId();
+        long brandId = filterForProductsDto.getBrandId();
+        String sorted = filterForProductsDto.getSorted();
+        boolean withoutPriceRange = minPrice == 0 && maxPrice == 0;
+        if (!withoutPriceRange){
+            filters.append("(p.price BETWEEN ");
+            filters.append(minPrice);
+            filters.append(" AND ");
+            filters.append(maxPrice);
+            filters.append(")");
+            if (subCategoryId != 0){
+                filters.append(" AND p.sub_category_id = ");
+                filters.append(subCategoryId);
+            }
+            if (brandId != 0){
+                filters.append(" AND b.brand_id = ");
+                filters.append(brandId);
+            }
+        }
+        else {
+            if (subCategoryId != 0){
+                filters.append("p.sub_category_id = ");
+                filters.append(subCategoryId);
+                if (brandId != 0){
+                    filters.append(" AND b.brand_id = ");
+                    filters.append(brandId);
+                }
+            }
+            else {
+                if (brandId != 0){
+                    filters.append("b.brand_id = ");
+                    filters.append(brandId);
+                }
+            }
+        }
+        if (sorted != null && !sorted.trim().isEmpty()){
+            if (sorted.equalsIgnoreCase("asc") || sorted.equalsIgnoreCase("ascending")){
+                filters.append("\n");
+                filters.append("ORDER BY price ASC");
+                filters.append("\n");
+            }
+            if (sorted.equalsIgnoreCase("desc") || sorted.equalsIgnoreCase("descending")){
+                filters.append("\n");
+                filters.append("ORDER BY price DESC");
+                filters.append("\n");
+            }
+        }
+        return filters.toString();
     }
 
 }

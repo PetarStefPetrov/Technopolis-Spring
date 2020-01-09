@@ -1,12 +1,10 @@
 package technopolisspring.technopolis.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.daos.UserDAO;
+import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -14,7 +12,6 @@ import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 @Getter
 @Setter
@@ -22,7 +19,7 @@ import java.util.List;
 public class UserWithAllAttributesDto {
 
     @Autowired
-    private UserDAO userDao;
+    private UserDao userDao;
     private long id;
     private String firstName;
     private String lastName;

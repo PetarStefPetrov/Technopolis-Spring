@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserDAO {
+public class UserDao {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

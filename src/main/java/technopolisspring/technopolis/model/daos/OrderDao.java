@@ -7,9 +7,7 @@ import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Component
@@ -19,7 +17,7 @@ public class OrderDao {
     JdbcTemplate jdbcTemplate;
 
     @Autowired
-    ProductDAO productDAO;
+    ProductDao productDAO;
 
     public Order addOrder(Order order) throws SQLException {
         String orderSql = "INSERT INTO `technopolis`.`orders` " +

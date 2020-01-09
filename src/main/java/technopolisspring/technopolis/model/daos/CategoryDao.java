@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CategoryDAO {
+public class CategoryDao {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

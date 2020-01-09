@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AttributeDAO {
+public class AttributeDao {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

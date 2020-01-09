@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-import technopolisspring.technopolis.model.daos.CategoryDAO;
+import technopolisspring.technopolis.model.daos.CategoryDao;
 import technopolisspring.technopolis.model.exception.GlobalException;
 import technopolisspring.technopolis.model.pojos.Product;
 
@@ -15,7 +15,7 @@ import java.util.Map;
 @RestController
 public class CategoryController  extends GlobalException {
     @Autowired
-    public CategoryDAO categoryDAO;
+    public CategoryDao categoryDAO;
 
     @GetMapping("categories/")
     public Map<Long,String> allCategories() throws SQLException {

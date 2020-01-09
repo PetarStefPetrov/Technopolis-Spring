@@ -9,7 +9,7 @@ import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
 @Component
-public class ReviewDAO {
+public class ReviewDao {
 
     @Autowired
     JdbcTemplate jdbcTemplate;

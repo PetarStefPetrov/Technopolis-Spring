@@ -3,7 +3,7 @@ package technopolisspring.technopolis.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.OrderDao;
-import technopolisspring.technopolis.model.daos.ProductDAO;
+import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
@@ -11,7 +11,6 @@ import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.User;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -24,7 +23,7 @@ public class OrderController extends GlobalException {
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
     public static final String SESSION_KEY_BASKET_USER = "user_basket";
     @Autowired
-    public ProductDAO productDAO;
+    public ProductDao productDAO;
     @Autowired
     public OrderDao orderDao;
 

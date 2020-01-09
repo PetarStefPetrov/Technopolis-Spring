@@ -2,9 +2,9 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import technopolisspring.technopolis.model.daos.ProductDAO;
-import technopolisspring.technopolis.model.daos.ReviewDAO;
-import technopolisspring.technopolis.model.daos.UserDAO;
+import technopolisspring.technopolis.model.daos.ProductDao;
+import technopolisspring.technopolis.model.daos.ReviewDao;
+import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
@@ -19,17 +19,16 @@ import technopolisspring.technopolis.model.pojos.User;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 public class UserController extends GlobalException {
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
     @Autowired
-    private UserDAO userDAO;
+    private UserDao userDAO;
     @Autowired
-    private ReviewDAO reviewDAO;
+    private ReviewDao reviewDAO;
     @Autowired
-    private ProductDAO productDAO;
+    private ProductDao productDAO;
 
 
     @PostMapping("users/login")

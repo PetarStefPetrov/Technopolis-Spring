@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.List;
 
 @Component
-    public class OfferDAO {
+    public class OfferDao {
 
         @Autowired
         JdbcTemplate jdbcTemplate;

@@ -1,14 +1,9 @@
 package technopolisspring.technopolis.controller;
 
-import org.hibernate.event.internal.ReattachVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
-import technopolisspring.technopolis.model.daos.ProductDAO;
-import technopolisspring.technopolis.model.daos.UserDAO;
-import technopolisspring.technopolis.model.dto.ProductDto;
+import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.model.daos.ProductDao;
+import technopolisspring.technopolis.model.dto.FilterForProductsDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
 import technopolisspring.technopolis.model.pojos.Product;
@@ -23,7 +18,7 @@ public class ProductController extends GlobalException {
 
     public static final int MAX_POSSIBLE_PRODUCT_PRICE = 1000000;
     @Autowired
-    private ProductDAO productDAO;
+    private ProductDao productDAO;
 
     @GetMapping("products/{product_id}")
     public Product getProduct(@PathVariable long product_id) throws SQLException {
@@ -77,6 +72,28 @@ public class ProductController extends GlobalException {
             throw new BadRequestException("invalid price range");
         }
         return productDAO.getProductsWithPriceRange(lowerLimit, upperLimit);
+    }
+
+    @PostMapping("products/filters/page/{pageNumber}")
+    public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto,
+                                                @PathVariable int pageNumber) {
+        if (    filterForProductsDto.getBrandId() == 0 &&
+                filterForProductsDto.getSubCategoryId() == 0 &&
+                filterForProductsDto.getMaxPrice() == 0 &&
+                filterForProductsDto.getMinPrice() == 0) {
+            throw new BadRequestException("invalid arguments");
+        }
+        if (    filterForProductsDto.getBrandId() < 0 ||
+                filterForProductsDto.getSubCategoryId() < 0 ||
+                filterForProductsDto.getMaxPrice() < 0 ||
+                filterForProductsDto.getMinPrice() < 0 ||
+                pageNumber < 1) {
+            throw new BadRequestException("invalid arguments");
+        }
+        if (filterForProductsDto.getMaxPrice() < filterForProductsDto.getMinPrice()) {
+            throw new BadRequestException("invalid arguments");
+        }
+        return productDAO.getProductsWithFilters(filterForProductsDto, pageNumber);
     }
 
 }
