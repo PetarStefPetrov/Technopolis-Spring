@@ -17,23 +17,23 @@ public class Product {
     private String description;
     private double price;
     private String pictureUrl;
-    private String brand;
+    private long brandId;
     private long subCategoryId;
     private List<Review> reviews; // <review_id, review>
 
-    public Product(long id, String description, double price, String pictureUrl, String brand, long subCategoryId) {
+    public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId) {
         this.id = id;
         this.description = description;
         this.price = price;
         this.pictureUrl = pictureUrl;
-        this.brand = brand;
+        this.brandId = brandId;
         this.subCategoryId = subCategoryId;
         this.reviews = new ArrayList<>();
     }
 
-    public Product(long id, String description, double price, String pictureUrl, String brand,
+    public Product(long id, String description, double price, String pictureUrl, long brandId,
                    long subCategoryId, List<Review> reviews) {
-        this(id, description, price, pictureUrl, brand, subCategoryId);
+        this(id, description, price, pictureUrl, brandId, subCategoryId);
         this.reviews.addAll(reviews);
     }
 

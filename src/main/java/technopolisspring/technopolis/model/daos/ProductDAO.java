@@ -14,9 +14,8 @@ public class ProductDAO {
     JdbcTemplate jdbcTemplate;
 
     public Product getProductById(long id) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, b.name, p.sub_category_id\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
                 "FROM `technopolis`.products AS p\n" +
-                "JOIN `technopolis`.brands AS b ON brand_id = b.id\n" +
                 "WHERE p.id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -30,7 +29,7 @@ public class ProductDAO {
                     result.getString("p.description"),
                     result.getDouble("p.price"),
                     result.getString("p.picture_url"),
-                    result.getString("b.name"),
+                    result.getLong("p.brand_id"),
                     result.getLong("p.sub_category_id")
             );
             return product;
@@ -38,9 +37,12 @@ public class ProductDAO {
     }
 
     public Product addProduct(Product product) throws SQLException {
-        String sql = "";
+        String sql = "INSERT INTO `technopolis`.`products` " +
+                "(`id`, `description`, `price`, `picture_url`, `brand_id`, `sub_category_id`) " +
+                "VALUES (?, ?, ?, ?, ?, ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            // todo set values
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             if(!resultSet.next()){
