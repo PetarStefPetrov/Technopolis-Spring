@@ -28,7 +28,7 @@ public class OrderController extends GlobalException {
     @Autowired
     public OrderDao orderDao;
 
-    @GetMapping("/orders/add")
+    @PostMapping("/orders/add")
     public Order addOrder(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -85,7 +85,7 @@ public class OrderController extends GlobalException {
         return basket;
     }
 
-    @GetMapping("orders/products")
+    @PostMapping("orders/products")
     public Map<Product, Integer> removeProductToBuy(HttpSession session) throws SQLException {
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
