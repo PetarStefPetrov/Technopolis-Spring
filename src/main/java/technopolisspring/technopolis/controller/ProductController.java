@@ -21,6 +21,7 @@ import java.util.List;
 @RestController
 public class ProductController extends GlobalException {
 
+    public static final int MAX_POSSIBLE_PRODUCT_PRICE = 1000000;
     @Autowired
     private ProductDAO productDAO;
 
@@ -68,6 +69,14 @@ public class ProductController extends GlobalException {
     public List<Product> sortByPriceDesc(List<Product> products){
         products.sort(Comparator.comparing(Product::getPrice).reversed());
         return products;
+    }
+
+    @GetMapping("products/from/{lowerLimit}/to/{upperLimit}")
+    public List<Product> getProductsWithPriceRange(@PathVariable double lowerLimit, @PathVariable double upperLimit) {
+        if (lowerLimit < 0 || upperLimit > MAX_POSSIBLE_PRODUCT_PRICE){
+            throw new BadRequestException("invalid price range");
+        }
+        return productDAO.getProductsWithPriceRange(lowerLimit, upperLimit);
     }
 
 }

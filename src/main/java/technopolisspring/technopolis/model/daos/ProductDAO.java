@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -198,6 +199,26 @@ public class ProductDAO {
                 result.getLong("brand_id"),
                 result.getLong("sub_category_id")
         ));
+        return products;
+    }
+
+    public List<Product> getProductsWithPriceRange(double lowerLimit, double upperLimit) {
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
+                "FROM technopolis.products\n" +
+                "WHERE price BETWEEN ? AND ?;";
+        List<Product> products = jdbcTemplate.query(sql,
+                preparedStatement -> {
+                    preparedStatement.setDouble(1, lowerLimit);
+                    preparedStatement.setDouble(2, upperLimit);
+                },
+                (result, i) -> new Product(
+                        result.getLong("id"),
+                        result.getString("description"),
+                        result.getDouble("price"),
+                        result.getString("picture_url"),
+                        result.getLong("brand_id"),
+                        result.getLong("sub_category_id")
+                ));
         return products;
     }
 
