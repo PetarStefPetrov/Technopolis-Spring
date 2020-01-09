@@ -85,7 +85,7 @@ public class ProductDAO {
         return products;
     }
 
-    public Product getProductBySubCategory(long subCategoryId) throws SQLException {
+    public List<Product> getProductsBySubCategory(long subCategoryId) throws SQLException {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
                 "FROM `technopolis`.products\n" +
                 "WHERE sub_category_id = ?;";
@@ -93,22 +93,23 @@ public class ProductDAO {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, subCategoryId);
             ResultSet result = statement.executeQuery();
-            if(!result.next()){
-                return null;
+            List<Product> products = new ArrayList<>();
+            while (result.next()) {
+                Product product = new Product(
+                        result.getLong("p.id"),
+                        result.getString("p.description"),
+                        result.getDouble("p.price"),
+                        result.getString("p.picture_url"),
+                        result.getLong("p.brand_id"),
+                        result.getLong("p.sub_category_id")
+                );
+                products.add(product);
             }
-            Product product = new Product(
-                    result.getLong("p.id"),
-                    result.getString("p.description"),
-                    result.getDouble("p.price"),
-                    result.getString("p.picture_url"),
-                    result.getLong("p.brand_id"),
-                    result.getLong("p.sub_category_id")
-            );
-            return product;
+            return products;
         }
     }
 
-    public Product getProductByCategory(long categoryId) throws SQLException {
+    public List<Product> getProductsByCategory(long categoryId) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.sub_categories AS sc ON sc.id = p.sub_category_id\n" +
@@ -118,18 +119,19 @@ public class ProductDAO {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, categoryId);
             ResultSet result = statement.executeQuery();
-            if(!result.next()){
-                return null;
+            List<Product> products = new ArrayList<>();
+            while (result.next()) {
+                Product product = new Product(
+                        result.getLong("p.id"),
+                        result.getString("p.description"),
+                        result.getDouble("p.price"),
+                        result.getString("p.picture_url"),
+                        result.getLong("p.brand_id"),
+                        result.getLong("p.sub_category_id")
+                );
+                products.add(product);
             }
-            Product product = new Product(
-                    result.getLong("p.id"),
-                    result.getString("p.description"),
-                    result.getDouble("p.price"),
-                    result.getString("p.picture_url"),
-                    result.getLong("p.brand_id"),
-                    result.getLong("p.sub_category_id")
-            );
-            return product;
+            return products;
         }
     }
 
