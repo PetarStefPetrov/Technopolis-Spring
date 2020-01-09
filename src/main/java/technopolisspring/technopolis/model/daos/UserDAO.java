@@ -19,7 +19,7 @@ public class UserDAO {
     JdbcTemplate jdbcTemplate;
 
     public User registerUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (first_name, last_name, email, password, phone, address,is_admin)\n" +
+        String sql = "INSERT INTO `technopolis`.users (first_name, last_name, email, password, phone, address,is_admin)\n" +
                 "VALUES (?,?,?,?,?,?,?);";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -41,7 +41,7 @@ public class UserDAO {
 
 
     public User deleteUser(User user) throws SQLException {
-        String sql = "DELETE FROM users WHERE id = ?;";
+        String sql = "DELETE FROM `technopolis`.users WHERE id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, user.getId());
@@ -51,7 +51,7 @@ public class UserDAO {
     }
 
     public User editUser(User user) throws SQLException {
-        String sql = "UPDATE users\n" +
+        String sql = "UPDATE `technopolis`.users\n" +
                 "SET \n" +
                 "first_name = ?,\n" +
                 "last_name = ?,\n" +
@@ -75,9 +75,9 @@ public class UserDAO {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
-                "FROM reviews AS r\n" +
-                "JOIN products AS p\n" +
-                "JOIN users AS u\n" +
+                "FROM `technopolis`.reviews AS r\n" +
+                "JOIN `technopolis`.products AS p\n" +
+                "JOIN `technopolis`.users AS u\n" +
                 "WHERE r.user_id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -120,9 +120,9 @@ public class UserDAO {
 
     public List<Product> getFavourites(long userId) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, b.name, p.sub_category_id\n" +
-                "FROM products AS p\n" +
-                "JOIN users_like_products AS ulp ON p.id = ulp.product_id\n" +
-                "JOIN brands AS b ON p.brand_id = b.id\n" +
+                "FROM `technopolis`.products AS p\n" +
+                "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
+                "JOIN `technopolis`.brands AS b ON p.brand_id = b.id\n" +
                 "WHERE ulp.user_id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -145,7 +145,7 @@ public class UserDAO {
     }
     public List<Order> getOrders(long userId) throws SQLException {
         String sql = "SELECT id, address, price\n" +
-                "FROM orders \n" +
+                "FROM `technopolis`.orders \n" +
                 "WHERE user_id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -167,7 +167,7 @@ public class UserDAO {
 
     public User getUserByEmail(String email) throws SQLException {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
-                "FROM users\n" +
+                "FROM `technopolis`.users\n" +
                 "WHERE email = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -192,7 +192,7 @@ public class UserDAO {
 
     public User getUserById(long id) throws SQLException {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
-                "FROM users\n" +
+                "FROM `technopolis`.users\n" +
                 "WHERE id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -216,7 +216,7 @@ public class UserDAO {
     }
 
     public List<User> getAll() {
-        String sql = "SELECT * FROM users;";
+        String sql = "SELECT * FROM `technopolis`.users;";
         List<User> users = jdbcTemplate.query(sql, (result, i) -> new User(
                 result.getLong("id"),
                 result.getString("first_name"),
@@ -229,6 +229,24 @@ public class UserDAO {
                 result.getBoolean("is_admin")
         ));
         return users;
+    }
+
+    public void makeAdmin(String email) throws SQLException {
+        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, true);
+            statement.setString(2, email);
+        }
+    }
+
+    public void removeAdmin(String email) throws SQLException {
+        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, false);
+            statement.setString(2, email);
+        }
     }
 
 }

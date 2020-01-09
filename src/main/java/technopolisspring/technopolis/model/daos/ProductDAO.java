@@ -18,8 +18,8 @@ public class ProductDAO {
 
     public Product getProductById(long id) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, b.name, p.sub_category_id\n" +
-                "FROM products AS p\n" +
-                "JOIN brands AS b ON brand_id = b.id\n" +
+                "FROM `technopolis`.products AS p\n" +
+                "JOIN `technopolis`.brands AS b ON brand_id = b.id\n" +
                 "WHERE p.id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {

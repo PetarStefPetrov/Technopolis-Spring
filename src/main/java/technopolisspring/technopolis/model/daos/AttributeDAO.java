@@ -21,8 +21,8 @@ public class AttributeDAO {
 
     public Attribute getAttributeById(long id) throws SQLException {
         String sql = "SELECT a.id, a.name, sc.name\n" +
-                "FROM attributes AS a\n" +
-                "JOIN sub_categories AS sc ON sc.id = a.sub_category_id\n" +
+                "FROM `technopolis`.attributes AS a\n" +
+                "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n" +
                 "WHERE a.id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -38,8 +38,8 @@ public class AttributeDAO {
 
     public List<Attribute> getAllAttributes() throws SQLException {
         String sql = "SELECT a.id, a.name, sc.name\n" +
-                "FROM attributes AS a\n" +
-                "JOIN sub_categories AS sc ON sc.id = a.sub_category_id\n";
+                "FROM `technopolis`.attributes AS a\n" +
+                "JOIN `technopolis`.sub_categories AS sc ON sc.id = a.sub_category_id\n";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
