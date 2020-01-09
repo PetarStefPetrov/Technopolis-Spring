@@ -189,7 +189,7 @@ public class UserDAO {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 Order order = new Order(
-                        result.getInt("id"),
+                        result.getLong("id"),
                         userId,
                         result.getString("address"),
                         result.getDouble("price")

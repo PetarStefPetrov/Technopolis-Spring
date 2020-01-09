@@ -8,10 +8,12 @@ import technopolisspring.technopolis.model.dto.ProductDto;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
+
 public class Product {
 
     private long id;
@@ -58,5 +60,21 @@ public class Product {
     }
 
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Product product = (Product) o;
+        return id == product.id &&
+                Double.compare(product.price, price) == 0 &&
+                brandId == product.brandId &&
+                subCategoryId == product.subCategoryId &&
+                Objects.equals(description, product.description) &&
+                Objects.equals(pictureUrl, product.pictureUrl);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, description, price, pictureUrl, brandId, subCategoryId, reviews);
+    }
 }
