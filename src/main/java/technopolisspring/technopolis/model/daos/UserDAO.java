@@ -153,14 +153,17 @@ public class UserDAO {
         }
     }
 
-    public void removeFromFavorites(long productId, long userId) throws SQLException {
+    public boolean removeFromFavorites(long productId, long userId) throws SQLException {
         String sql = "DELETE FROM `technopolis`.`users_like_products` " +
                 "WHERE (`product_id` = ?) and (`user_id` = ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
             statement.setLong(2, userId);
-            statement.execute();
+            if (statement.executeUpdate() == 0){
+                return false;
+            }
+            return true;
         }
     }
 
