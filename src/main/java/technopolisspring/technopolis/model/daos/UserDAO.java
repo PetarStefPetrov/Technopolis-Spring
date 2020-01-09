@@ -173,6 +173,7 @@ public class UserDAO {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
             ResultSet result = statement.executeQuery();
+            result.next();
             return result.getBoolean("is_admin");
         }
     }
@@ -266,20 +267,20 @@ public class UserDAO {
     }
 
     public void makeAdmin(String email) throws SQLException {
-        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
+        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = 1 WHERE `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setBoolean(1, true);
-            statement.setString(2, email);
+            statement.setString(1, email);
+            statement.execute();
         }
     }
 
     public void removeAdmin(String email) throws SQLException {
-        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = '?' WHERE (`email` = '?');";
+        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = 0 WHERE `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setBoolean(1, false);
-            statement.setString(2, email);
+            statement.setString(1, email);
+            statement.execute();
         }
     }
 
