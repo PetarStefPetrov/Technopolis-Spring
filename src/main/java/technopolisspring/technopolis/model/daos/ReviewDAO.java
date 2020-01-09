@@ -24,9 +24,10 @@ public class ReviewDAO {
             statement.setString(3, review.getComment());
             statement.setLong(4, product.getId());
             statement.setLong(5, user.getId());
+            statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
-            review.setId(resultSet.getLong("id"));
+            review.setId(resultSet.getInt(1));
             return review;
         }
     }
