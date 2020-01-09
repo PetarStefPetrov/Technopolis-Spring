@@ -25,6 +25,9 @@ public class ProductDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
+            if(!result.next()){
+                return null;
+            }
             Product product = new Product(
                     result.getLong("p.id"),
                     result.getString("p.description"),

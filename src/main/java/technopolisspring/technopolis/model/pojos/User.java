@@ -22,7 +22,7 @@ public class User {
     private String phone;
     private LocalDateTime createTime;
     private String address;
-    private boolean isAdmin;
+    private boolean isAdmin = false;
     private List<Review> reviews;
 
     public User (UserRegistrableDto reg){

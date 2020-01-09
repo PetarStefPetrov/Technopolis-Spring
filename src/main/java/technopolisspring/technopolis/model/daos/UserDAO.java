@@ -19,8 +19,8 @@ public class UserDAO {
     JdbcTemplate jdbcTemplate;
 
     public User registerUser(User user) throws SQLException {
-        String sql = "INSERT INTO users (first_name, last_name, email, password, phone, address)\n" +
-                "VALUES (?,?,?,?,?);";
+        String sql = "INSERT INTO users (first_name, last_name, email, password, phone, address,is_admin)\n" +
+                "VALUES (?,?,?,?,?,?,?);";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getFirstName());
@@ -28,10 +28,13 @@ public class UserDAO {
             statement.setString(3, user.getEmail());
             statement.setString(4, user.getPassword());
             statement.setString(5, user.getPhone());
+            statement.setString(6,user.getAddress());
+            statement.setBoolean(7,false);
+            statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
-            user.setId(resultSet.getLong("id"));
-            statement.execute();
+            user.setId(resultSet.getInt(1));
+
             return user;
         }
     }

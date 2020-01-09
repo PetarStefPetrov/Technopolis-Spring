@@ -2,6 +2,7 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.model.daos.ProductDAO;
 import technopolisspring.technopolis.model.daos.ReviewDAO;
 import technopolisspring.technopolis.model.daos.UserDAO;
 import technopolisspring.technopolis.model.dto.*;
@@ -30,6 +31,8 @@ public class UserController extends GlobalException {
     private UserDAO userDAO;
     @Autowired
     private ReviewDAO reviewDAO;
+    @Autowired
+    private ProductDAO productDAO;
 
 
     @PostMapping("users/login")
@@ -148,9 +151,17 @@ public class UserController extends GlobalException {
     }
 
     @PostMapping("users/add_review/{product_id}")
-    public void addReview(@RequestBody Review review,HttpSession session, @PathVariable(name = "product_id") long id){
-
-        //Review reviews = reviewDAO.addReview(review)
+    public Review addReview(@RequestBody Review review,HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        Product product = productDAO.getProductById(id);
+        if(product == null){
+            throw new BadRequestException("Invalid Product");
+        }
+        Review reviews = reviewDAO.addReview(review,product,user);
+        return reviews;
     }
 
 
