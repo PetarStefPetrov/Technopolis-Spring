@@ -48,7 +48,7 @@ public class UserController extends GlobalException {
 
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session) throws SQLException {
-        //TODO Validation email and password (valid name and email exists)
+        //TODO Cript password
         if(userDAO.getUserByEmail(userRegistrableDto.getEmail()) != null){
             throw  new BadRequestException("Email is exist");
         }
@@ -92,7 +92,7 @@ public class UserController extends GlobalException {
         return new UserWithoutPasswordDto(user);
     }
 
-    @PostMapping("users/profile")
+    @GetMapping("users/profile/")
     public UserWithAllAttributesDto getProfile(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -107,7 +107,7 @@ public class UserController extends GlobalException {
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        if(!user.isAdmin()){
+        if(userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
         User save = userDAO.getUserById(id);
@@ -118,12 +118,12 @@ public class UserController extends GlobalException {
     }
 
     @GetMapping("users/")
-    public List<User> allUsers(HttpSession session) {
+    public List<User> allUsers(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        if(!user.isAdmin()){
+        if(userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
         return userDAO.getAll();
@@ -179,7 +179,7 @@ public class UserController extends GlobalException {
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        //TODO
+        userDAO.addToFavorites(product.getId(),user.getId());
     }
 
 
