@@ -23,25 +23,27 @@ public class UserWithAllAttributesDto {
 
     @Autowired
     private UserDAO userDao;
-        private long id;
-        private String firstName;
-        private String lastName;
-        private String email;
-        private String phone;
-        private LocalDateTime createTime;
-        private String address;
-        private List<Review> reviews;
-        private List<Product> favorites;
-        private List<Order> orders ;
+    private long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phone;
+    private LocalDateTime createTime;
+    private String address;
+    private List<Review> reviews;
+    private List<Product> favorites;
+    private List<Order> orders;
 
-        public UserWithAllAttributesDto(User user,List<Review> reviews,List<Product> favorites,List<Order> orders) throws SQLException {
-            id= user.getId();
-            firstName = user.getFirstName();
-            lastName = user.getLastName();
-            email = user.getEmail();
-            phone = user.getPhone();
-            createTime = user.getCreateTime();
-            address = user.getAddress();
-            this.orders = orders;
-            this.favorites = favorites;
-            this.reviews = reviews;
+    public UserWithAllAttributesDto(User user, List<Review> reviews, List<Product> favorites, List<Order> orders) throws SQLException {
+        id = user.getId();
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        email = user.getEmail();
+        phone = user.getPhone();
+        createTime = user.getCreateTime();
+        address = user.getAddress();
+        this.orders = orders;
+        this.favorites = favorites;
+        this.reviews = reviews;
+    }
+}
