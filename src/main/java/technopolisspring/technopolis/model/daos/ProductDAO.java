@@ -149,6 +149,8 @@ public class ProductDAO {
             List<Review> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
+                // for some reason I'm constructing the product for which I'm asked of its reviews
+                // todo remove that
                 Product product = new Product(
                         result.getLong("p.id"),
                         result.getString("p.description"),
@@ -180,6 +182,23 @@ public class ProductDAO {
             }
             return reviews;
         }
+    }
+
+    public List<Product> lookForProductByDescription(String description) {
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
+                "FROM technopolis.products\n" +
+                "WHERE description LIKE ?;";
+        List<Product> products = jdbcTemplate.query(sql,
+                ps -> ps.setString(1, "%" + description + "%"),
+                (result, i) -> new Product(
+                result.getLong("id"),
+                result.getString("description"),
+                result.getDouble("price"),
+                result.getString("picture_url"),
+                result.getLong("brand_id"),
+                result.getLong("sub_category_id")
+        ));
+        return products;
     }
 
 }
