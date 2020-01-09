@@ -98,7 +98,10 @@ public class UserController extends GlobalException {
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        return new UserWithAllAttributesDto(user);
+        return new UserWithAllAttributesDto(user,
+                                            userDAO.getReviews(user.getId()),
+                                            userDAO.getFavourites(user.getId()),
+                                            userDAO.getOrders(user.getId()));
     }
 
     @GetMapping("users/{id}")
