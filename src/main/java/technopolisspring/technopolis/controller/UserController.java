@@ -184,6 +184,18 @@ public class UserController extends GlobalException {
         }
         userDAO.addToFavorites(product.getId(),user.getId());
     }
-
-
+    @PostMapping("users/remove_from_favorites/{product_id}")
+    public void removeFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        Product product = productDAO.getProductById(id);
+        if(product == null){
+            throw new BadRequestException("Invalid Product");
+        }
+        if(!userDAO.removeFromFavorites(product.getId(),user.getId())){
+            throw new BadRequestException("Dont have this product, in yours favorites");
+        }
+    }
 }
