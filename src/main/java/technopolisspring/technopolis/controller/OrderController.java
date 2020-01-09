@@ -85,7 +85,7 @@ public class OrderController extends GlobalException {
         return basket;
     }
 
-    @PostMapping("orders/products")
+    @GetMapping("orders/products")
     public Map<Product, Integer> removeProductToBuy(HttpSession session) throws SQLException {
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
