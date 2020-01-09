@@ -169,6 +169,18 @@ public class UserController extends GlobalException {
         Review reviews = reviewDAO.addReview(review,product,user);
         return reviews;
     }
+    @PostMapping("users/add_to_favorites/{product_id}")
+    public void addFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        Product product = productDAO.getProductById(id);
+        if(product == null){
+            throw new BadRequestException("Invalid Product");
+        }
+        //TODO
+    }
 
 
 }
