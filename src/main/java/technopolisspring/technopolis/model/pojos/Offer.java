@@ -39,7 +39,4 @@ public class Offer {
         this.products.put(product, discountedPrice);
     }
 
-    public long getId() {
-        return id;
-    }
 }
