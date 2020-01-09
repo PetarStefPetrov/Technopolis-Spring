@@ -20,6 +20,9 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class UserWithAllAttributesDto {
+
+    @Autowired
+    private UserDAO userDao;
         private long id;
         private String firstName;
         private String lastName;
@@ -42,5 +45,3 @@ public class UserWithAllAttributesDto {
             this.orders = orders;
             this.favorites = favorites;
             this.reviews = reviews;
-        }
-}
