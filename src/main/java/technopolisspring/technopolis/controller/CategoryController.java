@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import technopolisspring.technopolis.model.daos.CategoryDAO;
 import technopolisspring.technopolis.model.exception.GlobalException;
+import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,6 +28,10 @@ public class CategoryController  extends GlobalException {
     @GetMapping("brands/")
     public Map<Long,String> getAllBrands(){
         return categoryDAO.getAllBrands();
+    }
+    @GetMapping("brands/{brand_id}")
+    public List<Product> getAllProductsByBrand(@PathVariable long brand_id){
+        return categoryDAO.getProductById();
     }
 
 
