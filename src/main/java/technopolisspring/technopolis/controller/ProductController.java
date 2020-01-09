@@ -4,6 +4,7 @@ import org.hibernate.event.internal.ReattachVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import technopolisspring.technopolis.model.daos.ProductDAO;
 import technopolisspring.technopolis.model.daos.UserDAO;
@@ -14,6 +15,7 @@ import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 
 import java.sql.SQLException;
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -51,9 +53,21 @@ public class ProductController extends GlobalException {
         return productDAO.getReviews(product_id);
     }
 
-    @GetMapping("localhost:666/products/{description}")
+    @GetMapping("products/{description}")
     public List<Product> lookForProductsByDescription(@PathVariable String description) {
         return productDAO.lookForProductByDescription(description);
+    }
+
+    @PutMapping("products/asc")
+    public List<Product> sortByPriceAsc(List<Product> products){
+        products.sort(Comparator.comparing(Product::getPrice));
+        return products;
+    }
+
+    @PutMapping("products/desc")
+    public List<Product> sortByPriceDesc(List<Product> products){
+        products.sort(Comparator.comparing(Product::getPrice).reversed());
+        return products;
     }
 
 }
