@@ -3,6 +3,7 @@ package technopolisspring.technopolis.model.pojos;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import technopolisspring.technopolis.model.dto.ProductDto;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -35,6 +36,13 @@ public class Product {
                    long subCategoryId, List<Review> reviews) {
         this(id, description, price, pictureUrl, brandId, subCategoryId);
         this.reviews.addAll(reviews);
+    }
+    public Product (ProductDto productDto){
+        this.description = productDto.getDescription();
+        this.brandId = productDto.getBrandId();
+        this.subCategoryId = productDto.getSubCategoryId();
+        this.price = productDto.getPrice();
+        this.pictureUrl = productDto.getPictureUrl();
     }
 
     public void addReview(Review review){

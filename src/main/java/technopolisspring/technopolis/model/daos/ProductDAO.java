@@ -96,12 +96,12 @@ public class ProductDAO {
             List<Product> products = new ArrayList<>();
             while (result.next()) {
                 Product product = new Product(
-                        result.getLong("p.id"),
-                        result.getString("p.description"),
-                        result.getDouble("p.price"),
-                        result.getString("p.picture_url"),
-                        result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id")
+                        result.getLong("id"),
+                        result.getString("description"),
+                        result.getDouble("price"),
+                        result.getString("picture_url"),
+                        result.getLong("brand_id"),
+                        result.getLong("sub_category_id")
                 );
                 products.add(product);
             }
@@ -114,7 +114,7 @@ public class ProductDAO {
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.sub_categories AS sc ON sc.id = p.sub_category_id\n" +
                 "JOIN `technopolis`.categories AS c ON c.id = sc.category_id\n" +
-                "WHERE c.id = 1;";
+                "WHERE c.id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, categoryId);

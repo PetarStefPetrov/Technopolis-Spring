@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.controller;
 
+import org.hibernate.event.internal.ReattachVisitor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +10,7 @@ import technopolisspring.technopolis.model.daos.UserDAO;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
 import technopolisspring.technopolis.model.pojos.Product;
+import technopolisspring.technopolis.model.pojos.Review;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -30,8 +32,17 @@ public class ProductController extends GlobalException {
     public List<Product> getAllProducts(){
         return productDAO.getAllProducts();
     }
-    @GetMapping("products/category/{category_id}")
+    @GetMapping("products/categories/{category_id}")
     public List<Product> getAllProductByCategory(@PathVariable long category_id) throws SQLException {
-        return productDAO.getProductByCategory(category_id);
+        return productDAO.getProductsByCategory(category_id);
     }
+    @GetMapping("products/sub_categories/{sub_category_id}")
+    public List<Product> getAllProductBySubCategory(@PathVariable long sub_category_id) throws SQLException {
+        return productDAO.getProductsBySubCategory(sub_category_id);
+    }
+    @GetMapping("products/reviews/{product_id}")
+    public List<Review> getAllReviewForProduct(@PathVariable long product_id) throws SQLException {
+        return productDAO.getReviews(product_id);
+    }
+
 }

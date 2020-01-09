@@ -23,8 +23,6 @@ import java.util.Optional;
 
 @RestController
 public class UserController extends GlobalException {
-
-
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
     @Autowired
     private UserDAO userDAO;
