@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +26,7 @@ public class Order {
         this.id = id;
         this.userId = userId;
         this.address = address;
-        this.products = new ArrayList<>();
+        this.products = new HashMap<>();
     }
 
     public Order(long id, long userId, String address, double price) {
@@ -34,18 +35,19 @@ public class Order {
     }
     // Second one is because I'm not sure if we would only create orders by getting them from the db.
     // In that case the first one is not needed.
-    public Order(long id, int userId, String address, List<Product> products){
+    public Order(long id, int userId, String address, Map<Long,Integer> products){
         this(id, userId, address);
-        this.products.addAll(products);
-        for (Product product : products) {
-            this.price += product.getPrice();
-        }
+        this.products.putAll(products);
+        //TODO PESGO FIX MAP FOR EACH ELEMENT  * PRICE
+//        for (Product product : products) {
+//            this.price += product.getPrice();
+//        }
     }
-
-    public void addProduct(Product product){
-        this.products.add(product);
-        this.price += product.getPrice();
-    }
+//
+//    public void addProduct(Product product){
+//        this.products.add(product);
+//        this.price += product.getPrice();
+//    }
 
     public long getId() {
         return id;

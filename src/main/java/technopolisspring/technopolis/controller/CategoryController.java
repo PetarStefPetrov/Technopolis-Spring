@@ -26,12 +26,12 @@ public class CategoryController  extends GlobalException {
         return categoryDAO.getSubCategories(category_id);
     }
     @GetMapping("brands/")
-    public Map<Long,String> getAllBrands(){
+    public Map<Long,String> getAllBrands() throws SQLException {
         return categoryDAO.getAllBrands();
     }
     @GetMapping("brands/{brand_id}")
-    public List<Product> getAllProductsByBrand(@PathVariable long brand_id){
-        return categoryDAO.getProductById();
+    public List<Product> getAllProductsByBrand(@PathVariable long brand_id) throws SQLException {
+        return categoryDAO.getProductsByBrand(brand_id);
     }
 
 
