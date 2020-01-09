@@ -2,6 +2,7 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.model.daos.ReviewDAO;
 import technopolisspring.technopolis.model.daos.UserDAO;
 import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
@@ -26,73 +27,70 @@ public class UserController extends GlobalException {
 
     @Autowired
     private UserDAO userDAO;
+    @Autowired
+    private ReviewDAO reviewDAO;
 
-    @GetMapping("/test")
-    public void doSmth() throws SQLException {
-        List l = userDAO.getOrders(1);
-        System.out.println(l);
-    }
 
 //    @PostMapping("users/login")
 //    public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session){
 //        //TODO Cript password
-//        //TODO User user = userRepository.getUserByEmail(userDTO.getEmail());
+//      User user = userDAO.getUserByEmail(userDTO.getEmail());
 //        if(user == null || user.getPassword().equals(userDTO.getPassword())){
 //            throw new InvalidArguments("Invalid email or password");
 //        }
 //        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
 //        return new UserWithoutPasswordDto(user);
 //    }
-//
-//    @PostMapping("users/register")
-//    public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session){
-//        //TODO Validation email and password (valid name and email exists)
-//        User user = new User(userRegistrableDto);
-//        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-//        userRepository.save(user);
-//        return new UserWithoutPasswordDto(user);
-//    }
-//
-//    @PostMapping("/users/logout")
-//    public void logout(HttpSession session){
-//        session.invalidate();
-//    }
-//
-//    @DeleteMapping("users/delete")
-//    public void delete(HttpSession session){
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        userRepository.delete(user);
-//    }
-//
-//    @PutMapping("users/change_password")
-//    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto){
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        if (!user.getPassword().equals(changePasswordDto.getOldPassword())){
-//            throw new InvalidArguments("wrong password");
-//        }
-//        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
-//            throw new InvalidArguments("passwords don't match");
-//        }
-//        user.setPassword(changePasswordDto.getNewPassword());
-//        userRepository.save(user);
-//        return new UserWithoutPasswordDto(user);
-//    }
-//
-//    @PostMapping("users/profile")
-//    public UserWithAllAttributesDto getProfile(HttpSession session) throws SQLException {
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        return new UserWithAllAttributesDto(user);
-//    }
-//
+
+    @PostMapping("users/register")
+    public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session) throws SQLException {
+        //TODO Validation email and password (valid name and email exists)
+        User user = new User(userRegistrableDto);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
+        userDAO.registerUser(user);
+        return new UserWithoutPasswordDto(user);
+    }
+
+    @PostMapping("/users/logout")
+    public void logout(HttpSession session){
+        session.invalidate();
+    }
+
+    @DeleteMapping("users/delete")
+    public void delete(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        userDAO.deleteUser(user);
+    }
+
+    @PutMapping("users/change_password")
+    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        if (!user.getPassword().equals(changePasswordDto.getOldPassword())){
+            throw new InvalidArguments("wrong password");
+        }
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
+            throw new InvalidArguments("passwords don't match");
+        }
+        user.setPassword(changePasswordDto.getNewPassword());
+        userDAO.editUser(user);
+        return new UserWithoutPasswordDto(user);
+    }
+
+    @PostMapping("users/profile")
+    public UserWithAllAttributesDto getProfile(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        return new UserWithAllAttributesDto(user);
+    }
+
 //    @GetMapping("users/{id}")
 //    public User getUserById(HttpSession session, @PathVariable(name = "id") long id){
 //        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
@@ -102,11 +100,11 @@ public class UserController extends GlobalException {
 //        if(!user.isAdmin()){
 //            throw new AuthorizationException("Must be admin");
 //        }
-//        Optional<User> save = userRepository.findById(id);
-//        if(!save.isPresent()){
+//        User save = userDAO.getUserById(id);
+//        if(save == null){
 //            throw new BadRequestException("Invalid id");
 //        }
-//        return  save.get();
+//        return  save;
 //    }
 //
 //    @GetMapping("users/")
@@ -118,7 +116,7 @@ public class UserController extends GlobalException {
 //        if(!user.isAdmin()){
 //            throw new AuthorizationException("Must be admin");
 //        }
-//        return userRepository.findAll();
+//        return userDao.getAll();
 //    }
 //
 //    @GetMapping("users/reviews")
@@ -127,7 +125,7 @@ public class UserController extends GlobalException {
 //        if(user == null){
 //            throw new AuthorizationException("Must be logged in");
 //        }
-//        return reviewRepository.getAllByUserId(user.getId());
+//        return userDto.getReviews(user.getId());
 //    }
 //
 //    @GetMapping("users/orders")
@@ -136,7 +134,7 @@ public class UserController extends GlobalException {
 //        if(user == null){
 //            throw new AuthorizationException("Must be logged in");
 //        }
-//        return orderRepository.getAllByUserId(user.getId());
+//        return userDao.getOrders(user.getId());
 //    }
 //
 ////    @GetMapping("users/favorites")
@@ -148,10 +146,11 @@ public class UserController extends GlobalException {
 ////        return userDao.getFavourites(user.getId());
 ////    }
 //
-//    @PostMapping("users/add_review/{id}")
-//    public void addReview(HttpSession session, @PathVariable(name = "id") long id){
-//        //TODO
-//    }
+    @PostMapping("users/add_review/{product_id}")
+    public void addReview(@RequestBody Review review,HttpSession session, @PathVariable(name = "product_id") long id){
+
+        //Review reviews = reviewDAO.addReview(review)
+    }
 
 
 }
