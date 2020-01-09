@@ -36,7 +36,7 @@ public class CategoryDAO {
         }
     }
 
-    public Map<Long, String> getAllCategories(long categoryId) throws SQLException {
+    public Map<Long, String> getSubCategories(long categoryId) throws SQLException {
         String sql = "SELECT id, name\n" +
                 "FROM technopolis.sub_categories\n" +
                 "WHERE category_id = ?;";

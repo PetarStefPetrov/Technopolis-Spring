@@ -19,7 +19,7 @@ public class Order {
     private long userId;
     private String address;
     private double price;
-    private List<Product> products;
+    private Map<Long,Integer> products; // < product_id , quantity >
 
     private Order(long id, long userId, String address) {
         this.id = id;
