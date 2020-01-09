@@ -18,10 +18,12 @@ public class User {
     private String firstName;
     private String lastName;
     private String email;
+    @JsonIgnore
     private String password;
     private String phone;
     private LocalDateTime createTime;
     private String address;
+    @JsonIgnore
     private boolean isAdmin = false;
     private List<Review> reviews;
 
