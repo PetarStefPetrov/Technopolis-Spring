@@ -34,4 +34,26 @@ public class User {
         this.createTime = LocalDateTime.now();
         this.address = reg.getAddress();
     }
+
+    public User(long userId,
+                String firstName,
+                String lastName,
+                String email,
+                String password,
+                String phone,
+                LocalDateTime createTime,
+                String address,
+                boolean isAdmin) {
+        this.id =  userId;
+        this.firstName =  firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.phone = phone;
+        this.createTime = createTime;
+        this.address = address;
+        this.isAdmin = isAdmin;
+    }
+
+
 }
