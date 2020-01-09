@@ -170,6 +170,9 @@ public class UserDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
             ResultSet result = statement.executeQuery();
+            if(!result.next()){
+                return null;
+            }
             return new User(
                     result.getLong("id"),
                     result.getString("first_name"),
@@ -192,6 +195,9 @@ public class UserDAO {
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
             ResultSet result = statement.executeQuery();
+            if(!result.next()){
+                return null;
+            }
             return new User(
                     result.getLong("id"),
                     result.getString("first_name"),

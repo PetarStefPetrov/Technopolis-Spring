@@ -10,6 +10,7 @@ import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
 import technopolisspring.technopolis.model.exception.InvalidArguments;
 import technopolisspring.technopolis.model.pojos.Order;
+import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 
@@ -31,16 +32,16 @@ public class UserController extends GlobalException {
     private ReviewDAO reviewDAO;
 
 
-//    @PostMapping("users/login")
-//    public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session){
-//        //TODO Cript password
-//      User user = userDAO.getUserByEmail(userDTO.getEmail());
-//        if(user == null || user.getPassword().equals(userDTO.getPassword())){
-//            throw new InvalidArguments("Invalid email or password");
-//        }
-//        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-//        return new UserWithoutPasswordDto(user);
-//    }
+    @PostMapping("users/login")
+    public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
+        //TODO Cript password
+      User user = userDAO.getUserByEmail(userDTO.getEmail());
+        if(user == null || user.getPassword().equals(userDTO.getPassword())){
+            throw new InvalidArguments("Invalid email or password");
+        }
+        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
+        return new UserWithoutPasswordDto(user);
+    }
 
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session) throws SQLException {
@@ -91,61 +92,61 @@ public class UserController extends GlobalException {
         return new UserWithAllAttributesDto(user);
     }
 
-//    @GetMapping("users/{id}")
-//    public User getUserById(HttpSession session, @PathVariable(name = "id") long id){
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        if(!user.isAdmin()){
-//            throw new AuthorizationException("Must be admin");
-//        }
-//        User save = userDAO.getUserById(id);
-//        if(save == null){
-//            throw new BadRequestException("Invalid id");
-//        }
-//        return  save;
-//    }
-//
-//    @GetMapping("users/")
-//    public List<User> allUsers(HttpSession session) {
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        if(!user.isAdmin()){
-//            throw new AuthorizationException("Must be admin");
-//        }
-//        return userDao.getAll();
-//    }
-//
-//    @GetMapping("users/reviews")
-//    public List<Review> getReview(HttpSession session) {
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        return userDto.getReviews(user.getId());
-//    }
-//
-//    @GetMapping("users/orders")
-//    public List<Order> getOrders(HttpSession session) {
-//        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-//        if(user == null){
-//            throw new AuthorizationException("Must be logged in");
-//        }
-//        return userDao.getOrders(user.getId());
-//    }
-//
-////    @GetMapping("users/favorites")
-////    public List<Product> getFavourites(HttpSession session) {
-////        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-////        if(user == null){
-////            throw new AuthorizationException("Must be logged in");
-////        }
-////        return userDao.getFavourites(user.getId());
-////    }
-//
+    @GetMapping("users/{id}")
+    public User getUserById(HttpSession session, @PathVariable(name = "id") long id) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        if(!user.isAdmin()){
+            throw new AuthorizationException("Must be admin");
+        }
+        User save = userDAO.getUserById(id);
+        if(save == null){
+            throw new BadRequestException("Invalid id");
+        }
+        return  save;
+    }
+
+    @GetMapping("users/")
+    public List<User> allUsers(HttpSession session) {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        if(!user.isAdmin()){
+            throw new AuthorizationException("Must be admin");
+        }
+        return userDAO.getAll();
+    }
+
+    @GetMapping("users/reviews")
+    public List<Review> getReview(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        return userDAO.getReviews(user.getId());
+    }
+
+    @GetMapping("users/orders")
+    public List<Order> getOrders(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        return userDAO.getOrders(user.getId());
+    }
+
+    @GetMapping("users/favorites")
+    public List<Product> getFavourites(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        return userDAO.getFavourites(user.getId());
+    }
+
     @PostMapping("users/add_review/{product_id}")
     public void addReview(@RequestBody Review review,HttpSession session, @PathVariable(name = "product_id") long id){
 
