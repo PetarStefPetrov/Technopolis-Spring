@@ -49,6 +49,12 @@ public class UserController extends GlobalException {
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session) throws SQLException {
         //TODO Validation email and password (valid name and email exists)
+        if(userDAO.getUserByEmail(userRegistrableDto.getEmail()) != null){
+            throw  new BadRequestException("Email is exist");
+        }
+        if(!userRegistrableDto.getPassword().equals(userRegistrableDto.getConfirmPassword())){
+            throw new BadRequestException("Password dont match");
+        }
         User user = new User(userRegistrableDto);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         userDAO.registerUser(user);
