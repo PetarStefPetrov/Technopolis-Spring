@@ -1,6 +1,4 @@
 package technopolisspring.technopolis.model.daos;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Offer;
 import technopolisspring.technopolis.model.pojos.Product;

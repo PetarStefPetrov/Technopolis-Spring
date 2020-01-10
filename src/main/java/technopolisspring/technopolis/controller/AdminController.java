@@ -2,12 +2,15 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
+import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.ProductDto;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
+import technopolisspring.technopolis.model.pojos.Offer;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.User;
 
@@ -16,12 +19,15 @@ import java.sql.SQLException;
 
 @RestController
 public class AdminController  extends GlobalException {
+
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
 
     @Autowired
     private UserDao userDAO;
     @Autowired
     private ProductDao productDAO;
+    @Autowired
+    OfferDao offerDao;
 
     @GetMapping("users/make_admin/{email}")
         public void makeAdmin(@PathVariable String email, HttpSession session) throws SQLException {
@@ -66,6 +72,20 @@ public class AdminController  extends GlobalException {
         }
         Product product = new Product(productDto);
         return productDAO.addProduct(product);
+    }
+
+    @PostMapping("offers")
+    public Offer addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        if(!userDAO.isAdmin(user.getId())){
+            throw new AuthorizationException("Must be admin");
+        }
+        Offer offer = new Offer(createOfferDto);
+        offerDao.addOffer(offer);
+        return offer;
     }
 
 }

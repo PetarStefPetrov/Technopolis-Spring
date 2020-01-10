@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class CategoryController  extends GlobalException {
+public class CategoryController extends GlobalException {
 
     @Autowired
     public CategoryDao categoryDAO;
