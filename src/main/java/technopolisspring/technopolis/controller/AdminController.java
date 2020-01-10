@@ -75,7 +75,7 @@ public class AdminController  extends GlobalException {
     }
 
     @PostMapping("offers")
-    public Offer addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
+    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -83,9 +83,8 @@ public class AdminController  extends GlobalException {
         if(!userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
-        Offer offer = new Offer(createOfferDto);
-        offerDao.addOffer(offer);
-        return offer;
+        offerDao.addOffer(createOfferDto);
+        return createOfferDto;
     }
 
 }

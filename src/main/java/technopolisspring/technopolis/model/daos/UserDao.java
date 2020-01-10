@@ -8,6 +8,8 @@ import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,8 +21,8 @@ public class UserDao extends Dao {
 
     public User registerUser(User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.users " +
-                "(first_name, last_name, email, password, phone, address, is_admin)\n" +
-                "VALUES (?,?,?,?,?,?,?);";
+                "(first_name, last_name, email, password, phone, create_time, address, is_admin)\n" +
+                "VALUES (?,?,?,?,?,?,?,?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, user.getFirstName());
@@ -28,8 +30,9 @@ public class UserDao extends Dao {
             statement.setString(3, user.getEmail());
             statement.setString(4, user.getPassword());
             statement.setString(5, user.getPhone());
-            statement.setString(6,user.getAddress());
-            statement.setBoolean(7,false);
+            statement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
+            statement.setString(7, user.getAddress());
+            statement.setBoolean(8,false);
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();

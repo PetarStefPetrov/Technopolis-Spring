@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class RegisterUserDto {
+
     private String firstName;
     private String lastName;
     private String email;
@@ -16,4 +17,5 @@ public class RegisterUserDto {
     private String confirmPassword;
     private String phone;
     private String address;
+
 }

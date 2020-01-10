@@ -1,6 +1,6 @@
 package technopolisspring.technopolis.model.daos;
 import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.pojos.Offer;
+import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.*;
@@ -9,7 +9,7 @@ import java.util.List;
 @Component
     public class OfferDao extends Dao {
 
-        public void addOffer(Offer offer) throws SQLException {
+        public void addOffer(CreateOfferDto offer) throws SQLException {
             String sql = "INSERT INTO `technopolis`.`offers` " +
                     "(`name`, `discount_percent`, `start_date`, `end_date`) " +
                     "VALUES (?, ?, ?, ?);";

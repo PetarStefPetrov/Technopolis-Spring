@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.model.pojos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class User {
     @JsonIgnore
     private String password;
     private String phone;
+    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createTime;
     private String address;
     @JsonIgnore
