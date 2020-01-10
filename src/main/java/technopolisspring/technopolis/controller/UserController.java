@@ -110,7 +110,7 @@ public class UserController extends GlobalException {
         return  save;
     }
 
-    @GetMapping("users/page/{pageNumber}")
+    @GetMapping("users/pages/{pageNumber}")
     public List<User> allUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -122,7 +122,7 @@ public class UserController extends GlobalException {
         return userDAO.getAll(pageNumber);
     }
 
-    @GetMapping("users/reviews/page/{pageNumber}")
+    @GetMapping("users/reviews/pages/{pageNumber}")
     public List<Review> getReview(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -131,7 +131,7 @@ public class UserController extends GlobalException {
         return userDAO.getReviews(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/orders/page/{pageNumber}")
+    @GetMapping("users/orders/pages/{pageNumber}")
     public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -140,7 +140,7 @@ public class UserController extends GlobalException {
         return userDAO.getOrders(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/favorites/page/{pageNumber}")
+    @GetMapping("users/favorites/pages/{pageNumber}")
     public List<Product> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
