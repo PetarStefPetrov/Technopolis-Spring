@@ -11,10 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class OrderDao {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class OrderDao extends Dao {
 
     @Autowired
     ProductDao productDAO;

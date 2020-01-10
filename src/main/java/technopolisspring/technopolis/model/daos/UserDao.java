@@ -1,7 +1,6 @@
 package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
@@ -13,10 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class UserDao {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class UserDao extends Dao {
 
     @Autowired
     OrderDao orderDao;
@@ -74,17 +70,21 @@ public class UserDao {
     }
 
 
-    public List<Review> getReviews(long userId) throws SQLException {
+    public List<Review> getReviews(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE r.user_id = ?;";
+                "WHERE r.user_id = ?" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             List<Review> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
@@ -121,14 +121,18 @@ public class UserDao {
         }
     }
 
-    public List<Product> getFavourites(long userId) throws SQLException {
+    public List<Product> getFavourites(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
-                "WHERE ulp.user_id = ?;";
+                "WHERE ulp.user_id = ?" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             List<Product> favorites = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
@@ -181,13 +185,17 @@ public class UserDao {
         }
     }
 
-    public List<Order> getOrders(long userId) throws SQLException {
+    public List<Order> getOrders(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT id\n" +
                 "FROM `technopolis`.orders \n" +
-                "WHERE user_id = ?;";
+                "WHERE user_id = ?" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             List<Order> orders = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()) {
@@ -248,9 +256,17 @@ public class UserDao {
         }
     }
 
-    public List<User> getAll() {
-        String sql = "SELECT * FROM `technopolis`.users;";
-        List<User> users = jdbcTemplate.query(sql, (result, i) -> new User(
+    public List<User> getAll(int pageNumber) {
+        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+                "FROM `technopolis`.users\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
+        List<User> users = jdbcTemplate.query(sql,
+                preparedStatement -> {
+            preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
+            preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
+            },
+                (result, i) -> new User(
                 result.getLong("id"),
                 result.getString("first_name"),
                 result.getString("last_name"),

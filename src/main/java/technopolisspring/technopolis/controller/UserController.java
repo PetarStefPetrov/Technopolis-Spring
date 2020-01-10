@@ -68,7 +68,7 @@ public class UserController extends GlobalException {
         session.invalidate();
     }
 
-    @DeleteMapping("users/delete")
+    @DeleteMapping("users")
     public void delete(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -94,18 +94,6 @@ public class UserController extends GlobalException {
         return new UserWithoutPasswordDto(user);
     }
 
-    @GetMapping("users/profile/")
-    public UserWithAllAttributesDto getProfile(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        return new UserWithAllAttributesDto(user,
-                                            userDAO.getReviews(user.getId()),
-                                            userDAO.getFavourites(user.getId()),
-                                            userDAO.getOrders(user.getId()));
-    }
-
     @GetMapping("users/{id}")
     public User getUserById(HttpSession session, @PathVariable(name = "id") long id) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
@@ -122,8 +110,8 @@ public class UserController extends GlobalException {
         return  save;
     }
 
-    @GetMapping("users/")
-    public List<User> allUsers(HttpSession session) throws SQLException {
+    @GetMapping("users/page/{pageNumber}")
+    public List<User> allUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -131,34 +119,34 @@ public class UserController extends GlobalException {
         if(userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
-        return userDAO.getAll();
+        return userDAO.getAll(pageNumber);
     }
 
-    @GetMapping("users/reviews")
-    public List<Review> getReview(HttpSession session) throws SQLException {
+    @GetMapping("users/reviews/page/{pageNumber}")
+    public List<Review> getReview(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        return userDAO.getReviews(user.getId());
+        return userDAO.getReviews(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/orders")
-    public List<Order> getOrders(HttpSession session) throws SQLException {
+    @GetMapping("users/orders/page/{pageNumber}")
+    public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        return userDAO.getOrders(user.getId());
+        return userDAO.getOrders(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/favorites")
-    public List<Product> getFavourites(HttpSession session) throws SQLException {
+    @GetMapping("users/favorites/page/{pageNumber}")
+    public List<Product> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        return userDAO.getFavourites(user.getId());
+        return userDAO.getFavourites(user.getId(), pageNumber);
     }
 
     @PostMapping("users/add_review/{product_id}")
@@ -184,7 +172,7 @@ public class UserController extends GlobalException {
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        userDAO.addToFavorites(product.getId(),user.getId());
+        userDAO.addToFavorites(product.getId(), user.getId());
     }
     @PostMapping("users/remove_from_favorites/{product_id}")
     public void removeFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
@@ -196,7 +184,7 @@ public class UserController extends GlobalException {
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        if(!userDAO.removeFromFavorites(product.getId(),user.getId())){
+        if(!userDAO.removeFromFavorites(product.getId(), user.getId())){
             throw new BadRequestException("Dont have this product, in yours favorites");
         }
     }

@@ -29,14 +29,9 @@ public class ProductController extends GlobalException {
         return product;
     }
 
-    @GetMapping("products/")
-    public List<Product> getAllProducts(){
-        return productDAO.getAllProducts();
-    }
-
-    @GetMapping("products/categories/{category_id}")
-    public List<Product> getAllProductByCategory(@PathVariable long category_id) throws SQLException {
-        return productDAO.getProductsByCategory(category_id);
+    @GetMapping("products/pages/{pageNumber}")
+    public List<Product> getAllProducts(@PathVariable int pageNumber){
+        return productDAO.getAllProducts(pageNumber);
     }
 
     @GetMapping("products/sub_categories/{sub_category_id}")
@@ -49,32 +44,12 @@ public class ProductController extends GlobalException {
         return productDAO.getReviews(product_id);
     }
 
-    @GetMapping("products/{description}")
-    public List<Product> lookForProductsByDescription(@PathVariable String description) {
-        return productDAO.lookForProductByDescription(description);
+    @GetMapping("products/{description}/pages/{pageNumber}")
+    public List<Product> lookForProductsByDescription(@PathVariable String description, @PathVariable int pageNumber) {
+        return productDAO.lookForProductByDescription(description, pageNumber);
     }
 
-    @PutMapping("products/asc")
-    public List<Product> sortByPriceAsc(List<Product> products){
-        products.sort(Comparator.comparing(Product::getPrice));
-        return products;
-    }
-
-    @PutMapping("products/desc")
-    public List<Product> sortByPriceDesc(List<Product> products){
-        products.sort(Comparator.comparing(Product::getPrice).reversed());
-        return products;
-    }
-
-    @GetMapping("products/from/{lowerLimit}/to/{upperLimit}")
-    public List<Product> getProductsWithPriceRange(@PathVariable double lowerLimit, @PathVariable double upperLimit) {
-        if (lowerLimit < 0 || upperLimit > MAX_POSSIBLE_PRODUCT_PRICE){
-            throw new BadRequestException("invalid price range");
-        }
-        return productDAO.getProductsWithPriceRange(lowerLimit, upperLimit);
-    }
-
-    @PostMapping("products/filters/page/{pageNumber}")
+    @PostMapping("products/filters/pages/{pageNumber}")
     public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto,
                                                 @PathVariable int pageNumber) {
         if (    filterForProductsDto.getBrandId() == 0 &&

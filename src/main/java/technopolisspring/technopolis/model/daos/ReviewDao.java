@@ -9,10 +9,7 @@ import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
 @Component
-public class ReviewDao {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class ReviewDao extends Dao {
 
     public Review addReview(Review review, Product product, User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.reviews (name, title, comment, product_id, user_id)\n" +

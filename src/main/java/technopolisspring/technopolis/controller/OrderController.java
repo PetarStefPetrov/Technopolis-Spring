@@ -27,7 +27,7 @@ public class OrderController extends GlobalException {
     @Autowired
     public OrderDao orderDao;
 
-    @PostMapping("/orders/add")
+    @PostMapping("/orders")
     public Order addOrder(HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
@@ -43,7 +43,7 @@ public class OrderController extends GlobalException {
         return order;
     }
 
-    @PostMapping("orders/products/add/{product_id}")
+    @PostMapping("orders/products/{product_id}")
     public Map<Product, Integer> addProductToBuy(@PathVariable long product_id,HttpSession session) throws SQLException {
         Product product = productDAO.getProductById(product_id);
         if(product == null){
@@ -80,12 +80,12 @@ public class OrderController extends GlobalException {
             basket.remove(product);
         }
         session.removeAttribute(SESSION_KEY_BASKET_USER);
-        session.setAttribute(SESSION_KEY_BASKET_USER,basket);
+        session.setAttribute(SESSION_KEY_BASKET_USER, basket);
         return basket;
     }
 
     @GetMapping("orders/products")
-    public Map<Product, Integer> removeProductToBuy(HttpSession session) throws SQLException {
+    public Map<Product, Integer> getProducts(HttpSession session) {
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             throw new BadRequestException("Basket is empty");

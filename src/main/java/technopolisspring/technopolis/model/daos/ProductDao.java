@@ -1,11 +1,7 @@
 package technopolisspring.technopolis.model.daos;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.FilterForProductsDto;
-import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
@@ -15,11 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class ProductDao {
-
-    public static final int PAGE_SIZE = 20;
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class ProductDao extends Dao {
 
     public Product getProductById(long id) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
@@ -76,9 +68,17 @@ public class ProductDao {
         return product;
     }
 
-    public List<Product> getAllProducts(){
-        String sql = "SELECT * FROM `technopolis`.products;";
-        List<Product> products = jdbcTemplate.query(sql, (result, i) -> new Product(
+    public List<Product> getAllProducts(int pageNumber){
+        String sql = "SELECT * " +
+                "FROM `technopolis`.products\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
+        List<Product> products = jdbcTemplate.query(sql,
+                preparedStatement -> {
+                    preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
+                },
+                (result, i) -> new Product(
                 result.getLong("id"),
                 result.getString("description"),
                 result.getDouble("price"),
@@ -106,32 +106,6 @@ public class ProductDao {
                         result.getString("picture_url"),
                         result.getLong("brand_id"),
                         result.getLong("sub_category_id")
-                );
-                products.add(product);
-            }
-            return products;
-        }
-    }
-
-    public List<Product> getProductsByCategory(long categoryId) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
-                "FROM `technopolis`.products AS p\n" +
-                "JOIN `technopolis`.sub_categories AS sc ON sc.id = p.sub_category_id\n" +
-                "JOIN `technopolis`.categories AS c ON c.id = sc.category_id\n" +
-                "WHERE c.id = ?;";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, categoryId);
-            ResultSet result = statement.executeQuery();
-            List<Product> products = new ArrayList<>();
-            while (result.next()) {
-                Product product = new Product(
-                        result.getLong("p.id"),
-                        result.getString("p.description"),
-                        result.getDouble("p.price"),
-                        result.getString("p.picture_url"),
-                        result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id")
                 );
                 products.add(product);
             }
@@ -188,12 +162,18 @@ public class ProductDao {
         }
     }
 
-    public List<Product> lookForProductByDescription(String description) {
+    public List<Product> lookForProductByDescription(String description, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE description LIKE ?;";
+                "WHERE description LIKE ?" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         List<Product> products = jdbcTemplate.query(sql,
-                ps -> ps.setString(1, "%" + description + "%"),
+                preparedStatement -> {
+                    preparedStatement.setString(1, description + "%");
+                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
+                },
                 (result, i) -> new Product(
                 result.getLong("id"),
                 result.getString("description"),
@@ -205,31 +185,9 @@ public class ProductDao {
         return products;
     }
 
-    public List<Product> getProductsWithPriceRange(double lowerLimit, double upperLimit) {
+    public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE price BETWEEN ? AND ?;";
-        List<Product> products = jdbcTemplate.query(sql,
-                preparedStatement -> {
-                    preparedStatement.setDouble(1, lowerLimit);
-                    preparedStatement.setDouble(2, upperLimit);
-                },
-                (result, i) -> new Product(
-                        result.getLong("id"),
-                        result.getString("description"),
-                        result.getDouble("price"),
-                        result.getString("picture_url"),
-                        result.getLong("brand_id"),
-                        result.getLong("sub_category_id")
-                ));
-        return products;
-    }
-
-    public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
-                "FROM technopolis.products AS p\n" +
-                "JOIN technopolis.brands AS b ON b.id = p.brand_id\n" +
-                "JOIN technopolis.sub_categories AS sc ON sc.id = p.sub_category_id\n" +
                 "WHERE ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -259,32 +217,32 @@ public class ProductDao {
         String sorted = filterForProductsDto.getSorted();
         boolean withoutPriceRange = minPrice == 0 && maxPrice == 0;
         if (!withoutPriceRange){
-            filters.append("(p.price BETWEEN ");
+            filters.append("(price BETWEEN ");
             filters.append(minPrice);
             filters.append(" AND ");
             filters.append(maxPrice);
             filters.append(")");
             if (subCategoryId != 0){
-                filters.append(" AND p.sub_category_id = ");
+                filters.append(" AND sub_category_id = ");
                 filters.append(subCategoryId);
             }
             if (brandId != 0){
-                filters.append(" AND b.brand_id = ");
+                filters.append(" AND brand_id = ");
                 filters.append(brandId);
             }
         }
         else {
             if (subCategoryId != 0){
-                filters.append("p.sub_category_id = ");
+                filters.append("sub_category_id = ");
                 filters.append(subCategoryId);
                 if (brandId != 0){
-                    filters.append(" AND b.brand_id = ");
+                    filters.append(" AND brand_id = ");
                     filters.append(brandId);
                 }
             }
             else {
                 if (brandId != 0){
-                    filters.append("b.brand_id = ");
+                    filters.append("brand_id = ");
                     filters.append(brandId);
                 }
             }

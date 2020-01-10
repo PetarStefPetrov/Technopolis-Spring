@@ -9,10 +9,7 @@ import java.sql.*;
 import java.util.List;
 
 @Component
-    public class OfferDao {
-
-        @Autowired
-        JdbcTemplate jdbcTemplate;
+    public class OfferDao extends Dao {
 
         public void addOffer(Offer offer) throws SQLException {
             String sql = "INSERT INTO `technopolis`.`offers` " +

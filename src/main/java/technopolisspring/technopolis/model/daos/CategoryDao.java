@@ -16,10 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class CategoryDao {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class CategoryDao extends Dao {
 
     public Map<Long, String> getAllCategories() throws SQLException {
         String sql = "SELECT id, name\n" +

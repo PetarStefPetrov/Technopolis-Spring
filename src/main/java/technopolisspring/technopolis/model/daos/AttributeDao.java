@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AttributeDao {
-
-    @Autowired
-    JdbcTemplate jdbcTemplate;
+public class AttributeDao extends Dao{
 
     public List<Attribute> getAllAttributes() throws SQLException {
         String sql = "SELECT a.id, a.name, a.sub_category_id, pha.value\n" +
