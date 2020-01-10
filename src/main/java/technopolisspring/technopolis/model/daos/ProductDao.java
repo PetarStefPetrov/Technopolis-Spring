@@ -58,16 +58,6 @@ public class ProductDao extends Dao {
         }
     }
 
-    public Product deleteProduct(Product product) throws SQLException {
-        String sql = "DELETE FROM `technopolis`.products WHERE id = ?;";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, product.getId());
-            statement.execute();
-        }
-        return product;
-    }
-
     public List<Product> getAllProducts(int pageNumber){
         String sql = "SELECT * " +
                 "FROM `technopolis`.products\n" +

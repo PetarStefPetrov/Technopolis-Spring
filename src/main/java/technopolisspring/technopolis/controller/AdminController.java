@@ -38,6 +38,7 @@ public class AdminController  extends GlobalException {
         }
         userDAO.makeAdmin(email);
     }
+
     @GetMapping("users/remove_admin/{email}")
     public void removeAdmin(@PathVariable String email, HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
@@ -53,6 +54,7 @@ public class AdminController  extends GlobalException {
         }
         userDAO.removeAdmin(email);
     }
+
     @PostMapping("products/")
     public Product addProduct(@RequestBody ProductDto productDto,HttpSession session) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
@@ -65,19 +67,5 @@ public class AdminController  extends GlobalException {
         Product product = new Product(productDto);
         return productDAO.addProduct(product);
     }
-    @DeleteMapping("products/{product_id}")
-    public Product deleteProduct(@PathVariable long product_id,HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        Product product = productDAO.getProductById(product_id);
-        if(product == null){
-            throw new BadRequestException("Wrong id for product");
-        }
-        return productDAO.deleteProduct(product);
-    }
+
 }
