@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRegistrableDto {
+public class RegisterUserDto {
     private String firstName;
     private String lastName;
     private String email;

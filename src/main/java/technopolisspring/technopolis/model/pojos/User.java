@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import technopolisspring.technopolis.model.dto.UserRegistrableDto;
+import technopolisspring.technopolis.model.dto.RegisterUserDto;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -27,7 +25,7 @@ public class User {
     @JsonIgnore
     private boolean isAdmin = false;
 
-    public User (UserRegistrableDto reg){
+    public User (RegisterUserDto reg){
         this.firstName = reg.getFirstName();
         this.lastName = reg.getLastName();
         this.email = reg.getEmail();
@@ -56,6 +54,5 @@ public class User {
         this.address = address;
         this.isAdmin = isAdmin;
     }
-
 
 }

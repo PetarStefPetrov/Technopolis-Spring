@@ -1,6 +1,8 @@
 package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
@@ -22,6 +24,7 @@ import java.util.List;
 
 @RestController
 public class UserController extends GlobalException {
+
     public static final String SESSION_KEY_LOGGED_USER = "logged_user";
     @Autowired
     private UserDao userDAO;
@@ -33,9 +36,9 @@ public class UserController extends GlobalException {
 
     @PostMapping("users/login")
     public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
-        //TODO Cript password
-      User user = userDAO.getUserByEmail(userDTO.getEmail());
-        if(user == null || !user.getPassword().equals(userDTO.getPassword())){
+        //TODO check if crypting password works
+        User user = userDAO.getUserByEmail(userDTO.getEmail());
+        if(user == null || !BCrypt.checkpw(user.getPassword(), userDTO.getPassword())){
             throw new InvalidArguments("Invalid email or password");
         }
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
@@ -43,15 +46,18 @@ public class UserController extends GlobalException {
     }
 
     @PostMapping("users/register")
-    public UserWithoutPasswordDto register(@RequestBody UserRegistrableDto userRegistrableDto, HttpSession session) throws SQLException {
-        //TODO Cript password
-        if(userDAO.getUserByEmail(userRegistrableDto.getEmail()) != null){
-            throw  new BadRequestException("Email is exist");
+    public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
+        //TODO check if crypting password works
+        if(userDAO.getUserByEmail(registerUserDto.getEmail()) != null){
+            throw  new BadRequestException("User with this email already exists");
         }
-        if(!userRegistrableDto.getPassword().equals(userRegistrableDto.getConfirmPassword())){
-            throw new BadRequestException("Password dont match");
+        if(!registerUserDto.getPassword().equals(registerUserDto.getConfirmPassword())){
+            throw new BadRequestException("Passwords dont match");
         }
-        User user = new User(userRegistrableDto);
+        User user = new User(registerUserDto);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String password = encoder.encode(user.getPassword());
+        user.setPassword(password);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         userDAO.registerUser(user);
         return new UserWithoutPasswordDto(user);
@@ -78,10 +84,10 @@ public class UserController extends GlobalException {
             throw new AuthorizationException("Must be logged in");
         }
         if (!user.getPassword().equals(changePasswordDto.getOldPassword())){
-            throw new InvalidArguments("wrong password");
+            throw new InvalidArguments("Wrong password");
         }
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
-            throw new InvalidArguments("passwords don't match");
+            throw new InvalidArguments("Passwords don't match");
         }
         user.setPassword(changePasswordDto.getNewPassword());
         userDAO.editUser(user);

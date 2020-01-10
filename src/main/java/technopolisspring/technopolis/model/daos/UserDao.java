@@ -22,7 +22,8 @@ public class UserDao {
     OrderDao orderDao;
 
     public User registerUser(User user) throws SQLException {
-        String sql = "INSERT INTO `technopolis`.users (first_name, last_name, email, password, phone, address,is_admin)\n" +
+        String sql = "INSERT INTO `technopolis`.users " +
+                "(first_name, last_name, email, password, phone, address, is_admin)\n" +
                 "VALUES (?,?,?,?,?,?,?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -37,7 +38,6 @@ public class UserDao {
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
             user.setId(resultSet.getInt(1));
-
             return user;
         }
     }
