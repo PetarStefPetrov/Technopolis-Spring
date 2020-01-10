@@ -135,8 +135,6 @@ public class ProductDao extends Dao {
             List<Review> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
-                // for some reason I'm constructing the product for which I'm asked of its reviews
-                // todo remove that
                 Product product = new Product(
                         result.getLong("p.id"),
                         result.getString("p.description"),

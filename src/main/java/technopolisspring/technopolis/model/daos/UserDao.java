@@ -55,6 +55,7 @@ public class UserDao extends Dao {
                 "first_name = ?,\n" +
                 "last_name = ?,\n" +
                 "email = ?,\n" +
+                "password = ?,\n" +
                 "phone = ?\n" +
                 "WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -62,8 +63,9 @@ public class UserDao extends Dao {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
-            statement.setString(4, user.getPhone());
-            statement.setLong(5, user.getId());
+            statement.setString(4, user.getPassword());
+            statement.setString(5, user.getPhone());
+            statement.setLong(6, user.getId());
             statement.executeUpdate();
         }
         return user;
