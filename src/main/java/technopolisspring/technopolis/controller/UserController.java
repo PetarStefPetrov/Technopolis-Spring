@@ -89,7 +89,7 @@ public class UserController extends GlobalException {
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
             throw new InvalidArguments("Passwords don't match");
         }
-        user.setPassword(changePasswordDto.getNewPassword());
+        user.setPassword(changePasswordDto.getNewPassword()); // todo crypt new password
         userDAO.editUser(user);
         return new UserWithoutPasswordDto(user);
     }
