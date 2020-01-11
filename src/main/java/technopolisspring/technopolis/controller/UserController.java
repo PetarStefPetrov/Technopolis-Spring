@@ -38,8 +38,11 @@ public class UserController extends GlobalException {
     public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
         //TODO check if crypting password works
         User user = userDAO.getUserByEmail(userDTO.getEmail());
-        if(user == null || !BCrypt.checkpw(user.getPassword(), userDTO.getPassword())){
-            throw new InvalidArguments("Invalid email or password");
+        if(user == null ){
+            throw new InvalidArguments("Invalid email or password ");
+        }
+        if(!BCrypt.checkpw(userDTO.getPassword(),user.getPassword())){
+            throw new InvalidArguments("Invalid password or password ");
         }
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         return new UserWithoutPasswordDto(user);
@@ -48,6 +51,9 @@ public class UserController extends GlobalException {
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
         //TODO check if crypting password works
+        if(registerUserDto.getPassword().length() < 8 ){
+            throw  new BadRequestException("Password must be at least 8 symbols");
+        }
         if(userDAO.getUserByEmail(registerUserDto.getEmail()) != null){
             throw  new BadRequestException("User with this email already exists");
         }
@@ -83,13 +89,15 @@ public class UserController extends GlobalException {
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        if (!user.getPassword().equals(changePasswordDto.getOldPassword())){
+        if (!BCrypt.checkpw(changePasswordDto.getOldPassword(),user.getPassword())){
             throw new InvalidArguments("Wrong password");
         }
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
             throw new InvalidArguments("Passwords don't match");
         }
-        user.setPassword(changePasswordDto.getNewPassword());
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String password = encoder.encode(changePasswordDto.getNewPassword());
+        user.setPassword(password);
         userDAO.editUser(user);
         return new UserWithoutPasswordDto(user);
     }
