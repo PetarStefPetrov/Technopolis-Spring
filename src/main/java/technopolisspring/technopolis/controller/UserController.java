@@ -36,7 +36,6 @@ public class UserController extends GlobalException {
 
     @PostMapping("users/login")
     public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
-        //TODO check if crypting password works
         User user = userDAO.getUserByEmail(userDTO.getEmail());
         if(user == null ){
             throw new InvalidArguments("Invalid email or password ");
@@ -50,7 +49,6 @@ public class UserController extends GlobalException {
 
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
-        //TODO check if crypting password works
         if(registerUserDto.getPassword().length() < 8 ){
             throw  new BadRequestException("Password must be at least 8 symbols");
         }
@@ -109,14 +107,14 @@ public class UserController extends GlobalException {
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        if(userDAO.isAdmin(user.getId())){
+        if(!userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
         User save = userDAO.getUserById(id);
         if(save == null){
             throw new BadRequestException("Invalid id");
         }
-        return  save;
+        return save;
     }
 
     @GetMapping("users/pages/{pageNumber}")
@@ -125,7 +123,7 @@ public class UserController extends GlobalException {
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
-        if(userDAO.isAdmin(user.getId())){
+        if(!userDAO.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }
         return userDAO.getAll(pageNumber);
@@ -171,6 +169,7 @@ public class UserController extends GlobalException {
         Review reviews = reviewDAO.addReview(review, product, user);
         return reviews;
     }
+
     @PostMapping("users/add_to_favorites/{product_id}")
     public void addFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
@@ -183,8 +182,9 @@ public class UserController extends GlobalException {
         }
         userDAO.addToFavorites(product.getId(), user.getId());
     }
+
     @PostMapping("users/remove_from_favorites/{product_id}")
-    public void removeFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
+    public void removeFavorite(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -197,4 +197,5 @@ public class UserController extends GlobalException {
             throw new BadRequestException("Dont have this product, in yours favorites");
         }
     }
+
 }

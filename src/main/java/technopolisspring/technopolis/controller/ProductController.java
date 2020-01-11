@@ -2,6 +2,7 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.FilterForProductsDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
@@ -12,12 +13,15 @@ import technopolisspring.technopolis.model.pojos.Review;
 import java.sql.SQLException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProductController extends GlobalException {
 
     @Autowired
     private ProductDao productDAO;
+    @Autowired
+    private OfferDao offerDao;
 
     @GetMapping("products/{product_id}")
     public Product getProduct(@PathVariable long product_id) throws SQLException {
@@ -68,6 +72,12 @@ public class ProductController extends GlobalException {
             throw new BadRequestException("invalid arguments");
         }
         return productDAO.getProductsWithFilters(filterForProductsDto, pageNumber);
+    }
+
+    @GetMapping("offers/pages/{pageNumber}")
+    public List<Product> getAllProductsInOffers(@PathVariable int pageNumber) throws SQLException {
+        List<Product> products = offerDao.getAllProductsInOffers(pageNumber);
+        return products;
     }
 
 }

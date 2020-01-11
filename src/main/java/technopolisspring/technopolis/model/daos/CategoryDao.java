@@ -69,7 +69,8 @@ public class CategoryDao extends Dao {
     }
 
     public List<Product> getProductsByBrand(long brandId) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, " +
+                "p.brand_id, p.sub_category_id, p.offer_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "WHERE p.brand_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -87,7 +88,8 @@ public class CategoryDao extends Dao {
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
                         result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id")
+                        result.getLong("p.sub_category_id"),
+                        result.getLong("offer_id")
                 );
                 products.add(product);
             }

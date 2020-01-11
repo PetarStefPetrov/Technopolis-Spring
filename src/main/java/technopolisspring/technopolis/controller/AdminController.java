@@ -87,4 +87,26 @@ public class AdminController  extends GlobalException {
         return createOfferDto;
     }
 
+    @PostMapping("offers/{offerId}/products/{productId}")
+    public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        if(!userDAO.isAdmin(user.getId())){
+            throw new AuthorizationException("Must be admin");
+        }
+        double discount = offerDao.getOfferDiscount(offerId, productId);
+        if (discount == 0.0){
+            throw new BadRequestException("Offer or product doesn't exist");
+        }
+        if (discount == -1){
+            throw new BadRequestException("Product is already in that offer");
+        }
+        if (!offerDao.addProductToOffer(productId, offerId, discount)){
+            throw new BadRequestException("Offer or product doesn't exist");
+        }
+        return "Product was added successfully!";
+    }
+
 }

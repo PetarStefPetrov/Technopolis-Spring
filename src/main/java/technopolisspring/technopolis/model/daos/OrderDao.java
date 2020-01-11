@@ -31,7 +31,9 @@ public class OrderDao extends Dao {
             orderStatement.setDouble(3, order.getPrice());
             orderStatement.execute();
             ResultSet resultSet = orderStatement.getGeneratedKeys();
-            resultSet.next();
+            if(!resultSet.next()){
+                return null;
+            }
             order.setId(resultSet.getInt(1));
             for (Map.Entry<Product, Integer> entry : order.getProducts().entrySet()) {
                 orderProductsStatement.setLong(1, entry.getKey().getId());

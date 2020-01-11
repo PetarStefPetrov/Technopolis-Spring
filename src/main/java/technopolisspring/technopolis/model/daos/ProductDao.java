@@ -14,7 +14,7 @@ import java.util.List;
 public class ProductDao extends Dao {
 
     public Product getProductById(long id) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, offer_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "WHERE p.id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -30,7 +30,8 @@ public class ProductDao extends Dao {
                     result.getDouble("p.price"),
                     result.getString("p.picture_url"),
                     result.getLong("p.brand_id"),
-                    result.getLong("p.sub_category_id")
+                    result.getLong("p.sub_category_id"),
+                    result.getLong("p.offer_id")
             );
             return product;
         }
@@ -59,7 +60,7 @@ public class ProductDao extends Dao {
     }
 
     public List<Product> getAllProducts(int pageNumber){
-        String sql = "SELECT * " +
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM `technopolis`.products\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -69,18 +70,19 @@ public class ProductDao extends Dao {
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
                 (result, i) -> new Product(
-                result.getLong("id"),
-                result.getString("description"),
-                result.getDouble("price"),
-                result.getString("picture_url"),
-                result.getLong("brand_id"),
-                result.getLong("sub_category_id")
+                        result.getLong("id"),
+                        result.getString("description"),
+                        result.getDouble("price"),
+                        result.getString("picture_url"),
+                        result.getLong("brand_id"),
+                        result.getLong("sub_category_id"),
+                        result.getLong("offer_id")
         ));
         return products;
     }
 
     public List<Product> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM `technopolis`.products\n" +
                 "WHERE sub_category_id = ?\n" +
                 "LIMIT ?\n" +
@@ -99,7 +101,8 @@ public class ProductDao extends Dao {
                         result.getDouble("price"),
                         result.getString("picture_url"),
                         result.getLong("brand_id"),
-                        result.getLong("sub_category_id")
+                        result.getLong("sub_category_id"),
+                        result.getLong("offer_id")
                 );
                 products.add(product);
             }
@@ -109,7 +112,7 @@ public class ProductDao extends Dao {
 
     public List<Review> getReviews(long productId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
-                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
+                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
@@ -131,7 +134,8 @@ public class ProductDao extends Dao {
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
                         result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id")
+                        result.getLong("p.sub_category_id"),
+                        result.getLong("p.offer_id")
                 );
                 User user = new User(
                         result.getLong("u.id"),
@@ -159,7 +163,7 @@ public class ProductDao extends Dao {
     }
 
     public List<Product> lookForProductByDescription(String description, int pageNumber) {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
                 "WHERE description LIKE ?" +
                 "LIMIT ?\n" +
@@ -171,18 +175,19 @@ public class ProductDao extends Dao {
                     preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
                 (result, i) -> new Product(
-                result.getLong("id"),
-                result.getString("description"),
-                result.getDouble("price"),
-                result.getString("picture_url"),
-                result.getLong("brand_id"),
-                result.getLong("sub_category_id")
+                        result.getLong("id"),
+                        result.getString("description"),
+                        result.getDouble("price"),
+                        result.getString("picture_url"),
+                        result.getLong("brand_id"),
+                        result.getLong("sub_category_id"),
+                        result.getLong("offer_id")
         ));
         return products;
     }
 
     public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
                 "WHERE ?\n" +
                 "LIMIT ?\n" +
@@ -199,7 +204,8 @@ public class ProductDao extends Dao {
                         result.getDouble("price"),
                         result.getString("picture_url"),
                         result.getLong("brand_id"),
-                        result.getLong("sub_category_id")
+                        result.getLong("sub_category_id"),
+                        result.getLong("offer_id")
                 )
         );
     }

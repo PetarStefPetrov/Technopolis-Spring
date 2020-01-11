@@ -45,9 +45,4 @@ public class Offer {
         this.endDate = createOfferDto.getEndDate();
     }
 
-    public void addProduct(Product product){
-        double discountedPrice = product.getPrice() - (product.getPrice() * this.discountPercent);
-        this.products.put(product, discountedPrice);
-    }
-
 }

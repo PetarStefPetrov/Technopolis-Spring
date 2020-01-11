@@ -8,7 +8,6 @@ import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +41,16 @@ public class UserDao extends Dao {
     }
 
 
-    public User deleteUser(User user) throws SQLException {
+    public void deleteUser(User user) throws SQLException {
         String sql = "DELETE FROM `technopolis`.users WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, user.getId());
             statement.execute();
         }
-        return user;
     }
 
-    public User editUser(User user) throws SQLException {
+    public void editUser(User user) throws SQLException {
         String sql = "UPDATE `technopolis`.users\n" +
                 "SET \n" +
                 "first_name = ?,\n" +
@@ -71,18 +69,17 @@ public class UserDao extends Dao {
             statement.setLong(6, user.getId());
             statement.executeUpdate();
         }
-        return user;
     }
 
 
     public List<Review> getReviews(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
-                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
+                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE r.user_id = ?" +
+                "WHERE r.user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -99,7 +96,8 @@ public class UserDao extends Dao {
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
                         result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id")
+                        result.getLong("p.sub_category_id"),
+                        result.getLong("p.offer_id")
                 );
                 User user = new User(
                         result.getLong("u.id"),
@@ -127,10 +125,11 @@ public class UserDao extends Dao {
     }
 
     public List<Product> getFavourites(long userId, int pageNumber) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, " +
+                "p.sub_category_id, p.offer_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
-                "WHERE ulp.user_id = ?" +
+                "WHERE ulp.user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -147,7 +146,8 @@ public class UserDao extends Dao {
                         result.getDouble("p.price"),
                         result.getString("p.picture_url"),
                         result.getLong("p.brand_id"),
-                        result.getInt("p.sub_category_id")
+                        result.getInt("p.sub_category_id"),
+                        result.getLong("p.offer_id")
                 );
                 favorites.add(product);
             }
@@ -193,7 +193,7 @@ public class UserDao extends Dao {
     public List<Order> getOrders(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT id\n" +
                 "FROM `technopolis`.orders \n" +
-                "WHERE user_id = ?" +
+                "WHERE user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();

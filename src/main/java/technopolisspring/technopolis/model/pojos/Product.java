@@ -21,33 +21,32 @@ public class Product {
     private String pictureUrl;
     private long brandId;
     private long subCategoryId;
+    private long offerId;
     private List<Review> reviews;
 
-    public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId) {
+    public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId, long offerId) {
         this.id = id;
         this.description = description;
         this.price = price;
         this.pictureUrl = pictureUrl;
         this.brandId = brandId;
         this.subCategoryId = subCategoryId;
+        this.offerId = offerId;
         this.reviews = new ArrayList<>();
     }
 
     public Product(long id, String description, double price, String pictureUrl, long brandId,
-                   long subCategoryId, List<Review> reviews) {
-        this(id, description, price, pictureUrl, brandId, subCategoryId);
+                   long subCategoryId, long offerId, List<Review> reviews) {
+        this(id, description, price, pictureUrl, brandId, subCategoryId, offerId);
         this.reviews.addAll(reviews);
     }
+
     public Product (ProductDto productDto){
         this.description = productDto.getDescription();
         this.brandId = productDto.getBrandId();
         this.subCategoryId = productDto.getSubCategoryId();
         this.price = productDto.getPrice();
         this.pictureUrl = productDto.getPictureUrl();
-    }
-
-    public void addReview(Review review){
-        this.reviews.add(review);
     }
 
     public double getPrice() {
@@ -58,22 +57,16 @@ public class Product {
         return id;
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Product product = (Product) o;
-        return id == product.id &&
-                Double.compare(product.price, price) == 0 &&
-                brandId == product.brandId &&
-                subCategoryId == product.subCategoryId &&
-                Objects.equals(description, product.description) &&
-                Objects.equals(pictureUrl, product.pictureUrl);
+        return id == product.id;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, description, price, pictureUrl, brandId, subCategoryId, reviews);
+        return Objects.hash(id);
     }
 }
