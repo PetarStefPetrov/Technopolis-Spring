@@ -75,9 +75,8 @@ public class ProductController extends GlobalException {
     }
 
     @GetMapping("offers/pages/{pageNumber}")
-    public List<Product> getAllProductsInOffers(@PathVariable int pageNumber) throws SQLException {
-        List<Product> products = offerDao.getAllProductsInOffers(pageNumber);
-        return products;
+    public List<Product> getAllProductsInOffers(@PathVariable int pageNumber) {
+        return offerDao.getAllProductsInOffers(pageNumber);
     }
 
 }

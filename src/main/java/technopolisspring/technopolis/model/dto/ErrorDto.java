@@ -17,4 +17,5 @@ public class ErrorDto {
     private int status;
     private LocalDateTime time;
     private String exceptionType;
+
 }
