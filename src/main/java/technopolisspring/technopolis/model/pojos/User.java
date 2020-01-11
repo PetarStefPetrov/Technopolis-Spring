@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.pojos;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     private long id;
@@ -26,6 +28,7 @@ public class User {
     private String address;
     @JsonIgnore
     private boolean isAdmin = false;
+    private boolean isSubscribed;
 
     public User (RegisterUserDto reg){
         this.firstName = reg.getFirstName();
@@ -35,26 +38,6 @@ public class User {
         this.phone = reg.getPhone();
         this.createTime = LocalDateTime.now();
         this.address = reg.getAddress();
-    }
-
-    public User(long userId,
-                String firstName,
-                String lastName,
-                String email,
-                String password,
-                String phone,
-                LocalDateTime createTime,
-                String address,
-                boolean isAdmin) {
-        this.id =  userId;
-        this.firstName =  firstName;
-        this.lastName = lastName;
-        this.email = email;
-        this.password = password;
-        this.phone = phone;
-        this.createTime = createTime;
-        this.address = address;
-        this.isAdmin = isAdmin;
     }
 
 }

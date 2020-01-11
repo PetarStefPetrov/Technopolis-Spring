@@ -75,7 +75,8 @@ public class UserDao extends Dao {
     public List<Review> getReviews(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
-                "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
+                "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time," +
+                " u.address, u.is_admin, u.is_subscribed\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
@@ -108,7 +109,8 @@ public class UserDao extends Dao {
                         result.getString("u.phone"),
                         result.getTimestamp("u.create_time").toLocalDateTime(),
                         result.getString("u.address"),
-                        result.getBoolean("u.is_admin")
+                        result.getBoolean("u.is_admin"),
+                        result.getBoolean("u.is_subscribed")
                 );
                 Review review = new Review(
                         result.getLong("id"),
@@ -212,7 +214,8 @@ public class UserDao extends Dao {
     }
 
     public User getUserByEmail(String email) throws SQLException {
-        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+        String sql = "SELECT id, first_name, last_name, email, password, phone," +
+                " create_time, address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
                 "WHERE email = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -231,13 +234,15 @@ public class UserDao extends Dao {
                     result.getString("phone"),
                     result.getTimestamp("create_time").toLocalDateTime(),
                     result.getString("address"),
-                    result.getBoolean("is_admin")
+                    result.getBoolean("is_admin"),
+                    result.getBoolean("is_subscribed")
             );
         }
     }
 
     public User getUserById(long id) throws SQLException {
-        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time," +
+                " address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
                 "WHERE id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -256,13 +261,15 @@ public class UserDao extends Dao {
                     result.getString("phone"),
                     result.getTimestamp("create_time").toLocalDateTime(),
                     result.getString("address"),
-                    result.getBoolean("is_admin")
+                    result.getBoolean("is_admin"),
+                    result.getBoolean("is_subscribed")
             );
         }
     }
 
     public List<User> getAll(int pageNumber) {
-        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time, address, is_admin\n" +
+        String sql = "SELECT id, first_name, last_name, email, password, phone, create_time," +
+                " address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -280,7 +287,8 @@ public class UserDao extends Dao {
                 result.getString("phone"),
                 result.getTimestamp("create_time").toLocalDateTime(),
                 result.getString("address"),
-                result.getBoolean("is_admin")
+                result.getBoolean("is_admin"),
+                result.getBoolean("is_subscribed")
         ));
         return users;
     }
@@ -303,4 +311,14 @@ public class UserDao extends Dao {
         }
     }
 
+    public void subscribeUser(User user) throws SQLException {
+        String sql = "UPDATE `technopolis`.`users` SET `is_subscribed` = ? WHERE `id` = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setBoolean(1, !user.isSubscribed());
+            statement.setLong(2, user.getId());
+            statement.execute();
+            user.setSubscribed(!user.isSubscribed());
+        }
+    }
 }

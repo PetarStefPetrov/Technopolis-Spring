@@ -171,7 +171,7 @@ public class UserController extends GlobalException {
     }
 
     @PostMapping("users/add_to_favorites/{product_id}")
-    public void addFavorite(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
+    public void addFavorites(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -184,7 +184,7 @@ public class UserController extends GlobalException {
     }
 
     @PostMapping("users/remove_from_favorites/{product_id}")
-    public void removeFavorite(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+    public void removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -194,8 +194,18 @@ public class UserController extends GlobalException {
             throw new BadRequestException("Invalid Product");
         }
         if(!userDAO.removeFromFavorites(product.getId(), user.getId())){
-            throw new BadRequestException("Dont have this product, in yours favorites");
+            throw new BadRequestException("You don't have this product, in yours favorites");
         }
+    }
+
+    @PutMapping("users/subscribe")
+    public String subscribe(HttpSession session) throws SQLException {
+        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+        if(user == null){
+            throw new AuthorizationException("Must be logged in");
+        }
+        userDAO.subscribeUser(user);
+        return "Success!";
     }
 
 }

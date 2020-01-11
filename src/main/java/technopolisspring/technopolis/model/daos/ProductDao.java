@@ -113,7 +113,8 @@ public class ProductDao extends Dao {
     public List<Review> getReviews(long productId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
-                "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
+                "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time," +
+                " u.address, u.is_admin, u.is_subscribed\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
@@ -146,7 +147,8 @@ public class ProductDao extends Dao {
                         result.getString("u.phone"),
                         result.getTimestamp("u.create_time").toLocalDateTime(),
                         result.getString("u.address"),
-                        result.getBoolean("u.is_admin")
+                        result.getBoolean("u.is_admin"),
+                        result.getBoolean("u.is_subscribed")
                 );
                 Review review = new Review(
                         result.getLong("id"),

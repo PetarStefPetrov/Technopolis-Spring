@@ -106,7 +106,7 @@ public class AdminController  extends GlobalException {
         if (!offerDao.addProductToOffer(productId, offerId, discount)){
             throw new BadRequestException("Offer or product doesn't exist");
         }
-        return "Product was added successfully!";
+        return "Product was added successfully!"; //todo: add default price and fix logic of it
     }
 
 }

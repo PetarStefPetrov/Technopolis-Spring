@@ -21,6 +21,7 @@ public class UserWithoutPasswordDto {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createTime;
     private String address;
+    private boolean isSubscribed;
 
         public UserWithoutPasswordDto(User user){
             this.id = user.getId();
@@ -30,5 +31,6 @@ public class UserWithoutPasswordDto {
             this.phone = user.getPhone();
             this.createTime = user.getCreateTime();
             this.address = user.getAddress();
+            this.isSubscribed = user.isSubscribed();
         }
 }
