@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 public class ProductController extends GlobalException {
 
-    public static final int MAX_POSSIBLE_PRODUCT_PRICE = 1000000;
     @Autowired
     private ProductDao productDAO;
 
@@ -34,14 +33,14 @@ public class ProductController extends GlobalException {
         return productDAO.getAllProducts(pageNumber);
     }
 
-    @GetMapping("products/sub_categories/{sub_category_id}")
-    public List<Product> getAllProductBySubCategory(@PathVariable long sub_category_id) throws SQLException {
-        return productDAO.getProductsBySubCategory(sub_category_id);
+    @GetMapping("products/sub_categories/{sub_category_id}/pages/{pageNumber}")
+    public List<Product> getAllProductBySubCategory(@PathVariable long sub_category_id, @PathVariable int pageNumber) throws SQLException {
+        return productDAO.getProductsBySubCategory(sub_category_id, pageNumber);
     }
 
-    @GetMapping("products/reviews/{product_id}")
-    public List<Review> getAllReviewForProduct(@PathVariable long product_id) throws SQLException {
-        return productDAO.getReviews(product_id);
+    @GetMapping("products/reviews/{product_id}/pages/{pageNumber}")
+    public List<Review> getAllReviewForProduct(@PathVariable long product_id, @PathVariable int pageNumber) throws SQLException {
+        return productDAO.getReviews(product_id, pageNumber);
     }
 
     @GetMapping("products/{description}/pages/{pageNumber}")

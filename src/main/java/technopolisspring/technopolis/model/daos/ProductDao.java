@@ -89,13 +89,17 @@ public class ProductDao extends Dao {
         return products;
     }
 
-    public List<Product> getProductsBySubCategory(long subCategoryId) throws SQLException {
+    public List<Product> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id\n" +
                 "FROM `technopolis`.products\n" +
-                "WHERE sub_category_id = ?;";
+                "WHERE sub_category_id = ?\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, subCategoryId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
             List<Product> products = new ArrayList<>();
             while (result.next()) {
@@ -113,17 +117,21 @@ public class ProductDao extends Dao {
         }
     }
 
-    public List<Review> getReviews(long productId) throws SQLException {
+    public List<Review> getReviews(long productId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time, u.address, u.is_admin\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE r.product_id = ?;";
+                "WHERE r.product_id = ?\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             List<Review> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){

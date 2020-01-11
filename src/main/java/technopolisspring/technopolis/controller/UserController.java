@@ -95,6 +95,7 @@ public class UserController extends GlobalException {
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
             throw new InvalidArguments("Passwords don't match");
         }
+
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());
         user.setPassword(password);
