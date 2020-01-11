@@ -10,10 +10,11 @@ import technopolisspring.technopolis.model.dto.ProductDto;
 import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.GlobalException;
-import technopolisspring.technopolis.model.pojos.Offer;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.User;
+import technopolisspring.technopolis.service.EmailService;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 
@@ -28,6 +29,8 @@ public class AdminController  extends GlobalException {
     private ProductDao productDAO;
     @Autowired
     OfferDao offerDao;
+    @Autowired
+    EmailService emailService;
 
     @GetMapping("users/make_admin/{email}")
         public void makeAdmin(@PathVariable String email, HttpSession session) throws SQLException {
@@ -75,7 +78,7 @@ public class AdminController  extends GlobalException {
     }
 
     @PostMapping("offers")
-    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
+    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException, MessagingException {
         User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
@@ -84,6 +87,7 @@ public class AdminController  extends GlobalException {
             throw new AuthorizationException("Must be admin");
         }
         offerDao.addOffer(createOfferDto);
+        emailService.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
         return createOfferDto;
     }
 

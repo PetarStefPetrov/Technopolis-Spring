@@ -18,7 +18,7 @@ public class UserDao extends Dao {
     @Autowired
     OrderDao orderDao;
 
-    public User registerUser(User user) throws SQLException {
+    public void registerUser(User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.users " +
                 "(first_name, last_name, email, password, phone, create_time, address, is_admin)\n" +
                 "VALUES (?,?,?,?,?,?,?,?);";
@@ -36,7 +36,6 @@ public class UserDao extends Dao {
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
             user.setId(resultSet.getInt(1));
-            return user;
         }
     }
 
@@ -273,7 +272,7 @@ public class UserDao extends Dao {
                 "FROM `technopolis`.users\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
-        List<User> users = jdbcTemplate.query(sql,
+        return jdbcTemplate.query(sql,
                 preparedStatement -> {
             preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
             preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
@@ -290,7 +289,6 @@ public class UserDao extends Dao {
                 result.getBoolean("is_admin"),
                 result.getBoolean("is_subscribed")
         ));
-        return users;
     }
 
     public void makeAdmin(String email) throws SQLException {
@@ -321,4 +319,24 @@ public class UserDao extends Dao {
             user.setSubscribed(!user.isSubscribed());
         }
     }
+
+    public List<User> getAllSubscribers(){
+        String sql = "SELECT * \n" +
+                "FROM technopolis.users\n" +
+                "WHERE is_subscribed > 0;";
+        return jdbcTemplate.query(sql, (result, i) -> new User(
+                result.getLong("id"),
+                result.getString("first_name"),
+                result.getString("last_name"),
+                result.getString("email"),
+                result.getString("password"),
+                result.getString("phone"),
+                result.getTimestamp("create_time").toLocalDateTime(),
+                result.getString("address"),
+                result.getBoolean("is_admin"),
+                result.getBoolean("is_subscribed")
+                )
+        );
+    }
+
 }
