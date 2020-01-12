@@ -7,21 +7,17 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.ProductDto;
-import technopolisspring.technopolis.model.exception.AuthorizationException;
+import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
-import technopolisspring.technopolis.model.exception.GlobalException;
+import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.User;
 import technopolisspring.technopolis.service.EmailService;
 
-import javax.mail.MessagingException;
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 
 @RestController
-public class AdminController  extends GlobalException {
-
-    public static final String SESSION_KEY_LOGGED_USER = "logged_user";
+public class AdminController extends AbstractController {
 
     @Autowired
     private UserDao userDAO;
@@ -32,85 +28,50 @@ public class AdminController  extends GlobalException {
     @Autowired
     EmailService emailService;
 
-    @GetMapping("users/make_admin/{email}")
-        public void makeAdmin(@PathVariable String email, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        User admin = userDAO.getUserByEmail(email);
-        if(admin == null){
-            throw new BadRequestException("Invalid email");
-        }
-        userDAO.makeAdmin(email);
+    @GetMapping("users/make_admin")
+        public void makeAdmin(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsAdmin(session);
+        userDAO.makeAdmin(user.getEmail());
     }
 
-    @GetMapping("users/remove_admin/{email}")
-    public void removeAdmin(@PathVariable String email, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        User admin = userDAO.getUserByEmail(email);
-        if(admin == null){
-            throw new BadRequestException("Invalid email");
-        }
-        userDAO.removeAdmin(email);
+    @GetMapping("users/remove_admin")
+    public void removeAdmin(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsAdmin(session);
+        userDAO.removeAdmin(user.getEmail());
     }
 
-    @PostMapping("products/")
-    public Product addProduct(@RequestBody ProductDto productDto,HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
+    @PostMapping("products")
+    public Product addProduct(@RequestBody ProductDto productDto, HttpSession session) throws SQLException {
+        checkIfUserIsAdmin(session);
         Product product = new Product(productDto);
         return productDAO.addProduct(product);
     }
 
     @PostMapping("offers")
-    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException, MessagingException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
+    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
+        checkIfUserIsAdmin(session);
+        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > 1){
+            throw new InvalidArgumentsException("Discount percent must be between 0 and 1, 0 not included.");
         }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        offerDao.addOffer(createOfferDto);
-        emailService.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
+        this.offerDao.addOffer(createOfferDto);
+        this.emailService.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
         return createOfferDto;
     }
 
     @PostMapping("offers/{offerId}/products/{productId}")
     public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        double discount = offerDao.getOfferDiscount(offerId, productId);
-        if (discount == 0.0){
+        checkIfUserIsAdmin(session);
+        double discountedPrice = offerDao.getProductWithDiscountedPrice(productId);
+        if (discountedPrice == 0.0){
             throw new BadRequestException("Offer or product doesn't exist");
         }
-        if (discount == -1){
+        if (discountedPrice == -1){
             throw new BadRequestException("Product is already in that offer");
         }
-        if (!offerDao.addProductToOffer(productId, offerId, discount)){
+        if (!offerDao.addProductToOffer(productId, offerId)){
             throw new BadRequestException("Offer or product doesn't exist");
         }
-        return "Product was added successfully!"; //todo: add default price and fix logic of it
+        return "Product was added successfully!";
     }
 
 }

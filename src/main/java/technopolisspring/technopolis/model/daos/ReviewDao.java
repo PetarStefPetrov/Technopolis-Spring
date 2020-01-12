@@ -11,7 +11,7 @@ import java.sql.*;
 @Component
 public class ReviewDao extends Dao {
 
-    public Review addReview(Review review, Product product, User user) throws SQLException {
+    public Review addReview(Review review, long productId, long userId) throws SQLException {
         String sql = "INSERT INTO `technopolis`.reviews (name, title, comment, product_id, user_id)\n" +
                 "VALUES (?,?,?,?,?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -19,8 +19,8 @@ public class ReviewDao extends Dao {
             statement.setString(1, review.getName());
             statement.setString(2, review.getTitle());
             statement.setString(3, review.getComment());
-            statement.setLong(4, product.getId());
-            statement.setLong(5, user.getId());
+            statement.setLong(4, productId);
+            statement.setLong(5, userId);
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();

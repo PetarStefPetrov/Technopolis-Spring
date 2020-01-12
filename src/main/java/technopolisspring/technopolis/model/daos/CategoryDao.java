@@ -1,10 +1,6 @@
 package technopolisspring.technopolis.model.daos;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.pojos.Attribute;
-import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,11 +12,15 @@ import java.util.Map;
 @Component
 public class CategoryDao extends Dao {
 
-    public Map<Long, String> getAllCategories() throws SQLException {
+    public Map<Long, String> getAllCategories(int pageNumber) throws SQLException {
         String sql = "SELECT id, name\n" +
-                "FROM technopolis.categories;";
+                "FROM technopolis.categories\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, pageNumber * PAGE_SIZE);
+            statement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
             Map<Long, String> categories = new HashMap<>();
             while (result.next()) {
@@ -32,13 +32,17 @@ public class CategoryDao extends Dao {
         }
     }
 
-    public Map<Long, String> getSubCategories(long categoryId) throws SQLException {
+    public Map<Long, String> getSubCategories(long categoryId, int pageNumber) throws SQLException {
         String sql = "SELECT id, name\n" +
                 "FROM technopolis.sub_categories\n" +
-                "WHERE category_id = ?;";
+                "WHERE category_id = ?\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, categoryId);
+            statement.setInt(2, pageNumber * PAGE_SIZE);
+            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
             Map<Long, String> subCategories = new HashMap<>();
             while (result.next()) {
@@ -50,11 +54,15 @@ public class CategoryDao extends Dao {
         }
     }
 
-    public Map<Long, String> getAllBrands() throws SQLException {
+    public Map<Long, String> getAllBrands(int pageNumber) throws SQLException {
         String sql = "SELECT id, name\n" +
-                "FROM technopolis.brands;";
+                "FROM technopolis.brands\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, pageNumber * PAGE_SIZE);
+            statement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
             Map<Long, String> brands = new HashMap<>();
             while (result.next()) {

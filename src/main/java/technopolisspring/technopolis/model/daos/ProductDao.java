@@ -14,9 +14,9 @@ import java.util.List;
 public class ProductDao extends Dao {
 
     public Product getProductById(long id) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, offer_id\n" +
-                "FROM `technopolis`.products AS p\n" +
-                "WHERE p.id = ?;";
+        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
+                "FROM `technopolis`.products\n" +
+                "WHERE is_deleted = 0 AND id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
@@ -25,13 +25,13 @@ public class ProductDao extends Dao {
                 return null;
             }
             Product product = new Product(
-                    result.getLong("p.id"),
-                    result.getString("p.description"),
-                    result.getDouble("p.price"),
-                    result.getString("p.picture_url"),
-                    result.getLong("p.brand_id"),
-                    result.getLong("p.sub_category_id"),
-                    result.getLong("p.offer_id")
+                    result.getLong("id"),
+                    result.getString("description"),
+                    result.getDouble("price"),
+                    result.getString("picture_url"),
+                    result.getLong("brand_id"),
+                    result.getLong("sub_category_id"),
+                    result.getLong("offer_id")
             );
             return product;
         }
@@ -62,6 +62,7 @@ public class ProductDao extends Dao {
     public List<Product> getAllProducts(int pageNumber){
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM `technopolis`.products\n" +
+                "WHERE is_deleted = 0\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         List<Product> products = jdbcTemplate.query(sql,
@@ -84,7 +85,7 @@ public class ProductDao extends Dao {
     public List<Product> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM `technopolis`.products\n" +
-                "WHERE sub_category_id = ?\n" +
+                "WHERE is_deleted = 0 AND sub_category_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -118,7 +119,7 @@ public class ProductDao extends Dao {
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE r.product_id = ?\n" +
+                "WHERE p.is_deleted = 0 AND u.is_deleted = 0 AND r.product_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -167,12 +168,12 @@ public class ProductDao extends Dao {
     public List<Product> lookForProductByDescription(String description, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE description LIKE ?" +
+                "WHERE is_deleted = 0 AND description LIKE ?" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         List<Product> products = jdbcTemplate.query(sql,
                 preparedStatement -> {
-                    preparedStatement.setString(1, description + "%");
+                    preparedStatement.setString(1, "%" + description + "%");
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
                     preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
@@ -191,7 +192,7 @@ public class ProductDao extends Dao {
     public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE ?\n" +
+                "WHERE is_deleted = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
@@ -213,7 +214,7 @@ public class ProductDao extends Dao {
     }
 
     private String filterSql(FilterForProductsDto filterForProductsDto) {
-        StringBuilder filters = new StringBuilder();
+        StringBuilder filters = new StringBuilder("0");
         double minPrice = filterForProductsDto.getMinPrice();
         double maxPrice = filterForProductsDto.getMaxPrice();
         long subCategoryId = filterForProductsDto.getSubCategoryId();
@@ -221,35 +222,19 @@ public class ProductDao extends Dao {
         String sorted = filterForProductsDto.getSorted();
         boolean withoutPriceRange = minPrice == 0 && maxPrice == 0;
         if (!withoutPriceRange){
-            filters.append("(price BETWEEN ");
+            filters.append(" AND (price BETWEEN ");
             filters.append(minPrice);
             filters.append(" AND ");
             filters.append(maxPrice);
             filters.append(")");
-            if (subCategoryId != 0){
-                filters.append(" AND sub_category_id = ");
-                filters.append(subCategoryId);
-            }
-            if (brandId != 0){
-                filters.append(" AND brand_id = ");
-                filters.append(brandId);
-            }
         }
-        else {
-            if (subCategoryId != 0){
-                filters.append("sub_category_id = ");
-                filters.append(subCategoryId);
-                if (brandId != 0){
-                    filters.append(" AND brand_id = ");
-                    filters.append(brandId);
-                }
-            }
-            else {
-                if (brandId != 0){
-                    filters.append("brand_id = ");
-                    filters.append(brandId);
-                }
-            }
+        if (subCategoryId != 0){
+            filters.append(" AND sub_category_id = ");
+            filters.append(subCategoryId);
+        }
+        if (brandId != 0){
+            filters.append(" AND brand_id = ");
+            filters.append(brandId);
         }
         if (sorted != null && !sorted.trim().isEmpty()){
             if (sorted.equalsIgnoreCase("asc") || sorted.equalsIgnoreCase("ascending")){
@@ -264,6 +249,18 @@ public class ProductDao extends Dao {
             }
         }
         return filters.toString();
+    }
+
+    public boolean deleteProduct(long productId) throws SQLException {
+        String sql = "UPDATE `technopolis`.`products` SET `is_deleted` = '1' WHERE (`id` = ?);";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, productId);
+            if (statement.executeUpdate() == 0) {
+                return false;
+            }
+            return true;
+        }
     }
 
 }

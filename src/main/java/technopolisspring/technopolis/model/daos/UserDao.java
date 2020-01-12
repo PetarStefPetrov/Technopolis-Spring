@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -40,12 +41,15 @@ public class UserDao extends Dao {
     }
 
 
-    public void deleteUser(User user) throws SQLException {
-        String sql = "DELETE FROM `technopolis`.users WHERE id = ?;";
+    public boolean deleteUser(long userID) throws SQLException {
+        String sql = "UPDATE `technopolis`.`users` SET `is_deleted` = '1' WHERE (`id` = ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, user.getId());
-            statement.execute();
+            statement.setLong(1, userID);
+            if (statement.executeUpdate() == 0) {
+                return false;
+            }
+            return true;
         }
     }
 
@@ -57,7 +61,7 @@ public class UserDao extends Dao {
                 "email = ?,\n" +
                 "password = ?,\n" +
                 "phone = ?\n" +
-                "WHERE id = ?;";
+                "WHERE is_deleted = 0 AND id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getFirstName());
@@ -79,7 +83,7 @@ public class UserDao extends Dao {
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE r.user_id = ?\n" +
+                "WHERE p.is_deleted = 0 AND r.user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -130,7 +134,7 @@ public class UserDao extends Dao {
                 "p.sub_category_id, p.offer_id\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
-                "WHERE ulp.user_id = ?\n" +
+                "WHERE p.is_deleted = 0 AND ulp.user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -173,15 +177,12 @@ public class UserDao extends Dao {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
             statement.setLong(2, userId);
-            if (statement.executeUpdate() == 0){
-                return false;
-            }
-            return true;
+            return statement.executeUpdate() != 0;
         }
     }
 
     public boolean isAdmin(long userId) throws SQLException {
-        String sql = "SELECT is_admin FROM `technopolis`.users WHERE id = ?";
+        String sql = "SELECT is_admin FROM `technopolis`.users WHERE is_deleted = 0 AND id = ?";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userId);
@@ -216,7 +217,7 @@ public class UserDao extends Dao {
         String sql = "SELECT id, first_name, last_name, email, password, phone," +
                 " create_time, address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
-                "WHERE email = ?;";
+                "WHERE is_deleted = 0 AND email = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -243,7 +244,7 @@ public class UserDao extends Dao {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time," +
                 " address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
-                "WHERE id = ?;";
+                "WHERE is_deleted = 0 AND id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, id);
@@ -266,10 +267,11 @@ public class UserDao extends Dao {
         }
     }
 
-    public List<User> getAll(int pageNumber) {
+    public List<User> getAllUsers(int pageNumber) {
         String sql = "SELECT id, first_name, last_name, email, password, phone, create_time," +
                 " address, is_admin, is_subscribed\n" +
                 "FROM `technopolis`.users\n" +
+                "WHERE is_deleted = 0\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
@@ -292,7 +294,9 @@ public class UserDao extends Dao {
     }
 
     public void makeAdmin(String email) throws SQLException {
-        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = 1 WHERE `email` = ?;";
+        String sql = "UPDATE `technopolis`.`users` " +
+                "SET `is_admin` = 1 " +
+                "WHERE is_deleted = 0 AND `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -301,7 +305,9 @@ public class UserDao extends Dao {
     }
 
     public void removeAdmin(String email) throws SQLException {
-        String sql = "UPDATE `technopolis`.`users` SET `is_admin` = 0 WHERE `email` = ?;";
+        String sql = "UPDATE `technopolis`.`users` " +
+                "SET `is_admin` = 0 " +
+                "WHERE is_deleted = 0 AND `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, email);
@@ -309,8 +315,10 @@ public class UserDao extends Dao {
         }
     }
 
-    public void subscribeUser(User user) throws SQLException {
-        String sql = "UPDATE `technopolis`.`users` SET `is_subscribed` = ? WHERE `id` = ?;";
+    public void subscribeUser(UserWithoutPasswordDto user) throws SQLException {
+        String sql = "UPDATE `technopolis`.`users` " +
+                "SET `is_subscribed` = ? " +
+                "WHERE is_deleted = 0 AND `id` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setBoolean(1, !user.isSubscribed());
@@ -323,7 +331,7 @@ public class UserDao extends Dao {
     public List<User> getAllSubscribers(){
         String sql = "SELECT * \n" +
                 "FROM technopolis.users\n" +
-                "WHERE is_subscribed > 0;";
+                "WHERE is_deleted = 0 AND is_subscribed > 0;";
         return jdbcTemplate.query(sql, (result, i) -> new User(
                 result.getLong("id"),
                 result.getString("first_name"),
@@ -339,4 +347,19 @@ public class UserDao extends Dao {
         );
     }
 
+    public boolean checkIfProductAlreadyIsInFavorites(long userId, long productId) throws SQLException {
+        String sql = "SELECT user_id, product_id\n" +
+                "FROM technopolis.users_like_products\n" +
+                "WHERE user_id = ? AND product_id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, userId);
+            statement.setLong(2, productId);
+            ResultSet result = statement.executeQuery();
+            if(!result.next()){
+                return false;
+            }
+            return true;
+        }
+    }
 }

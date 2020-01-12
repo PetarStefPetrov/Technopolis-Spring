@@ -8,10 +8,8 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
-import technopolisspring.technopolis.model.exception.AuthorizationException;
 import technopolisspring.technopolis.model.exception.BadRequestException;
-import technopolisspring.technopolis.model.exception.GlobalException;
-import technopolisspring.technopolis.model.exception.InvalidArguments;
+import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -23,28 +21,28 @@ import java.sql.SQLException;
 import java.util.List;
 
 @RestController
-public class UserController extends GlobalException {
+public class UserController extends AbstractController {
 
-    public static final String SESSION_KEY_LOGGED_USER = "logged_user";
     @Autowired
-    private UserDao userDAO;
+    private UserDao userDao;
     @Autowired
-    private ReviewDao reviewDAO;
+    private ReviewDao reviewDao;
     @Autowired
-    private ProductDao productDAO;
+    private ProductDao productDao;
 
 
     @PostMapping("users/login")
-    public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDTO, HttpSession session) throws SQLException {
-        User user = userDAO.getUserByEmail(userDTO.getEmail());
+    public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDto, HttpSession session) throws SQLException {
+        User user = userDao.getUserByEmail(userDto.getEmail());
         if(user == null ){
-            throw new InvalidArguments("Invalid email or password ");
+            throw new InvalidArgumentsException("Invalid email or password");
         }
-        if(!BCrypt.checkpw(userDTO.getPassword(),user.getPassword())){
-            throw new InvalidArguments("Invalid password or password ");
+        if(!BCrypt.checkpw(userDto.getPassword(), user.getPassword())){
+            throw new InvalidArgumentsException("Invalid email or password");
         }
-        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-        return new UserWithoutPasswordDto(user);
+        UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
+        return userWithoutPasswordDto;
     }
 
     @PostMapping("users/register")
@@ -52,18 +50,18 @@ public class UserController extends GlobalException {
         if(registerUserDto.getPassword().length() < 8 ){
             throw  new BadRequestException("Password must be at least 8 symbols");
         }
-        if(userDAO.getUserByEmail(registerUserDto.getEmail()) != null){
+        if(userDao.getUserByEmail(registerUserDto.getEmail()) != null){
             throw  new BadRequestException("User with this email already exists");
         }
         if(!registerUserDto.getPassword().equals(registerUserDto.getConfirmPassword())){
-            throw new BadRequestException("Passwords dont match");
+            throw new BadRequestException("Passwords don't match");
         }
         User user = new User(registerUserDto);
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(user.getPassword());
         user.setPassword(password);
         session.setAttribute(SESSION_KEY_LOGGED_USER, user);
-        userDAO.registerUser(user);
+        userDao.registerUser(user);
         return new UserWithoutPasswordDto(user);
     }
 
@@ -73,139 +71,112 @@ public class UserController extends GlobalException {
     }
 
     @DeleteMapping("users")
-    public void delete(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
+    public UserWithoutPasswordDto delete(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        if (!userDao.deleteUser(user.getId())){
+            throw new BadRequestException("There is no such user");
         }
-        userDAO.deleteUser(user);
+        logout(session);
+        return user;
     }
 
     @PutMapping("users/change_password")
     public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if (!BCrypt.checkpw(changePasswordDto.getOldPassword(),user.getPassword())){
-            throw new InvalidArguments("Wrong password");
+        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session);
+        User user = userDao.getUserById(userInSession.getId());
+        if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
+            throw new InvalidArgumentsException("Wrong password");
         }
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
-            throw new InvalidArguments("Passwords don't match");
+            throw new InvalidArgumentsException("Passwords don't match");
         }
-
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());
         user.setPassword(password);
-        userDAO.editUser(user);
+        userDao.editUser(user);
         return new UserWithoutPasswordDto(user);
     }
 
     @GetMapping("users/{id}")
-    public User getUserById(HttpSession session, @PathVariable(name = "id") long id) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        User save = userDAO.getUserById(id);
-        if(save == null){
+    public UserWithoutPasswordDto getUserById(HttpSession session, @PathVariable long id) throws SQLException {
+        checkIfUserIsAdmin(session);
+        if(userDao.getUserById(id) == null){
             throw new BadRequestException("Invalid id");
         }
-        return save;
+        return new UserWithoutPasswordDto(userDao.getUserById(id));
     }
 
-    @GetMapping("users/pages/{pageNumber}")
-    public List<User> allUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        if(!userDAO.isAdmin(user.getId())){
-            throw new AuthorizationException("Must be admin");
-        }
-        return userDAO.getAll(pageNumber);
+    @GetMapping("users/profile")
+    public UserWithoutPasswordDto getMyProfile(HttpSession session) {
+        return checkIfUserIsLogged(session);
     }
 
-    @GetMapping("users/reviews/pages/{pageNumber}")
+    @GetMapping("users/page/{pageNumber}")
+    public List<User> getAllUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+        checkIfUserIsAdmin(session);
+        return userDao.getAllUsers(pageNumber); // todo: return list of users without passwords
+    }
+
+    @GetMapping("users/reviews/page/{pageNumber}")
     public List<Review> getReview(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        return userDAO.getReviews(user.getId(), pageNumber);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return userDao.getReviews(user.getId(), pageNumber);
     }
 
     @GetMapping("users/orders/pages/{pageNumber}")
     public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        return userDAO.getOrders(user.getId(), pageNumber);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return userDao.getOrders(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/favorites/pages/{pageNumber}")
+    @GetMapping("users/favorites/page/{pageNumber}")
     public List<Product> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        return userDAO.getFavourites(user.getId(), pageNumber);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return userDao.getFavourites(user.getId(), pageNumber);
     }
 
     @PostMapping("users/add_review/{product_id}")
-    public Review addReview(@RequestBody Review review,HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        Product product = productDAO.getProductById(id);
+    public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        Review reviews = reviewDAO.addReview(review, product, user);
-        return reviews;
+        return reviewDao.addReview(review, id, user.getId());
     }
 
     @PostMapping("users/add_to_favorites/{product_id}")
-    public void addFavorites(HttpSession session ,@PathVariable(name = "product_id") long id) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        Product product = productDAO.getProductById(id);
+    public Product addFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        userDAO.addToFavorites(product.getId(), user.getId());
+        if(userDao.checkIfProductAlreadyIsInFavorites(user.getId(), product.getId())){
+            return product;
+        }
+        userDao.addToFavorites(product.getId(), user.getId());
+        return product;
     }
 
     @PostMapping("users/remove_from_favorites/{product_id}")
-    public void removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        Product product = productDAO.getProductById(id);
+    public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        if(!userDAO.removeFromFavorites(product.getId(), user.getId())){
+        if(!userDao.removeFromFavorites(product.getId(), user.getId())){
             throw new BadRequestException("You don't have this product, in yours favorites");
         }
+        return product;
     }
 
     @PutMapping("users/subscribe")
-    public String subscribe(HttpSession session) throws SQLException {
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
-        if(user == null){
-            throw new AuthorizationException("Must be logged in");
-        }
-        userDAO.subscribeUser(user);
-        return "Success!";
+    public UserWithoutPasswordDto subscribe(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        userDao.subscribeUser(user);
+        return user;
     }
 
 }

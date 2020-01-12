@@ -29,7 +29,7 @@ public class OfferDao extends Dao {
     public List<Product> getAllProductsInOffers(int pageNumber){
         String sql = "SELECT id, 'description', price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE offer_id IS NOT NULL\n" +
+                "WHERE is_deleted = 0 AND offer_id IS NOT NULL\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
@@ -48,35 +48,27 @@ public class OfferDao extends Dao {
         ));
     }
 
-    public boolean addProductToOffer(long productId, long offerId, double discountedPrice) throws SQLException {
+    public boolean addProductToOffer(long productId, long offerId) throws SQLException {
         String sql = "UPDATE `technopolis`.`products` " +
-                "SET `price` = ?, " +
-                "`offer_id` = ? " +
-                "WHERE (`id` = ?);";
+                "SET `offer_id` = ? " +
+                "WHERE is_deleted = 0 AND `id` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setDouble(1, discountedPrice);
-            statement.setLong(2, offerId);
-            statement.setLong(3, productId);
+            statement.setLong(1, offerId);
+            statement.setLong(2, productId);
             return statement.executeUpdate() != 0;
         }
     }
 
-    public double getOfferDiscount(long offerId, long productId) throws SQLException {
-        String sql = "SELECT discount_percent, price, p.offer_id\n" +
+    public double getProductWithDiscountedPrice(long productId) throws SQLException {
+        String sql = "SELECT discount_percent, price, offer_id\n" +
                 "FROM technopolis.offers AS o\n" +
-                "RIGHT JOIN technopolis.products AS p ON o.id = p.offer_id\n" +
+                "RIGHT JOIN technopolis.products AS p ON o.id = offer_id\n" +
                 "WHERE p.id = ?\n" +
-                "UNION\n" +
-                "SELECT discount_percent, price, p.offer_id\n" +
-                "FROM technopolis.offers AS o\n" +
-                "JOIN technopolis.products AS p ON o.id = p.offer_id\n" +
-                "WHERE o.id = ?\n" +
                 "LIMIT 1";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
-            statement.setLong(2, offerId);
             ResultSet resultSet = statement.executeQuery();
             if (!resultSet.next()) {
                 return 0.0;

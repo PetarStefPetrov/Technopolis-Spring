@@ -7,9 +7,9 @@ import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
 
-public abstract class GlobalException {
+public abstract class GlobalExceptionHandler {
 
-    @ExceptionHandler({InvalidArguments.class})
+    @ExceptionHandler({InvalidArgumentsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ErrorDto invalidArgoments(Exception e){
         ErrorDto errorDTO = new ErrorDto(
@@ -42,15 +42,15 @@ public abstract class GlobalException {
         return errorDTO;
     }
 
-    @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorDto somethingWentWrong(Exception e){
-        ErrorDto errorDTO = new ErrorDto(
-                "Whoops, something went wrong!",
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-        return errorDTO;
-    }
+//    @ExceptionHandler({Exception.class})
+////    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+////    public ErrorDto somethingWentWrong(Exception e){
+////        ErrorDto errorDTO = new ErrorDto(
+////                "Whoops, something went wrong!",
+////                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+////                LocalDateTime.now(),
+////                e.getClass().getName());
+////        return errorDTO;
+////    }
 
 }

@@ -15,7 +15,7 @@ public class OrderDao extends Dao {
     @Autowired
     ProductDao productDAO;
 
-    public Order addOrder(Order order) throws SQLException {
+    public void addOrder(Order order) throws SQLException {
         String orderSql = "INSERT INTO `technopolis`.`orders` " +
                 "(`user_id`, `address`, `price`) " +
                 "VALUES (?, ?, ?);";
@@ -32,7 +32,7 @@ public class OrderDao extends Dao {
             orderStatement.execute();
             ResultSet resultSet = orderStatement.getGeneratedKeys();
             if(!resultSet.next()){
-                return null;
+                return;
             }
             order.setId(resultSet.getInt(1));
             for (Map.Entry<Product, Integer> entry : order.getProducts().entrySet()) {
@@ -42,7 +42,6 @@ public class OrderDao extends Dao {
                 orderProductsStatement.execute();
             }
             connection.commit();
-            return order;
         } catch (SQLException e) {
             connection.setAutoCommit(true);
             connection.rollback();
