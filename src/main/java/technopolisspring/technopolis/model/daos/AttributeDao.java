@@ -66,7 +66,7 @@ public class AttributeDao extends Dao{
         }
     }
 
-    public Attribute deleteAttribute(Attribute attribute, long productId) throws SQLException {
+    public boolean deleteAttribute(long attributeId, long productId) throws SQLException {
         String attributeSql = "DELETE FROM `technopolis`.`attributes` WHERE `id` = ?;";
         String addValueSql = "DELETE FROM `technopolis`.`products_have_attriubtes` " +
                 "WHERE (`product_id` = ?) and (`attribute_id` = ?);";
@@ -75,12 +75,15 @@ public class AttributeDao extends Dao{
              PreparedStatement valueStatement = connection.prepareStatement(addValueSql)) {
             connection.setAutoCommit(false);
             valueStatement.setLong(1, productId);
-            valueStatement.setLong(2, attribute.getId());
+            valueStatement.setLong(2, attributeId);
             valueStatement.execute();
-            attributeStatement.setLong(1, attribute.getId());
-            attributeStatement.execute();
+            attributeStatement.setLong(1, attributeId);
+            int changesMade = attributeStatement.executeUpdate();
             connection.commit();
-            return attribute;
+            if (changesMade == 0){
+                return false;
+            }
+            return true;
         } catch (SQLException e){
             connection.setAutoCommit(true);
             connection.rollback();
