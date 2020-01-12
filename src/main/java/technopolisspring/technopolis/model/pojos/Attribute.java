@@ -14,6 +14,7 @@ public class Attribute {
     private long id;
     private String name;
     private long subCategoryId;
+    private long productId;
     private String value;
 
     public Attribute(String name, long subCategoryId) {

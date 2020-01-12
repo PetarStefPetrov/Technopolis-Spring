@@ -1,10 +1,7 @@
 package technopolisspring.technopolis.model.daos;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.Attribute;
-import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,19 +11,19 @@ import java.util.List;
 public class AttributeDao extends Dao{
 
     public List<Attribute> getAllAttributes() throws SQLException {
-        String sql = "SELECT a.id, a.name, a.sub_category_id, pha.value\n" +
+        String sql = "SELECT id, name, sub_category_id, value\n" +
                 "FROM technopolis.attributes AS a\n" +
-                "JOIN technopolis.products_have_attriubtes AS pha ON pha.attribute_id = a.id;";
+                "JOIN technopolis.products_have_attriubtes AS pha ON id = attribute_id;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             ResultSet result = statement.executeQuery();
             List<Attribute> attributes = new ArrayList<>();
             while (result.next()){
                 Attribute attribute = new Attribute(
-                        result.getLong("a.id"),
-                        result.getString("a.name"),
-                        result.getLong("a.sub_category_id"),
-                        result.getString("pha.value")
+                        result.getLong("id"),
+                        result.getString("name"),
+                        result.getLong("sub_category_id"),
+                        result.getString("value")
                 );
                 attributes.add(attribute);
             }
@@ -34,7 +31,7 @@ public class AttributeDao extends Dao{
         }
     }
 
-    public Attribute addAttribute(Attribute attribute, long productId) throws SQLException {
+    public void addAttribute(Attribute attribute, long productId) throws SQLException {
         String attributeSql = "INSERT INTO `technopolis`.`attributes` " +
                 "(`name`, `sub_category_id`) " +
                 "VALUES (?, ?);";
@@ -54,8 +51,8 @@ public class AttributeDao extends Dao{
             valueStatement.setLong(1, productId);
             valueStatement.setLong(2, attribute.getId());
             valueStatement.setString(3, attribute.getValue());
+            valueStatement.execute();
             connection.commit();
-            return attribute;
         } catch (SQLException e){
             connection.setAutoCommit(true);
             connection.rollback();
@@ -80,10 +77,7 @@ public class AttributeDao extends Dao{
             attributeStatement.setLong(1, attributeId);
             int changesMade = attributeStatement.executeUpdate();
             connection.commit();
-            if (changesMade == 0){
-                return false;
-            }
-            return true;
+            return changesMade != 0;
         } catch (SQLException e){
             connection.setAutoCommit(true);
             connection.rollback();
