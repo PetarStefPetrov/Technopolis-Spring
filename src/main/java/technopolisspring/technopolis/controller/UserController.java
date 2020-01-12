@@ -47,6 +47,7 @@ public class UserController extends AbstractController {
 
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
+        registerUserDto.setPassword(registerUserDto.getPassword().trim());
         if(registerUserDto.getPassword().length() < 8 ){
             throw  new BadRequestException("Password must be at least 8 symbols");
         }

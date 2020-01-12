@@ -42,15 +42,26 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
-//    @ExceptionHandler({Exception.class})
-////    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-////    public ErrorDto somethingWentWrong(Exception e){
-////        ErrorDto errorDTO = new ErrorDto(
-////                "Whoops, something went wrong!",
-////                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-////                LocalDateTime.now(),
-////                e.getClass().getName());
-////        return errorDTO;
-////    }
+    @ExceptionHandler({UserNotFoundException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorDto userNotFound(Exception e){
+        ErrorDto errorDTO = new ErrorDto(
+                e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
+
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDto somethingWentWrong(Exception e){
+        ErrorDto errorDTO = new ErrorDto(
+                "Whoops, something went wrong!",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
 
 }
