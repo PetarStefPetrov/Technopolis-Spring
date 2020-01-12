@@ -1,0 +1,52 @@
+Action map
+
+User
+- register
+- login / logout
+- edit password
+- get user by id (view profile)
+- delete user
+- subscribe / unsubscribe
+- get all users (admin)
+- get user by id (admin)
+- get my reviews
+- get my favorites
+- get my orders
+- add review
+- add to favorites
+- remove from favorites
+
+Offers
+- add offer (admin)
+- add products to offer (admin)
+- get all products in offers
+
+Orders
+- create order from the basket
+- add product (to basket)
+- remove product (from basket)
+- get all products (in the basket)
+
+Products
+- add product (admin)
+- delete product (admin)
+- add attribute (to the product) (admin)
+- get by id
+- look for products by description
+- get all products
+- get all products with filters
+- get all by sub category
+- get reviews for product
+
+Admin
+- make admin (admin)
+- remove admin (admin)
+
+Categories
+- get sub categories for a category
+- get all categories
+- get all brands
+
+Attributes
+- get all attributes (admin)
+- remove attribute (admin)
