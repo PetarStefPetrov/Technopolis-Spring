@@ -1,6 +1,7 @@
 package technopolisspring.technopolis.model.exception;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import technopolisspring.technopolis.model.dto.ErrorDto;
@@ -54,11 +55,11 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
-    @ExceptionHandler({DateTimeParseException.class})
+    @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto wrongDateFormat(Exception e){
         ErrorDto errorDTO = new ErrorDto(
-                "Wrong date format! The correct format is: dd-MM-yyyy HH:mm:ss",
+                "Invalid arguments!",
                 HttpStatus.UNAUTHORIZED.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
