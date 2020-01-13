@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 
 public abstract class GlobalExceptionHandler {
 
@@ -47,6 +48,17 @@ public abstract class GlobalExceptionHandler {
     public ErrorDto userNotFound(Exception e){
         ErrorDto errorDTO = new ErrorDto(
                 e.getMessage(),
+                HttpStatus.UNAUTHORIZED.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+        return errorDTO;
+    }
+
+    @ExceptionHandler({DateTimeParseException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDto wrongDateFormat(Exception e){
+        ErrorDto errorDTO = new ErrorDto(
+                "Wrong date format! The correct format is: dd-MM-yyyy HH:mm:ss",
                 HttpStatus.UNAUTHORIZED.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
