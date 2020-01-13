@@ -37,4 +37,12 @@ public class UserWithoutPasswordDto {
             this.isSubscribed = user.isSubscribed();
             this.isAdmin = user.isAdmin();
         }
+
+    public void edit(EditUserDto editUserDto) {
+        this.firstName = editUserDto.getFirstName();
+        this.lastName = editUserDto.getLastName();
+        this.email = editUserDto.getEmail();
+        this.phone = editUserDto.getPhone();
+        this.address = editUserDto.getAddress();
+    }
 }

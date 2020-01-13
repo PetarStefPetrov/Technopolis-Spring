@@ -24,7 +24,7 @@ public class ProductDao extends Dao {
             if(!result.next()){
                 return null;
             }
-            Product product = new Product(
+            return new Product(
                     result.getLong("id"),
                     result.getString("description"),
                     result.getDouble("price"),
@@ -33,7 +33,6 @@ public class ProductDao extends Dao {
                     result.getLong("sub_category_id"),
                     result.getLong("offer_id")
             );
-            return product;
         }
     }
 
@@ -65,7 +64,7 @@ public class ProductDao extends Dao {
                 "WHERE is_deleted = 0\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
-        List<Product> products = jdbcTemplate.query(sql,
+        return jdbcTemplate.query(sql,
                 preparedStatement -> {
                     preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
@@ -79,7 +78,6 @@ public class ProductDao extends Dao {
                         result.getLong("sub_category_id"),
                         result.getLong("offer_id")
         ));
-        return products;
     }
 
     public List<Product> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
@@ -171,7 +169,7 @@ public class ProductDao extends Dao {
                 "WHERE is_deleted = 0 AND description LIKE ?" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
-        List<Product> products = jdbcTemplate.query(sql,
+        return jdbcTemplate.query(sql,
                 preparedStatement -> {
                     preparedStatement.setString(1, "%" + description + "%");
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
@@ -186,13 +184,13 @@ public class ProductDao extends Dao {
                         result.getLong("sub_category_id"),
                         result.getLong("offer_id")
         ));
-        return products;
     }
 
     public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE is_deleted = " + filterSql(filterForProductsDto) +"\n" +
+                "WHERE is_deleted = " + filterSql(filterForProductsDto) + "\n" +
+                "ORDER BY " + checkSorting(filterForProductsDto) + "\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
@@ -213,13 +211,26 @@ public class ProductDao extends Dao {
         );
     }
 
+    private String checkSorting(FilterForProductsDto filterForProductsDto) {
+        String sorted = filterForProductsDto.getSorted();
+        String wayOfSorting = "id ASC";
+        if (sorted != null && !sorted.trim().isEmpty()){
+            if (sorted.equalsIgnoreCase("desc") || sorted.equalsIgnoreCase("descending")){
+                wayOfSorting = "price DESC";
+            }
+            if (sorted.equalsIgnoreCase("asc") || sorted.equalsIgnoreCase("ascending")){
+                wayOfSorting = "price ASC";
+            }
+        }
+        return wayOfSorting;
+    }
+
     private String filterSql(FilterForProductsDto filterForProductsDto) {
         StringBuilder filters = new StringBuilder("0");
         double minPrice = filterForProductsDto.getMinPrice();
         double maxPrice = filterForProductsDto.getMaxPrice();
         long subCategoryId = filterForProductsDto.getSubCategoryId();
         long brandId = filterForProductsDto.getBrandId();
-        String sorted = filterForProductsDto.getSorted();
         boolean withoutPriceRange = minPrice == 0 && maxPrice == 0;
         if (!withoutPriceRange){
             filters.append(" AND (price BETWEEN ");
@@ -236,18 +247,6 @@ public class ProductDao extends Dao {
             filters.append(" AND brand_id = ");
             filters.append(brandId);
         }
-        if (sorted != null && !sorted.trim().isEmpty()){
-            if (sorted.equalsIgnoreCase("asc") || sorted.equalsIgnoreCase("ascending")){
-                filters.append("\n");
-                filters.append("ORDER BY price ASC");
-                filters.append("\n");
-            }
-            if (sorted.equalsIgnoreCase("desc") || sorted.equalsIgnoreCase("descending")){
-                filters.append("\n");
-                filters.append("ORDER BY price DESC");
-                filters.append("\n");
-            }
-        }
         return filters.toString();
     }
 
@@ -256,10 +255,7 @@ public class ProductDao extends Dao {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
-            if (statement.executeUpdate() == 0) {
-                return false;
-            }
-            return true;
+            return statement.executeUpdate() != 0;
         }
     }
 

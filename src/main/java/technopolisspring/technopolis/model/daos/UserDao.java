@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.dto.EditUserDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
@@ -46,30 +47,38 @@ public class UserDao extends Dao {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, userID);
-            if (statement.executeUpdate() == 0) {
-                return false;
-            }
-            return true;
+            return statement.executeUpdate() != 0;
         }
     }
 
-    public void editUser(User user) throws SQLException {
+    public void editUser(EditUserDto user) throws SQLException {
         String sql = "UPDATE `technopolis`.users\n" +
                 "SET \n" +
                 "first_name = ?,\n" +
                 "last_name = ?,\n" +
                 "email = ?,\n" +
-                "password = ?,\n" +
-                "phone = ?\n" +
+                "phone = ?,\n" +
+                "address = ?\n" +
                 "WHERE is_deleted = 0 AND id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getFirstName());
             statement.setString(2, user.getLastName());
             statement.setString(3, user.getEmail());
-            statement.setString(4, user.getPassword());
-            statement.setString(5, user.getPhone());
+            statement.setString(4, user.getPhone());
+            statement.setString(5, user.getAddress());
             statement.setLong(6, user.getId());
+            statement.executeUpdate();
+        }
+    }
+
+    public void changePassword(User user) throws SQLException {
+        String sql = "UPDATE `technopolis`.users\n" +
+                "SET password = ?\n" +
+                "WHERE is_deleted = 0 AND id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, user.getPassword());
             statement.executeUpdate();
         }
     }
@@ -356,10 +365,7 @@ public class UserDao extends Dao {
             statement.setLong(1, userId);
             statement.setLong(2, productId);
             ResultSet result = statement.executeQuery();
-            if(!result.next()){
-                return false;
-            }
-            return true;
+            return result.next();
         }
     }
 }

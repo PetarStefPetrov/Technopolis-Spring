@@ -95,13 +95,21 @@ public class UserController extends AbstractController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());
         user.setPassword(password);
-        userDao.editUser(user);
+        userDao.changePassword(user);
         return new UserWithoutPasswordDto(user);
     }
 
+    @PutMapping("users")
+    public UserWithoutPasswordDto editUser(@RequestBody EditUserDto editUserDto, HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        editUserDto.setId(user.getId());
+        userDao.editUser(editUserDto);
+        user.edit(editUserDto);
+        return user;
+    }
+
     @GetMapping("users/{id}")
-    public UserWithoutPasswordDto getUserById(HttpSession session, @PathVariable long id) throws SQLException {
-        checkIfUserIsAdmin(session);
+    public UserWithoutPasswordDto getUserById(@PathVariable long id) throws SQLException {
         if(userDao.getUserById(id) == null){
             throw new BadRequestException("Invalid id");
         }
@@ -116,7 +124,7 @@ public class UserController extends AbstractController {
     @GetMapping("users/page/{pageNumber}")
     public List<User> getAllUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         checkIfUserIsAdmin(session);
-        return userDao.getAllUsers(pageNumber); // todo: return list of users without passwords
+        return userDao.getAllUsers(pageNumber);
     }
 
     @GetMapping("users/reviews/page/{pageNumber}")
