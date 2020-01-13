@@ -53,7 +53,7 @@ public class ProductController extends AbstractController {
     }
 
     @PostMapping("products/filters/page/{pageNumber}")
-    public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto,
+    public List<Product> getProductsWithFilters(@RequestBody FilterForProductsDto filterForProductsDto,
                                                 @PathVariable int pageNumber) {
         if (    filterForProductsDto.getBrandId() == 0 &&
                 filterForProductsDto.getSubCategoryId() == 0 &&

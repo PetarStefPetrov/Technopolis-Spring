@@ -192,14 +192,14 @@ public class ProductDao extends Dao {
     public List<Product> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
         String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
-                "WHERE is_deleted = ?\n" +
+                "WHERE is_deleted = " + filterSql(filterForProductsDto) +"\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
                 preparedStatement -> {
-                    preparedStatement.setString(1, filterSql(filterForProductsDto));
-                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
-                    preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
+//                    preparedStatement.setString(1, filterSql(filterForProductsDto));
+                    preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
                 (result, i) -> new Product(
                         result.getLong("id"),
