@@ -1,7 +1,7 @@
 package technopolisspring.technopolis.model.daos;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
-import technopolisspring.technopolis.model.pojos.Product;
+import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 
 import java.sql.*;
 import java.util.List;
@@ -26,7 +26,7 @@ public class OfferDao extends Dao {
         }
     }
 
-    public List<Product> getAllProductsInOffers(int pageNumber){
+    public List<ProductWithoutReviewsDto> getAllProductsInOffers(int pageNumber){
         String sql = "SELECT id, 'description', price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
                 "WHERE is_deleted = 0 AND offer_id IS NOT NULL\n" +
@@ -37,7 +37,7 @@ public class OfferDao extends Dao {
             preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
             preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
         },
-                (result, i) -> new Product(
+                (result, i) -> new ProductWithoutReviewsDto(
                 result.getLong("id"),
                 result.getString("description"),
                 result.getDouble("price"),

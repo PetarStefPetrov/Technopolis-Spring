@@ -3,10 +3,9 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.EditUserDto;
+import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
@@ -83,62 +82,7 @@ public class UserDao extends Dao {
         }
     }
 
-
-    public List<Review> getReviews(long userId, int pageNumber) throws SQLException {
-        String sql = "SELECT r.id, r.name, r.title, r.comment,\n" +
-                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
-                "u.id, u.first_name, u.last_name, u.email, u.password, u.phone, u.create_time," +
-                " u.address, u.is_admin, u.is_subscribed\n" +
-                "FROM `technopolis`.reviews AS r\n" +
-                "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
-                "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
-                "WHERE p.is_deleted = 0 AND r.user_id = ?\n" +
-                "LIMIT ?\n" +
-                "OFFSET ?;";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, userId);
-            statement.setInt(2, pageNumber * PAGE_SIZE);
-            statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
-            List<Review> reviews = new ArrayList<>();
-            ResultSet result = statement.executeQuery();
-            while (result.next()){
-                Product product = new Product(
-                        result.getLong("p.id"),
-                        result.getString("p.description"),
-                        result.getDouble("p.price"),
-                        result.getString("p.picture_url"),
-                        result.getLong("p.brand_id"),
-                        result.getLong("p.sub_category_id"),
-                        result.getLong("p.offer_id")
-                );
-                User user = new User(
-                        result.getLong("u.id"),
-                        result.getString("u.first_name"),
-                        result.getString("u.last_name"),
-                        result.getString("u.email"),
-                        result.getString("u.password"),
-                        result.getString("u.phone"),
-                        result.getTimestamp("u.create_time").toLocalDateTime(),
-                        result.getString("u.address"),
-                        result.getBoolean("u.is_admin"),
-                        result.getBoolean("u.is_subscribed")
-                );
-                Review review = new Review(
-                        result.getLong("id"),
-                        result.getString("name"),
-                        result.getString("title"),
-                        result.getString("comment"),
-                        product,
-                        user
-                );
-                reviews.add(review);
-            }
-            return reviews;
-        }
-    }
-
-    public List<Product> getFavourites(long userId, int pageNumber) throws SQLException {
+    public List<ProductWithoutReviewsDto> getFavourites(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, " +
                 "p.sub_category_id, p.offer_id\n" +
                 "FROM `technopolis`.products AS p\n" +
@@ -151,10 +95,10 @@ public class UserDao extends Dao {
             statement.setLong(1, userId);
             statement.setInt(2, pageNumber * PAGE_SIZE);
             statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
-            List<Product> favorites = new ArrayList<>();
+            List<ProductWithoutReviewsDto> favorites = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
-                Product product = new Product(
+                ProductWithoutReviewsDto product = new ProductWithoutReviewsDto(
                         result.getInt("p.id"),
                         result.getString("p.description"),
                         result.getDouble("p.price"),

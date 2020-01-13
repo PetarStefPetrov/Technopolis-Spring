@@ -3,9 +3,9 @@ package technopolisspring.technopolis.model.pojos;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import technopolisspring.technopolis.model.dto.ProductDto;
+import technopolisspring.technopolis.model.dto.CreateProductDto;
+import technopolisspring.technopolis.model.dto.ReviewOfProductDto;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,7 +22,7 @@ public class Product {
     private long brandId;
     private long subCategoryId;
     private long offerId;
-    private List<Review> reviews;
+    private List<ReviewOfProductDto> reviews;
 
     public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId, long offerId) {
         this.id = id;
@@ -36,25 +36,17 @@ public class Product {
     }
 
     public Product(long id, String description, double price, String pictureUrl, long brandId,
-                   long subCategoryId, long offerId, List<Review> reviews) {
+                   long subCategoryId, long offerId, List<ReviewOfProductDto> reviews) {
         this(id, description, price, pictureUrl, brandId, subCategoryId, offerId);
         this.reviews.addAll(reviews);
     }
 
-    public Product (ProductDto productDto){
-        this.description = productDto.getDescription();
-        this.brandId = productDto.getBrandId();
-        this.subCategoryId = productDto.getSubCategoryId();
-        this.price = productDto.getPrice();
-        this.pictureUrl = productDto.getPictureUrl();
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public long getId() {
-        return id;
+    public Product (CreateProductDto createProductDto){
+        this.description = createProductDto.getDescription();
+        this.brandId = createProductDto.getBrandId();
+        this.subCategoryId = createProductDto.getSubCategoryId();
+        this.price = createProductDto.getPrice();
+        this.pictureUrl = createProductDto.getPictureUrl();
     }
 
     @Override
@@ -74,4 +66,9 @@ public class Product {
     public String toString() {
         return  description;
     }
+
+    public void addReview(ReviewOfProductDto review){
+        this.reviews.add(review);
+    }
+
 }

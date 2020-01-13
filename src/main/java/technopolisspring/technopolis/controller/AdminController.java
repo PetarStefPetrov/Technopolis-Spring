@@ -6,7 +6,7 @@ import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
-import technopolisspring.technopolis.model.dto.ProductDto;
+import technopolisspring.technopolis.model.dto.CreateProductDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.model.exception.UserNotFoundException;
@@ -47,9 +47,9 @@ public class AdminController extends AbstractController {
     }
 
     @PostMapping("products")
-    public Product addProduct(@RequestBody ProductDto productDto, HttpSession session) throws SQLException {
+    public Product addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        Product product = new Product(productDto);
+        Product product = new Product(createProductDto);
         return productDAO.addProduct(product);
     }
 

@@ -47,7 +47,7 @@ public class UserController extends AbstractController {
 
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
-        registerUserDto.setPassword(registerUserDto.getPassword().trim());
+        registerUserDto.setPassword(registerUserDto.getPassword().trim()); // todo: more validations
         if(registerUserDto.getPassword().length() < 8 ){
             throw  new BadRequestException("Password must be at least 8 symbols");
         }
@@ -84,7 +84,7 @@ public class UserController extends AbstractController {
 
     @PutMapping("users/change_password")
     public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) throws SQLException {
-        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
             throw new InvalidArgumentsException("Wrong password");
@@ -101,7 +101,7 @@ public class UserController extends AbstractController {
 
     @PutMapping("users")
     public UserWithoutPasswordDto editUser(@RequestBody EditUserDto editUserDto, HttpSession session) throws SQLException {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session); // todo: validations
         editUserDto.setId(user.getId());
         userDao.editUser(editUserDto);
         user.edit(editUserDto);
@@ -128,37 +128,37 @@ public class UserController extends AbstractController {
     }
 
     @GetMapping("users/reviews/page/{pageNumber}")
-    public List<Review> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+    public List<ReviewOfUserDto> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getReviews(user.getId(), pageNumber);
+        return reviewDao.getReviewsOfUser(user.getId(), pageNumber);
     }
 
-    @GetMapping("users/orders/pages/{pageNumber}")
+    @GetMapping("users/orders/page/{pageNumber}")
     public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getOrders(user.getId(), pageNumber);
     }
 
     @GetMapping("users/favorites/page/{pageNumber}")
-    public List<Product> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+    public List<ProductWithoutReviewsDto> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getFavourites(user.getId(), pageNumber);
     }
 
-    @PostMapping("users/reviews/{product_id}")
-    public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+    @PostMapping("users/reviews/{productId}")
+    public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(id);
+        Product product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        return reviewDao.addReview(review, id, user.getId());
+        return reviewDao.addReview(review, productId, user);
     }
 
-    @PostMapping("users/add_to_favorites/{product_id}")
-    public Product addFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+    @PostMapping("users/add_to_favorites/{productId}")
+    public Product addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(id);
+        Product product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
