@@ -26,7 +26,7 @@ public class OrderController extends AbstractController {
 
     @PostMapping("/orders")
     public Order addOrder(HttpSession session) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             throw new BadRequestException("Basket is empty");

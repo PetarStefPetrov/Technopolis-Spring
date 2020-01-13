@@ -16,16 +16,16 @@ public class AbstractController extends GlobalExceptionHandler {
     @Autowired
     UserDao userDao;
 
-    protected User checkIfUserIsLogged(HttpSession session){
-        User user = (User) session.getAttribute(SESSION_KEY_LOGGED_USER);
+    protected UserWithoutPasswordDto checkIfUserIsLogged(HttpSession session){
+        UserWithoutPasswordDto user = (UserWithoutPasswordDto) session.getAttribute(SESSION_KEY_LOGGED_USER);
         if(user == null){
             throw new AuthorizationException("Must be logged in");
         }
         return user;
     }
 
-    protected User checkIfUserIsAdmin(HttpSession session) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+    protected UserWithoutPasswordDto checkIfUserIsAdmin(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         if(!userDao.isAdmin(user.getId())){
             throw new AuthorizationException("Must be admin");
         }

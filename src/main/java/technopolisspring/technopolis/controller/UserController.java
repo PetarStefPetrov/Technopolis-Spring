@@ -41,7 +41,7 @@ public class UserController extends AbstractController {
             throw new InvalidArgumentsException("Invalid email or password");
         }
         UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER,user);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
         return userWithoutPasswordDto;
     }
 
@@ -62,8 +62,9 @@ public class UserController extends AbstractController {
         String password = encoder.encode(user.getPassword());
         user.setPassword(password);
         userDao.registerUser(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, new UserWithoutPasswordDto(user));
-        return new UserWithoutPasswordDto(user);
+        UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
+        return userWithoutPasswordDto;
     }
 
     @PostMapping("/users/logout")
@@ -72,8 +73,8 @@ public class UserController extends AbstractController {
     }
 
     @DeleteMapping("users")
-    public User delete(HttpSession session) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+    public UserWithoutPasswordDto delete(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         if (!userDao.deleteUser(user.getId())){
             throw new BadRequestException("There is no such user");
         }
@@ -83,7 +84,7 @@ public class UserController extends AbstractController {
 
     @PutMapping("users/change_password")
     public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) throws SQLException {
-        User userInSession = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session);
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
             throw new InvalidArgumentsException("Wrong password");
@@ -109,8 +110,7 @@ public class UserController extends AbstractController {
 
     @GetMapping("users/profile")
     public UserWithoutPasswordDto getMyProfile(HttpSession session) {
-        User user = checkIfUserIsLogged(session);
-        return new UserWithoutPasswordDto(user);
+        return checkIfUserIsLogged(session);
     }
 
     @GetMapping("users/page/{pageNumber}")
@@ -120,26 +120,26 @@ public class UserController extends AbstractController {
     }
 
     @GetMapping("users/reviews/page/{pageNumber}")
-    public List<Review> getReview(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+    public List<Review> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getReviews(user.getId(), pageNumber);
     }
 
     @GetMapping("users/orders/pages/{pageNumber}")
     public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getOrders(user.getId(), pageNumber);
     }
 
     @GetMapping("users/favorites/page/{pageNumber}")
     public List<Product> getFavourites(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getFavourites(user.getId(), pageNumber);
     }
 
-    @PostMapping("users/add_review/{product_id}")
+    @PostMapping("users/reviews/{product_id}")
     public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
@@ -149,7 +149,7 @@ public class UserController extends AbstractController {
 
     @PostMapping("users/add_to_favorites/{product_id}")
     public Product addFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
@@ -163,7 +163,7 @@ public class UserController extends AbstractController {
 
     @PostMapping("users/remove_from_favorites/{product_id}")
     public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
@@ -176,9 +176,9 @@ public class UserController extends AbstractController {
 
     @PutMapping("users/subscribe")
     public UserWithoutPasswordDto subscribe(HttpSession session) throws SQLException {
-        User user = checkIfUserIsLogged(session);
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         userDao.subscribeUser(user);
-        return new UserWithoutPasswordDto(user);
+        return user;
     }
 
 }
