@@ -32,6 +32,7 @@ public class OrderController extends AbstractController {
         }
         Order order = new Order(user.getId(), user.getAddress(), basket);
         orderDao.addOrder(order);
+        session.removeAttribute(SESSION_KEY_BASKET_USER);
         return order;
     }
 
@@ -69,7 +70,12 @@ public class OrderController extends AbstractController {
         if(!basket.containsKey(product)){
             throw new BadRequestException("Invalid request");
         } else {
-            basket.remove(product);
+            int quantity = basket.get(product);
+            if (quantity == 1){
+                basket.remove(product);
+            } else {
+                basket.put(product,--quantity);
+            }
         }
         session.removeAttribute(SESSION_KEY_BASKET_USER);
         session.setAttribute(SESSION_KEY_BASKET_USER, basket);
