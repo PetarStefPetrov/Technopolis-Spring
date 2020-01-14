@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 public abstract class GlobalExceptionHandler {
 
