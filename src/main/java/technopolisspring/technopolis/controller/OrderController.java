@@ -8,6 +8,7 @@ import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
+import technopolisspring.technopolis.model.pojos.User;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -25,7 +26,7 @@ public class OrderController extends AbstractController {
 
     @PostMapping("/orders")
     public Order addOrder(HttpSession session) throws SQLException {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        User user = checkIfUserIsLogged(session);
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             throw new BadRequestException("Basket is empty");

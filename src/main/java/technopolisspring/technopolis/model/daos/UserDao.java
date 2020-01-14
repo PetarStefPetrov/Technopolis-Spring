@@ -315,7 +315,7 @@ public class UserDao extends Dao {
         }
     }
 
-    public void subscribeUser(UserWithoutPasswordDto user) throws SQLException {
+    public void subscribeUser(User user) throws SQLException {
         String sql = "UPDATE `technopolis`.`users` " +
                 "SET `is_subscribed` = ? " +
                 "WHERE is_deleted = 0 AND `id` = ?;";
