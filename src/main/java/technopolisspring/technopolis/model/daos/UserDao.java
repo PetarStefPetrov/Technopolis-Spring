@@ -293,25 +293,25 @@ public class UserDao extends Dao {
         ));
     }
 
-    public boolean makeAdmin(long userId) throws SQLException {
+    public void makeAdmin(String email) throws SQLException {
         String sql = "UPDATE `technopolis`.`users` " +
                 "SET `is_admin` = 1 " +
-                "WHERE is_deleted = 0 AND `id` = ?;";
+                "WHERE is_deleted = 0 AND `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, userId);
-            return statement.executeUpdate() != 0;
+            statement.setString(1, email);
+            statement.execute();
         }
     }
 
-    public boolean removeAdmin(long userId) throws SQLException {
+    public void removeAdmin(String email) throws SQLException {
         String sql = "UPDATE `technopolis`.`users` " +
                 "SET `is_admin` = 0 " +
-                "WHERE is_deleted = 0 AND `id` = ?;";
+                "WHERE is_deleted = 0 AND `email` = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, userId);
-            return statement.executeUpdate() != 0;
+            statement.setString(1, email);
+            statement.execute();
         }
     }
 

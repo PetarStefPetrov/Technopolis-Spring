@@ -7,9 +7,9 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.ProductDto;
+import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.model.exception.UserNotFoundException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.service.EmailService;
 
@@ -28,22 +28,16 @@ public class AdminController extends AbstractController {
     @Autowired
     EmailService emailService;
 
-    @PutMapping("users/make_admin/{userId}")
-    public String makeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
-        checkIfUserIsAdmin(session);
-        if (!userDAO.makeAdmin(userId)){
-            throw new UserNotFoundException();
-        }
-        return "Success!";
+    @GetMapping("users/make_admin")
+        public void makeAdmin(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsAdmin(session);
+        userDAO.makeAdmin(user.getEmail());
     }
 
-    @PutMapping("users/remove_admin/{userId}")
-    public String removeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
-        checkIfUserIsAdmin(session);
-        if (!userDAO.removeAdmin(userId)){
-            throw new InvalidArgumentsException("Invalid user");
-        }
-        return "Success!";
+    @GetMapping("users/remove_admin")
+    public void removeAdmin(HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsAdmin(session);
+        userDAO.removeAdmin(user.getEmail());
     }
 
     @PostMapping("products")
