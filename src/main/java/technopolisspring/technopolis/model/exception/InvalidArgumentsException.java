@@ -1,4 +1,4 @@
-package technopolisspring.technopolis.exception;
+package technopolisspring.technopolis.model.exception;
 
 public class InvalidArgumentsException extends RuntimeException {
 
