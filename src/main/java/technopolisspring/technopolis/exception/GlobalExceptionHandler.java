@@ -11,9 +11,13 @@ import java.time.LocalDateTime;
 
 public abstract class GlobalExceptionHandler {
 
+    public static final String URL_REQUIRES_ARGUMENTS = "Url requires arguments";
+    public static final String WHOOPS_SOMETHING_WENT_WRONG = "Whoops, something went wrong!";
+    public static final String INVALID_ARGUMENTS = "Invalid arguments";
+
     @ExceptionHandler({InvalidArgumentsException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorDto invalidArgoments(Exception e){
+    public ErrorDto invalidArguments(Exception e){
         return new ErrorDto(
                 e.getMessage(),
                 HttpStatus.UNAUTHORIZED.value(),
@@ -55,7 +59,7 @@ public abstract class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto wrongDateFormat(Exception e){
         return new ErrorDto(
-                "Invalid arguments!",
+                INVALID_ARGUMENTS,
                 HttpStatus.UNAUTHORIZED.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
@@ -65,7 +69,7 @@ public abstract class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto somethingWentWrong(Exception e){
         return new ErrorDto(
-                "Whoops, something went wrong!",
+                WHOOPS_SOMETHING_WENT_WRONG,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
@@ -75,7 +79,7 @@ public abstract class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto urlRequiresArguments(Exception e){
         return new ErrorDto(
-                "Url requires arguments",
+                URL_REQUIRES_ARGUMENTS,
                 HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
