@@ -41,7 +41,7 @@ public class UserController extends AbstractController {
             throw new InvalidArgumentsException("Invalid email or password");
         }
         UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
+        session.setAttribute(SESSION_KEY_LOGGED_USER,user);
         return userWithoutPasswordDto;
     }
 
@@ -61,10 +61,9 @@ public class UserController extends AbstractController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(user.getPassword());
         user.setPassword(password);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         userDao.registerUser(user);
-        UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
-        return userWithoutPasswordDto;
+        return new UserWithoutPasswordDto(user);
     }
 
     @PostMapping("/users/logout")
@@ -110,8 +109,8 @@ public class UserController extends AbstractController {
 
     @GetMapping("users/profile")
     public UserWithoutPasswordDto getMyProfile(HttpSession session) {
-        User user = ;
-        return new UserWithoutPasswordDto(checkIfUserIsLogged(session));
+        User user = checkIfUserIsLogged(session);
+        return new UserWithoutPasswordDto(user);
     }
 
     @GetMapping("users/page/{pageNumber}")

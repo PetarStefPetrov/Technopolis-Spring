@@ -54,7 +54,6 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
-<<<<<<< HEAD
     @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto wrongDateFormat(Exception e){
@@ -66,8 +65,6 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
-=======
->>>>>>> parent of 518956a... we are now handling wrong date format given in JSON
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto somethingWentWrong(Exception e){
