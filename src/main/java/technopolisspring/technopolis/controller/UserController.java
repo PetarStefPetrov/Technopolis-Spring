@@ -61,8 +61,8 @@ public class UserController extends AbstractController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(user.getPassword());
         user.setPassword(password);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, user);
         userDao.registerUser(user);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, new UserWithoutPasswordDto(user));
         return new UserWithoutPasswordDto(user);
     }
 

@@ -24,6 +24,7 @@ public class UserWithoutPasswordDto {
     private LocalDateTime createTime;
     private String address;
     private boolean isSubscribed;
+    private boolean isAdmin;
 
         public UserWithoutPasswordDto(User user){
             this.id = user.getId();
@@ -34,5 +35,6 @@ public class UserWithoutPasswordDto {
             this.createTime = user.getCreateTime();
             this.address = user.getAddress();
             this.isSubscribed = user.isSubscribed();
+            this.isAdmin = user.isAdmin();
         }
 }
