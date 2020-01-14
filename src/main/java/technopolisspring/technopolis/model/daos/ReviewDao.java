@@ -1,14 +1,11 @@
 package technopolisspring.technopolis.model.daos;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.dto.EditReviewDto;
 import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 import technopolisspring.technopolis.model.dto.ReviewOfUserDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
-import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
-import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -34,26 +31,27 @@ public class ReviewDao extends Dao {
         }
     }
 
-    public void editReview(Review review) throws SQLException {
+    public boolean editReview(EditReviewDto review) throws SQLException {
         String sql = "UPDATE `technopolis`.reviews\n" +
                 "SET \n" +
                 "title = ?,\n" +
                 "comment = ?\n" +
-                "WHERE id = ?;";
+                "WHERE id = ? AND user_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, review.getTitle());
             statement.setString(2, review.getComment());
             statement.setLong(3, review.getId());
-            statement.executeUpdate();
+            statement.setLong(4, review.getUserId());
+            return statement.executeUpdate() != 0;
         }
     }
 
-    public void deleteReview(int id) throws SQLException {
+    public void deleteReview(long reviewId) throws SQLException {
         String sql = "DELETE FROM `technopolis`.reviews WHERE id = ?";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, id);
+            statement.setLong(1, reviewId);
             statement.execute();
         }
     }
@@ -95,5 +93,25 @@ public class ReviewDao extends Dao {
         }
     }
 
+    public Review getReviewById(long reviewId) throws SQLException {
+        String sql = "SELECT title, comment, product_id, user_id\n" +
+                "FROM technopolis.reviews\n" +
+                "WHERE id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, reviewId);
+            ResultSet resultSet = statement.executeQuery();
+            if (!resultSet.next()){
+                return null;
+            }
+            return new Review(
+                    reviewId,
+                    resultSet.getString("title"),
+                    resultSet.getString("comment"),
+                    resultSet.getLong("product_id"),
+                    resultSet.getLong("user_id")
+            );
+        }
+    }
 }
 

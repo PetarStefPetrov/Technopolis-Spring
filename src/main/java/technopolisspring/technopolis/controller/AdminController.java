@@ -9,7 +9,7 @@ import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
 import technopolisspring.technopolis.model.exception.BadRequestException;
 import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.model.exception.UserNotFoundException;
+import technopolisspring.technopolis.model.exception.NotFoundException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.service.EmailService;
 
@@ -32,7 +32,7 @@ public class AdminController extends AbstractController {
     public String makeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (!userDAO.makeAdmin(userId)){
-            throw new UserNotFoundException();
+            throw new NotFoundException("User not found");
         }
         return "Success!";
     }
