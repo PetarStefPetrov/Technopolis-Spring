@@ -11,7 +11,7 @@ import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
 import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.service.EmailService;
+import technopolisspring.technopolis.utils.EmailUtil;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -26,7 +26,7 @@ public class AdminController extends AbstractController {
     @Autowired
     OfferDao offerDao;
     @Autowired
-    EmailService emailService;
+    EmailUtil emailUtil;
 
     @PutMapping("users/make_admin/{userId}")
     public String makeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
@@ -61,7 +61,7 @@ public class AdminController extends AbstractController {
         }
         createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / 100);
         this.offerDao.addOffer(createOfferDto);
-        this.emailService.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
+        this.emailUtil.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
         return createOfferDto;
     }
 
