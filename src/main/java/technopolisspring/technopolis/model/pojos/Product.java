@@ -4,16 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
-import technopolisspring.technopolis.model.dto.ReviewOfProductDto;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product implements IProductWithReview {
+public class Product implements IProduct {
 
     private long id;
     private String description;
@@ -22,7 +19,6 @@ public class Product implements IProductWithReview {
     private long brandId;
     private long subCategoryId;
     private long offerId;
-    private List<ReviewOfProductDto> reviews;
 
     public Product(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId, long offerId) {
         this.id = id;
@@ -32,7 +28,6 @@ public class Product implements IProductWithReview {
         this.brandId = brandId;
         this.subCategoryId = subCategoryId;
         this.offerId = offerId;
-        this.reviews = new ArrayList<>();
     }
 
     public Product (CreateProductDto createProductDto){
@@ -59,11 +54,6 @@ public class Product implements IProductWithReview {
     @Override
     public String toString() {
         return  description;
-    }
-
-    @Override
-    public void addReview(ReviewOfProductDto review){
-        this.reviews.add(review);
     }
 
 }

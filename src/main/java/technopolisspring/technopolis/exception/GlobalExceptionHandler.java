@@ -70,15 +70,15 @@ public abstract class GlobalExceptionHandler {
                 e.getClass().getName());
     }
 
-    @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorDto somethingWentWrong(Exception e){
-        return new ErrorDto(
-                WHOOPS_SOMETHING_WENT_WRONG,
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-    }
+//    @ExceptionHandler({Exception.class})
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+//    public ErrorDto somethingWentWrong(Exception e){
+//        return new ErrorDto(
+//                WHOOPS_SOMETHING_WENT_WRONG,
+//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                LocalDateTime.now(),
+//                e.getClass().getName());
+//    }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

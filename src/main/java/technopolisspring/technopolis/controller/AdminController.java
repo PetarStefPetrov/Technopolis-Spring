@@ -1,16 +1,15 @@
 package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.exception.BadRequestException;
+import technopolisspring.technopolis.exception.InvalidArgumentsException;
+import technopolisspring.technopolis.exception.NotFoundException;
 import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
-import technopolisspring.technopolis.exception.BadRequestException;
-import technopolisspring.technopolis.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.exception.NotFoundException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.service.EmailService;
 
@@ -35,7 +34,7 @@ public class AdminController extends AbstractController {
         if (!userDAO.makeAdmin(userId)){
             throw new NotFoundException("User not found");
         }
-        return "Success!";
+        return ProductController.SUCCESS;
     }
 
     @PutMapping("users/remove_admin/{userId}")
@@ -44,7 +43,7 @@ public class AdminController extends AbstractController {
         if (!userDAO.removeAdmin(userId)){
             throw new InvalidArgumentsException("Invalid user");
         }
-        return "Success!";
+        return ProductController.SUCCESS;
     }
 
     @PostMapping("products")
@@ -69,17 +68,10 @@ public class AdminController extends AbstractController {
     @PostMapping("offers/{offerId}/products/{productId}")
     public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        double discountedPrice = offerDao.getProductWithDiscountedPrice(productId);
-        if (discountedPrice == 0.0){
-            throw new BadRequestException("Offer or product doesn't exist");
-        }
-        if (discountedPrice == -1){
-            throw new BadRequestException("Product is already in that offer");
-        }
         if (!offerDao.addProductToOffer(productId, offerId)){
             throw new BadRequestException("Offer or product doesn't exist");
         }
-        return "Product was added successfully!";
+        return ProductController.SUCCESS;
     }
 
 }

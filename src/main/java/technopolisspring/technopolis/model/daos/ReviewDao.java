@@ -2,9 +2,9 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.EditReviewDto;
-import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 import technopolisspring.technopolis.model.dto.ReviewOfUserDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
+import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 
 import java.sql.*;
@@ -72,7 +72,7 @@ public class ReviewDao extends Dao {
             List<ReviewOfUserDto> reviews = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
-                ProductWithoutReviewsDto product = new ProductWithoutReviewsDto(
+                Product product = new Product(
                         result.getLong("p.id"),
                         result.getString("p.description"),
                         result.getDouble("p.price"),
@@ -113,5 +113,6 @@ public class ReviewDao extends Dao {
             );
         }
     }
+
 }
 

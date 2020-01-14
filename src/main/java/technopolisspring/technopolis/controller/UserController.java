@@ -178,7 +178,7 @@ public class UserController extends AbstractController {
     }
 
     @GetMapping("users/orders/page/{pageNumber}")
-    public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+    public List<OrderWithoutProductsDto> getOrders(HttpSession session, @PathVariable int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getOrders(user.getId(), validatePageNumber(pageNumber));
     }

@@ -3,14 +3,11 @@ package technopolisspring.technopolis.controller;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.FilterForProductsDto;
-import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
-import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.IProduct;
-import technopolisspring.technopolis.model.pojos.IProductWithReview;
-import technopolisspring.technopolis.model.pojos.Product;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -28,8 +25,8 @@ public class ProductController extends AbstractController {
     private OfferDao offerDao;
 
     @GetMapping("products/{productId}")
-    public IProductWithReview getProduct(@PathVariable long productId) throws SQLException {
-        IProductWithReview product = productDao.getProductById(productId);
+    public IProduct getProduct(@PathVariable long productId) throws SQLException {
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException(INVALID_PRODUCT);
         }
