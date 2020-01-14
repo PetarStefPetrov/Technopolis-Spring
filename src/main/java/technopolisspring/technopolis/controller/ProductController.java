@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.controller;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.OfferDao;
@@ -18,16 +19,19 @@ import java.util.List;
 @RestController
 public class ProductController extends AbstractController {
 
+    public static final String INVALID_PRODUCT = "Invalid Product";
+    public static final String INVALID_ARGUMENTS = "Invalid arguments";
+    public static final String SUCCESS = "Success!";
     @Autowired
     private ProductDao productDao;
     @Autowired
     private OfferDao offerDao;
 
-    @GetMapping("products/{product_id}")
-    public IProductWithReview getProduct(@PathVariable long product_id) throws SQLException {
-        IProductWithReview product = productDao.getProductById(product_id);
+    @GetMapping("products/{productId}")
+    public IProductWithReview getProduct(@PathVariable long productId) throws SQLException {
+        IProductWithReview product = productDao.getProductById(productId);
         if(product == null){
-            throw new BadRequestException("Invalid Product");
+            throw new BadRequestException(INVALID_PRODUCT);
         }
         return product;
     }
@@ -37,9 +41,9 @@ public class ProductController extends AbstractController {
         return productDao.getAllProducts(validatePageNumber(pageNumber));
     }
 
+    @SneakyThrows
     @GetMapping("products/sub_categories/{sub_category_id}/page/{pageNumber}")
-    public List<IProduct> getAllProductsBySubCategory(@PathVariable long sub_category_id, @PathVariable int pageNumber) throws SQLException {
-        // todo: check if that category exists
+    public List<IProduct> getAllProductsBySubCategory(@PathVariable long sub_category_id, @PathVariable int pageNumber) {
         return productDao.getProductsBySubCategory(sub_category_id, validatePageNumber(pageNumber));
     }
 
@@ -55,17 +59,17 @@ public class ProductController extends AbstractController {
                 filterForProductsDto.getSubCategoryId() == 0 &&
                 filterForProductsDto.getMaxPrice() == 0 &&
                 filterForProductsDto.getMinPrice() == 0) {
-            throw new BadRequestException("Invalid arguments");
+            throw new BadRequestException(INVALID_ARGUMENTS);
         }
         if (    filterForProductsDto.getBrandId() < 0 ||
                 filterForProductsDto.getSubCategoryId() < 0 ||
                 filterForProductsDto.getMaxPrice() < 0 ||
                 filterForProductsDto.getMinPrice() < 0 ||
                 pageNumber < 1) {
-            throw new BadRequestException("Invalid arguments");
+            throw new BadRequestException(INVALID_ARGUMENTS);
         }
         if (filterForProductsDto.getMaxPrice() < filterForProductsDto.getMinPrice()) {
-            throw new BadRequestException("Invalid arguments");
+            throw new BadRequestException(INVALID_ARGUMENTS);
         }
         return productDao.getProductsWithFilters(filterForProductsDto, validatePageNumber(pageNumber));
     }
@@ -79,9 +83,9 @@ public class ProductController extends AbstractController {
     public String deleteProduct(@PathVariable long productId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (!productDao.deleteProduct(productId)){
-            throw new BadRequestException("There is no such product");
+            throw new BadRequestException(INVALID_PRODUCT);
         }
-        return "Success!";
+        return SUCCESS;
     }
 
 }

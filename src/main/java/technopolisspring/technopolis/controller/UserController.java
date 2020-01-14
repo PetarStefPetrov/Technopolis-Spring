@@ -13,10 +13,7 @@ import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.exception.NotFoundException;
-import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.Review;
-import technopolisspring.technopolis.model.pojos.User;
+import technopolisspring.technopolis.model.pojos.*;
 import technopolisspring.technopolis.service.ValidationUtil;
 
 
@@ -29,6 +26,8 @@ import java.util.List;
 @Validated
 public class UserController extends AbstractController {
 
+    public static final String YOU_DON_T_HAVE_THIS_PRODUCT_IN_YOURS_FAVORITES = "You don't have this product, in yours favorites";
+    public static final String SUCCESS = "Success!";
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -141,7 +140,7 @@ public class UserController extends AbstractController {
     @PostMapping("users/reviews/{productId}")
     public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(productId);
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
@@ -186,15 +185,15 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @GetMapping("users/favorites/page/{pageNumber}")
-    public List<ProductWithoutReviewsDto> getFavourites(HttpSession session, @PathVariable int pageNumber) {
+    public List<IProduct> getFavourites(HttpSession session, @PathVariable int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
     }
 
     @PostMapping("users/add_to_favorites/{productId}")
-    public Product addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
+    public IProduct addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(productId);
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
@@ -206,17 +205,13 @@ public class UserController extends AbstractController {
     }
 
     @SneakyThrows
-    @PostMapping("users/remove_from_favorites/{product_id}")
-    public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) {
+    @PostMapping("users/remove_from_favorites/{productId}")
+    public String removeFavorites(HttpSession session, @PathVariable long productId) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(id);
-        if(product == null){
-            throw new BadRequestException("Invalid Product");
+        if(!userDao.removeFromFavorites(productId, user.getId())){
+            throw new BadRequestException(YOU_DON_T_HAVE_THIS_PRODUCT_IN_YOURS_FAVORITES);
         }
-        if(!userDao.removeFromFavorites(product.getId(), user.getId())){
-            throw new BadRequestException("You don't have this product, in yours favorites");
-        }
-        return product;
+        return SUCCESS;
     }
 
     @PutMapping("users/subscribe")
