@@ -26,7 +26,6 @@ public class User {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime createTime;
     private String address;
-    @JsonIgnore
     private boolean isAdmin = false;
     private boolean isSubscribed;
 
