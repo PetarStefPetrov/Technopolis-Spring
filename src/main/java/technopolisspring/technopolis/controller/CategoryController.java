@@ -15,19 +15,19 @@ public class CategoryController extends AbstractController {
     @Autowired
     public CategoryDao categoryDAO;
 
-    @GetMapping("categories/page/{pageNumber}") // todo: pagination
+    @GetMapping("categories/page/{pageNumber}")
     public Map<Long,String> allCategories(@PathVariable int pageNumber) throws SQLException {
-        return categoryDAO.getAllCategories(pageNumber);
+        return categoryDAO.getAllCategories(validatePageNumber(pageNumber));
     }
 
     @GetMapping("categories/{category_id}/page/{pageNumber}")
     public Map<Long,String> allSubCategoriesById(@PathVariable long category_id, @PathVariable int pageNumber) throws SQLException {
-        return categoryDAO.getSubCategories(category_id, pageNumber);
+        return categoryDAO.getSubCategories(category_id, validatePageNumber(pageNumber));
     }
 
-    @GetMapping("brands/page/{pageNumber}") // todo: pagination
+    @GetMapping("brands/page/{pageNumber}")
     public Map<Long,String> getAllBrands(@PathVariable int pageNumber) throws SQLException {
-        return categoryDAO.getAllBrands(pageNumber);
+        return categoryDAO.getAllBrands(validatePageNumber(pageNumber));
     }
 
 }

@@ -4,10 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
-import technopolisspring.technopolis.model.daos.ReviewDao;
 import technopolisspring.technopolis.model.dto.FilterForProductsDto;
 import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
-import technopolisspring.technopolis.model.exception.BadRequestException;
+import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Product;
 
 import javax.servlet.http.HttpSession;
@@ -33,18 +32,18 @@ public class ProductController extends AbstractController {
 
     @GetMapping("products/page/{pageNumber}")
     public List<ProductWithoutReviewsDto> getAllProducts(@PathVariable int pageNumber){
-        return productDao.getAllProducts(pageNumber);
+        return productDao.getAllProducts(validatePageNumber(pageNumber));
     }
 
     @GetMapping("products/sub_categories/{sub_category_id}/page/{pageNumber}")
     public List<ProductWithoutReviewsDto> getAllProductsBySubCategory(@PathVariable long sub_category_id, @PathVariable int pageNumber) throws SQLException {
         // todo: check if that category exists
-        return productDao.getProductsBySubCategory(sub_category_id, pageNumber);
+        return productDao.getProductsBySubCategory(sub_category_id, validatePageNumber(pageNumber));
     }
 
     @GetMapping("products/{description}/page/{pageNumber}")
     public List<ProductWithoutReviewsDto> lookForProductsByDescription(@PathVariable String description, @PathVariable int pageNumber) {
-        return productDao.lookForProductsByDescription(description, pageNumber);
+        return productDao.lookForProductsByDescription(description, validatePageNumber(pageNumber));
     }
 
     @PostMapping("products/filters/page/{pageNumber}")
@@ -66,12 +65,12 @@ public class ProductController extends AbstractController {
         if (filterForProductsDto.getMaxPrice() < filterForProductsDto.getMinPrice()) {
             throw new BadRequestException("Invalid arguments");
         }
-        return productDao.getProductsWithFilters(filterForProductsDto, pageNumber);
+        return productDao.getProductsWithFilters(filterForProductsDto, validatePageNumber(pageNumber));
     }
 
     @GetMapping("offers/page/{pageNumber}")
     public List<ProductWithoutReviewsDto> getAllProductsInOffers(@PathVariable int pageNumber) {
-        return offerDao.getAllProductsInOffers(pageNumber);
+        return offerDao.getAllProductsInOffers(validatePageNumber(pageNumber));
     }
 
     @DeleteMapping("products/{productId}")

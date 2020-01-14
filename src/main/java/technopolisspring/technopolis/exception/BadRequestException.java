@@ -1,4 +1,4 @@
-package technopolisspring.technopolis.model.exception;
+package technopolisspring.technopolis.exception;
 
 public class BadRequestException extends RuntimeException {
     public BadRequestException(String msg) {
