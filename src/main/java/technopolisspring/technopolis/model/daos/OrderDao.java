@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.pojos.IProduct;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 
@@ -35,7 +36,7 @@ public class OrderDao extends Dao {
                 return;
             }
             order.setId(resultSet.getInt(1));
-            for (Map.Entry<Product, Integer> entry : order.getProducts().entrySet()) {
+            for (Map.Entry<IProduct, Integer> entry : order.getProducts().entrySet()) {
                 orderProductsStatement.setLong(1, entry.getKey().getId());
                 orderProductsStatement.setLong(2, order.getId());
                 orderProductsStatement.setInt(3, entry.getValue());
@@ -63,17 +64,16 @@ public class OrderDao extends Dao {
             if(!result.next()){
                 return null;
             }
-            Order order = new Order(
+            return new Order(
                     result.getLong("id"),
                     result.getLong("user_id"),
                     result.getString("address"),
                     getOrderProducts(orderId)
             );
-            return order;
         }
     }
 
-    public Map<Product, Integer> getOrderProducts(long orderId) throws SQLException {
+    public Map<IProduct, Integer> getOrderProducts(long orderId) throws SQLException {
         String sql = "SELECT product_id, order_id, quantity\n" +
                 "FROM technopolis.orders_have_products\n" +
                 "WHERE order_id = ?;";
@@ -81,8 +81,8 @@ public class OrderDao extends Dao {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, orderId);
             ResultSet result = statement.executeQuery();
-            Map<Product, Integer> products = new HashMap<>();
-            while (result.next()){
+            Map<IProduct, Integer> products = new HashMap<>();
+            while (result.next()){ //todo fix
                 products.put(productDAO.getProductById(result.getLong("product_id")),
                                                        result.getInt("quantity"));
             }

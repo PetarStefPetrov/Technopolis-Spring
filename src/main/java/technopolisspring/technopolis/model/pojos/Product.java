@@ -13,7 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product implements IProduct {
+public class Product implements IProductWithReview {
 
     private long id;
     private String description;
@@ -61,6 +61,7 @@ public class Product implements IProduct {
         return  description;
     }
 
+    @Override
     public void addReview(ReviewOfProductDto review){
         this.reviews.add(review);
     }

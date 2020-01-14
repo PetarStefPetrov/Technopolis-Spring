@@ -13,10 +13,7 @@ import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.exception.NotFoundException;
-import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.Review;
-import technopolisspring.technopolis.model.pojos.User;
+import technopolisspring.technopolis.model.pojos.*;
 
 
 import javax.servlet.http.HttpSession;
@@ -133,7 +130,7 @@ public class UserController extends AbstractController {
     @PostMapping("users/reviews/{productId}")
     public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(productId);
+        IProductWithReview product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
@@ -178,15 +175,15 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @GetMapping("users/favorites/page/{pageNumber}")
-    public List<ProductWithoutReviewsDto> getFavourites(HttpSession session, @PathVariable int pageNumber) {
+    public List<IProduct> getFavourites(HttpSession session, @PathVariable int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
     }
 
     @PostMapping("users/add_to_favorites/{productId}")
-    public Product addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
+    public IProduct addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(productId);
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
@@ -199,9 +196,9 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PostMapping("users/remove_from_favorites/{product_id}")
-    public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) {
+    public IProduct removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Product product = productDao.getProductById(id);
+        IProduct product = productDao.getProductById(id); // there's no need for this todo: fix later
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }

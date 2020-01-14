@@ -1,13 +1,19 @@
 package technopolisspring.technopolis.model.daos;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
+import technopolisspring.technopolis.model.pojos.IProduct;
 
 import java.sql.*;
 import java.util.List;
 
 @Component
 public class OfferDao extends Dao {
+
+    @Autowired
+    ProductDao productDao;
 
     public void addOffer(CreateOfferDto offer) throws SQLException {
         String sql = "INSERT INTO `technopolis`.`offers` " +
@@ -26,7 +32,7 @@ public class OfferDao extends Dao {
         }
     }
 
-    public List<ProductWithoutReviewsDto> getAllProductsInOffers(int pageNumber){
+    public List<IProduct> getAllProductsInOffers(int pageNumber){
         String sql = "SELECT id, 'description', price, picture_url, brand_id, sub_category_id, offer_id\n" +
                 "FROM technopolis.products\n" +
                 "WHERE is_deleted = 0 AND offer_id IS NOT NULL\n" +
@@ -37,15 +43,7 @@ public class OfferDao extends Dao {
             preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
             preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
         },
-                (result, i) -> new ProductWithoutReviewsDto(
-                result.getLong("id"),
-                result.getString("description"),
-                result.getDouble("price"),
-                result.getString("picture_url"),
-                result.getLong("brand_id"),
-                result.getLong("sub_category_id"),
-                result.getLong("offer_id")
-        ));
+                (result, i) -> productDao.getProductWithoutReviews(result));
     }
 
     public boolean addProductToOffer(long productId, long offerId) throws SQLException {
@@ -78,7 +76,12 @@ public class OfferDao extends Dao {
             }
             double price = resultSet.getDouble("price");
             double discountPercent = resultSet.getDouble("discount_percent");
-            return price - (price * discountPercent);
+            return calculateDiscountedPrice(price, discountPercent);
         }
     }
+
+    public double calculateDiscountedPrice(double price, double discountPercent){
+        return price - (price * discountPercent);
+    }
+
 }

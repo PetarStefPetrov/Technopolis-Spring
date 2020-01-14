@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import technopolisspring.technopolis.model.pojos.IProduct;
+import technopolisspring.technopolis.model.pojos.IProductWithReview;
 
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductInOfferDto  implements IProduct {
+public class ProductInOfferDto implements IProductWithReview {
 
     private long id;
     private String description;
@@ -41,6 +42,11 @@ public class ProductInOfferDto  implements IProduct {
     @Override
     public String toString() {
         return this.description;
+    }
+
+    @Override
+    public void addReview(ReviewOfProductDto review){
+        this.reviews.add(review);
     }
 
 }
