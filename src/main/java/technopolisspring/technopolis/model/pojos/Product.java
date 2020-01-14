@@ -13,7 +13,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product {
+public class Product implements IProduct {
 
     private long id;
     private String description;
@@ -33,12 +33,6 @@ public class Product {
         this.subCategoryId = subCategoryId;
         this.offerId = offerId;
         this.reviews = new ArrayList<>();
-    }
-
-    public Product(long id, String description, double price, String pictureUrl, long brandId,
-                   long subCategoryId, long offerId, List<ReviewOfProductDto> reviews) {
-        this(id, description, price, pictureUrl, brandId, subCategoryId, offerId);
-        this.reviews.addAll(reviews);
     }
 
     public Product (CreateProductDto createProductDto){

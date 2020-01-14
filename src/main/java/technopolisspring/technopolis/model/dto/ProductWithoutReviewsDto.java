@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import technopolisspring.technopolis.model.pojos.IProduct;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductWithoutReviewsDto {
+public class ProductWithoutReviewsDto implements IProduct {
 
     private long id;
     private String description;

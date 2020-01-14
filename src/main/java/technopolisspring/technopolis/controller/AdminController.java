@@ -1,6 +1,7 @@
 package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
@@ -56,9 +57,10 @@ public class AdminController extends AbstractController {
     @PostMapping("offers")
     public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > 1){
+        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > 100){
             throw new InvalidArgumentsException("Discount percent must be between 0 and 1, 0 not included.");
         }
+        createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / 100);
         this.offerDao.addOffer(createOfferDto);
         this.emailService.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
         return createOfferDto;
