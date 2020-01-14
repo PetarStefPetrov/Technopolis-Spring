@@ -110,8 +110,8 @@ public class UserController extends AbstractController {
 
     @GetMapping("users/profile")
     public UserWithoutPasswordDto getMyProfile(HttpSession session) {
-        User user = checkIfUserIsLogged(session);
-        return new UserWithoutPasswordDto(user);
+        User user = ;
+        return new UserWithoutPasswordDto(checkIfUserIsLogged(session));
     }
 
     @GetMapping("users/page/{pageNumber}")

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 
 public abstract class GlobalExceptionHandler {
 
@@ -55,6 +54,7 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
+<<<<<<< HEAD
     @ExceptionHandler({HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto wrongDateFormat(Exception e){
@@ -66,6 +66,8 @@ public abstract class GlobalExceptionHandler {
         return errorDTO;
     }
 
+=======
+>>>>>>> parent of 518956a... we are now handling wrong date format given in JSON
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorDto somethingWentWrong(Exception e){
