@@ -1,4 +1,4 @@
-package technopolisspring.technopolis.model.exception;
+package technopolisspring.technopolis.exception;
 
 public class AuthorizationException extends RuntimeException {
     public AuthorizationException(String msg){

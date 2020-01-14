@@ -1,6 +1,5 @@
 package technopolisspring.technopolis.controller;
 
-import lombok.Setter;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -10,9 +9,9 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
-import technopolisspring.technopolis.model.exception.BadRequestException;
-import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.model.exception.NotFoundException;
+import technopolisspring.technopolis.exception.BadRequestException;
+import technopolisspring.technopolis.exception.InvalidArgumentsException;
+import technopolisspring.technopolis.exception.NotFoundException;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -130,7 +129,7 @@ public class UserController extends AbstractController {
     @GetMapping("users/page/{pageNumber}")
     public List<User> getAllUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         checkIfUserIsAdmin(session);
-        return userDao.getAllUsers(pageNumber);
+        return userDao.getAllUsers(validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
@@ -147,7 +146,7 @@ public class UserController extends AbstractController {
     @GetMapping("users/reviews/page/{pageNumber}")
     public List<ReviewOfUserDto> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return reviewDao.getReviewsOfUser(user.getId(), pageNumber);
+        return reviewDao.getReviewsOfUser(user.getId(), validatePageNumber(pageNumber));
     }
 
     @PutMapping("users/reviews")
@@ -177,14 +176,14 @@ public class UserController extends AbstractController {
     @GetMapping("users/orders/page/{pageNumber}")
     public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getOrders(user.getId(), pageNumber);
+        return userDao.getOrders(user.getId(), validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
     @GetMapping("users/favorites/page/{pageNumber}")
     public List<ProductWithoutReviewsDto> getFavourites(HttpSession session, @PathVariable int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getFavourites(user.getId(), pageNumber);
+        return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
     }
 
     @PostMapping("users/add_to_favorites/{productId}")

@@ -10,12 +10,16 @@ import java.util.List;
 @Component
 public class AttributeDao extends Dao{
 
-    public List<Attribute> getAllAttributes() throws SQLException {
+    public List<Attribute> getAllAttributes(int pageNumber) throws SQLException {
         String sql = "SELECT id, name, sub_category_id, value\n" +
                 "FROM technopolis.attributes AS a\n" +
-                "JOIN technopolis.products_have_attriubtes AS pha ON id = attribute_id;";
+                "JOIN technopolis.products_have_attriubtes AS pha ON id = attribute_id\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, pageNumber * PAGE_SIZE);
+            statement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
             List<Attribute> attributes = new ArrayList<>();
             while (result.next()){
