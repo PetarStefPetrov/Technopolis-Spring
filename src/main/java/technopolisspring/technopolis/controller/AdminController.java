@@ -19,6 +19,9 @@ import java.sql.SQLException;
 @RestController
 public class AdminController extends AbstractController {
 
+    private static final String USER_NOT_FOUND = "User not found";
+    private static final String INVALID_USER = "Invalid user";
+    private static final int MAX_PERCENT = 100;
     @Autowired
     private UserDao userDAO;
     @Autowired
@@ -32,7 +35,7 @@ public class AdminController extends AbstractController {
     public String makeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (!userDAO.makeAdmin(userId)){
-            throw new NotFoundException("User not found");
+            throw new NotFoundException(USER_NOT_FOUND);
         }
         return ProductController.SUCCESS;
     }
@@ -41,7 +44,7 @@ public class AdminController extends AbstractController {
     public String removeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (!userDAO.removeAdmin(userId)){
-            throw new InvalidArgumentsException("Invalid user");
+            throw new InvalidArgumentsException(INVALID_USER);
         }
         return ProductController.SUCCESS;
     }
@@ -56,10 +59,10 @@ public class AdminController extends AbstractController {
     @PostMapping("offers")
     public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > 100){
+        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > MAX_PERCENT){
             throw new InvalidArgumentsException("Discount percent must be between 0 and 1, 0 not included.");
         }
-        createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / 100);
+        createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / MAX_PERCENT);
         this.offerDao.addOffer(createOfferDto);
         this.emailUtil.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
         return createOfferDto;

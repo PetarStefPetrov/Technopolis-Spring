@@ -1,15 +1,10 @@
 package technopolisspring.technopolis.exception;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
@@ -70,15 +65,15 @@ public abstract class GlobalExceptionHandler {
                 e.getClass().getName());
     }
 
-//    @ExceptionHandler({Exception.class})
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorDto somethingWentWrong(Exception e){
-//        return new ErrorDto(
-//                WHOOPS_SOMETHING_WENT_WRONG,
-//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                LocalDateTime.now(),
-//                e.getClass().getName());
-//    }
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDto somethingWentWrong(Exception e){
+        return new ErrorDto(
+                WHOOPS_SOMETHING_WENT_WRONG,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+    }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

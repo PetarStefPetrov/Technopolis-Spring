@@ -1,10 +1,10 @@
 package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import technopolisspring.technopolis.model.daos.UserDao;
-import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.exception.AuthorizationException;
 import technopolisspring.technopolis.exception.GlobalExceptionHandler;
+import technopolisspring.technopolis.model.daos.UserDao;
+import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;

@@ -1,19 +1,19 @@
 package technopolisspring.technopolis.model.daos;
 
 import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.pojos.Attribute;
+import technopolisspring.technopolis.model.dto.AddAttributeToProductDto;
+import technopolisspring.technopolis.model.dto.AttributeWithoutValueDto;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AttributeDao extends Dao{
+public class AttributeDao extends Dao {
 
-    public List<Attribute> getAllAttributes(int pageNumber) throws SQLException {
-        String sql = "SELECT id, name, sub_category_id, value\n" +
+    public List<AttributeWithoutValueDto> getAllAttributes(int pageNumber) throws SQLException {
+        String sql = "SELECT id, name, sub_category_id\n" +
                 "FROM technopolis.attributes AS a\n" +
-                "JOIN technopolis.products_have_attriubtes AS pha ON id = attribute_id\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -21,13 +21,12 @@ public class AttributeDao extends Dao{
             statement.setInt(1, pageNumber * PAGE_SIZE);
             statement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
-            List<Attribute> attributes = new ArrayList<>();
+            List<AttributeWithoutValueDto> attributes = new ArrayList<>();
             while (result.next()){
-                Attribute attribute = new Attribute(
+                AttributeWithoutValueDto attribute = new AttributeWithoutValueDto(
                         result.getLong("id"),
                         result.getString("name"),
-                        result.getLong("sub_category_id"),
-                        result.getString("value")
+                        result.getLong("sub_category_id")
                 );
                 attributes.add(attribute);
             }
@@ -35,60 +34,74 @@ public class AttributeDao extends Dao{
         }
     }
 
-    public void addAttribute(Attribute attribute, long productId) throws SQLException {
-        String attributeSql = "INSERT INTO `technopolis`.`attributes` " +
-                "(`name`, `sub_category_id`) " +
-                "VALUES (?, ?);";
-        String addValueSql = "INSERT INTO `technopolis`.`products_have_attriubtes` " +
+    public void addAttributeToProduct(AddAttributeToProductDto attribute, long productId) throws SQLException {
+        String sql = "INSERT INTO `technopolis`.`products_have_attriubtes` " +
                 "(`product_id`, `attribute_id`, `value`) " +
                 "VALUES (?, ?, ?);";
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        try (PreparedStatement attributeStatement = connection.prepareStatement(attributeSql, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement valueStatement = connection.prepareStatement(addValueSql)) {
-            connection.setAutoCommit(false);
-            attributeStatement.setString(1, attribute.getName());
-            attributeStatement.setLong(2, attribute.getSubCategoryId());
-            attributeStatement.execute();
-            ResultSet resultSet = attributeStatement.getGeneratedKeys();
-            resultSet.next();
-            attribute.setId(resultSet.getInt(1));
-            valueStatement.setLong(1, productId);
-            valueStatement.setLong(2, attribute.getId());
-            valueStatement.setString(3, attribute.getValue());
-            valueStatement.execute();
-            connection.commit();
-        } catch (SQLException e){
-            connection.setAutoCommit(true);
-            connection.rollback();
-            throw e;
-        }
-        finally {
-            connection.close();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, productId);
+            statement.setLong(2, attribute.getId());
+            statement.setString(3, attribute.getValue());
+            statement.execute();
         }
     }
 
-    public boolean deleteAttribute(long attributeId, long productId) throws SQLException {
-        String attributeSql = "DELETE FROM `technopolis`.`attributes` WHERE `id` = ?;";
-        String addValueSql = "DELETE FROM `technopolis`.`products_have_attriubtes` " +
-                "WHERE (`product_id` = ?) and (`attribute_id` = ?);";
+    public void addAttribute(AttributeWithoutValueDto attribute) throws SQLException {
+        String sql = "INSERT INTO `technopolis`.`attributes` " +
+                "(`name`, `sub_category_id`) " +
+                "VALUES (?, ?);";
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
+            statement.setString(1, attribute.getName());
+            statement.setLong(2, attribute.getSubCategoryId());
+            statement.execute();
+            ResultSet resultSet = statement.getGeneratedKeys();
+            resultSet.next();
+            attribute.setId(resultSet.getInt(1));
+        }
+    }
+
+    public boolean deleteAttribute(long attributeId) throws SQLException {
+        String attributeSql = "DELETE FROM technopolis.attributes WHERE id = ?;";
+        String phaSql = "DELETE FROM technopolis.products_have_attriubtes " +
+                "WHERE attribute_id = ?;";
         Connection connection = jdbcTemplate.getDataSource().getConnection();
         try (PreparedStatement attributeStatement = connection.prepareStatement(attributeSql, Statement.RETURN_GENERATED_KEYS);
-             PreparedStatement valueStatement = connection.prepareStatement(addValueSql)) {
+             PreparedStatement phaStatement = connection.prepareStatement(phaSql)) {
             connection.setAutoCommit(false);
-            valueStatement.setLong(1, productId);
-            valueStatement.setLong(2, attributeId);
-            valueStatement.execute();
+            phaStatement.setLong(1, attributeId);
+            phaStatement.execute();
             attributeStatement.setLong(1, attributeId);
             int changesMade = attributeStatement.executeUpdate();
             connection.commit();
             return changesMade != 0;
         } catch (SQLException e){
-            connection.setAutoCommit(true);
             connection.rollback();
             throw e;
         }
         finally {
+            connection.setAutoCommit(true); // is this really needed?
             connection.close();
+        }
+    }
+
+    public AttributeWithoutValueDto getAttributeById(long attributeId) throws SQLException {
+        String sql = "SELECT id, name, sub_category_id\n" +
+                "FROM technopolis.attributes\n" +
+                "WHERE id = ?;";
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setLong(1, attributeId);
+            ResultSet result = statement.executeQuery();
+            if (!result.next()){
+                return null;
+            }
+            return new AttributeWithoutValueDto(
+                    result.getLong("id"),
+                    result.getString("name"),
+                    result.getLong("sub_category_id")
+            );
         }
     }
 
