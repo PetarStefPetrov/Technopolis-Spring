@@ -5,10 +5,9 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.OrderDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
-import technopolisspring.technopolis.model.exception.BadRequestException;
+import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.User;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;

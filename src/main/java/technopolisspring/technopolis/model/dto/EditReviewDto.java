@@ -1,4 +1,4 @@
-package technopolisspring.technopolis.model.pojos;
+package technopolisspring.technopolis.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,12 +9,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Review {
+public class EditReviewDto {
 
     private long id;
     private String title;
     private String comment;
     private long userId;
-    private long productId;
 
 }

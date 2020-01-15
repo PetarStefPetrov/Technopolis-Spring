@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.controller;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -8,8 +9,9 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.*;
-import technopolisspring.technopolis.model.exception.BadRequestException;
-import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
+import technopolisspring.technopolis.exception.BadRequestException;
+import technopolisspring.technopolis.exception.InvalidArgumentsException;
+import technopolisspring.technopolis.exception.NotFoundException;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
@@ -45,8 +47,10 @@ public class UserController extends AbstractController {
         return userWithoutPasswordDto;
     }
 
+    @SneakyThrows
     @PostMapping("users/register")
-    public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) throws SQLException {
+    public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) {
+        registerUserDto.setPassword(registerUserDto.getPassword().trim()); // todo: more validations
         if(registerUserDto.getPassword().length() < 8 ){
             throw  new BadRequestException("Password must be at least 8 symbols");
         }
@@ -61,8 +65,9 @@ public class UserController extends AbstractController {
         String password = encoder.encode(user.getPassword());
         user.setPassword(password);
         userDao.registerUser(user);
-        session.setAttribute(SESSION_KEY_LOGGED_USER, new UserWithoutPasswordDto(user));
-        return new UserWithoutPasswordDto(user);
+        UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
+        session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
+        return userWithoutPasswordDto;
     }
 
     @PostMapping("/users/logout")
@@ -80,9 +85,10 @@ public class UserController extends AbstractController {
         return user;
     }
 
+    @SneakyThrows
     @PutMapping("users/change_password")
-    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) throws SQLException {
-        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session);
+    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) {
+        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
             throw new InvalidArgumentsException("Wrong password");
@@ -93,13 +99,22 @@ public class UserController extends AbstractController {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());
         user.setPassword(password);
-        userDao.editUser(user);
+        userDao.changePassword(user);
         return new UserWithoutPasswordDto(user);
     }
 
+    @SneakyThrows
+    @PutMapping("users")
+    public UserWithoutPasswordDto editUser(@RequestBody EditUserDto editUserDto, HttpSession session) {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session); // todo: validations
+        editUserDto.setId(user.getId());
+        userDao.editUser(editUserDto);
+        user.edit(editUserDto);
+        return user;
+    }
+
     @GetMapping("users/{id}")
-    public UserWithoutPasswordDto getUserById(HttpSession session, @PathVariable long id) throws SQLException {
-        checkIfUserIsAdmin(session);
+    public UserWithoutPasswordDto getUserById(@PathVariable long id) throws SQLException {
         if(userDao.getUserById(id) == null){
             throw new BadRequestException("Invalid id");
         }
@@ -114,7 +129,7 @@ public class UserController extends AbstractController {
     @GetMapping("users/page/{pageNumber}")
     public List<User> getAllUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         checkIfUserIsAdmin(session);
-        return userDao.getAllUsers(pageNumber); // todo: return list of users without passwords
+        return userDao.getAllUsers(validatePageNumber(pageNumber));
     }
 
     @GetMapping("users/reviews/page/{pageNumber}")
@@ -141,14 +156,69 @@ public class UserController extends AbstractController {
         Product product = productDao.getProductById(id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
+    @SneakyThrows
+    @PostMapping("users/reviews/{productId}")
+    public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Product product = productDao.getProductById(productId);
+        if(product == null){
+            throw new BadRequestException("Invalid Product");
         }
-        return reviewDao.addReview(review, id, user.getId());
+        return reviewDao.addReview(review, productId, user);
+    }
+
+    @GetMapping("users/reviews/page/{pageNumber}")
+    public List<ReviewOfUserDto> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return reviewDao.getReviewsOfUser(user.getId(), validatePageNumber(pageNumber));
+    }
+
+    @PutMapping("users/reviews")
+    public EditReviewDto editReview(@RequestBody EditReviewDto review, HttpSession session) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        review.setUserId(user.getId());
+        if (!reviewDao.editReview(review)){
+            throw new InvalidArgumentsException("Invalid review");
+        }
+        return review;
+    }
+
+    @DeleteMapping("users/reviews/{reviewId}")
+    public Review deleteReview(HttpSession session, @PathVariable long reviewId) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Review review = reviewDao.getReviewById(reviewId);
+        if (review == null){
+            throw new NotFoundException("Review not found");
+        }
+        if (review.getUserId() != user.getId()){
+            throw new BadRequestException("You can only delete your own reviews!");
+        }
+        reviewDao.deleteReview(reviewId);
+        return review;
     }
 
     @PostMapping("users/add_to_favorites/{product_id}")
     public Product addFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Product product = productDao.getProductById(id);
+
+    @GetMapping("users/orders/page/{pageNumber}")
+    public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return userDao.getOrders(user.getId(), validatePageNumber(pageNumber));
+    }
+
+    @SneakyThrows
+    @GetMapping("users/favorites/page/{pageNumber}")
+    public List<ProductWithoutReviewsDto> getFavourites(HttpSession session, @PathVariable int pageNumber) {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
+    }
+
+    @PostMapping("users/add_to_favorites/{productId}")
+    public Product addFavorites(HttpSession session, @PathVariable long productId) throws SQLException {
+        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
+        Product product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
@@ -159,8 +229,9 @@ public class UserController extends AbstractController {
         return product;
     }
 
+    @SneakyThrows
     @PostMapping("users/remove_from_favorites/{product_id}")
-    public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) throws SQLException {
+    public Product removeFavorites(HttpSession session, @PathVariable(name = "product_id") long id) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Product product = productDao.getProductById(id);
         if(product == null){

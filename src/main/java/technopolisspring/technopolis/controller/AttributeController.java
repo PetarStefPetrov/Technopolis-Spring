@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.AttributeDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
-import technopolisspring.technopolis.model.exception.BadRequestException;
+import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Attribute;
 import technopolisspring.technopolis.model.pojos.Product;
 
@@ -31,9 +31,9 @@ public class AttributeController extends AbstractController {
     }
 
     @GetMapping("attributes/page/{pageNumber}")
-    public List<Attribute> getAllAttributes(HttpSession session, @PathVariable Long pageNumber) throws SQLException {
+    public List<Attribute> getAllAttributes(HttpSession session, @PathVariable int pageNumber) throws SQLException {
         checkIfUserIsAdmin(session);
-        return attributeDao.getAllAttributes();
+        return attributeDao.getAllAttributes(validatePageNumber(pageNumber));
     }
 
     @DeleteMapping("products/{productId}/attributes/{attributeId}/")
