@@ -86,7 +86,7 @@ public class OrderController extends AbstractController {
     public Map<Product, Integer> getProducts(HttpSession session) {
         Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
-            throw new BadRequestException("Basket is empty");
+            basket = new HashMap<>();
         }
         return basket;
     }

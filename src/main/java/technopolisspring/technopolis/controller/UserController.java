@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
@@ -19,10 +20,12 @@ import technopolisspring.technopolis.model.pojos.User;
 
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.List;
 
 @RestController
+@Validated
 public class UserController extends AbstractController {
 
     @Autowired
@@ -49,11 +52,7 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PostMapping("users/register")
-    public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) {
-        registerUserDto.setPassword(registerUserDto.getPassword().trim()); // todo: more validations
-        if(registerUserDto.getPassword().length() < 8 ){
-            throw  new BadRequestException("Password must be at least 8 symbols");
-        }
+    public UserWithoutPasswordDto register(@RequestBody @Valid RegisterUserDto registerUserDto, HttpSession session) {
         if(userDao.getUserByEmail(registerUserDto.getEmail()) != null){
             throw  new BadRequestException("User with this email already exists");
         }
@@ -61,9 +60,7 @@ public class UserController extends AbstractController {
             throw new BadRequestException("Passwords don't match");
         }
         User user = new User(registerUserDto);
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String password = encoder.encode(user.getPassword());
-        user.setPassword(password);
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         userDao.registerUser(user);
         UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
         session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
@@ -87,7 +84,7 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PutMapping("users/change_password")
-    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) {
+    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
         UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
