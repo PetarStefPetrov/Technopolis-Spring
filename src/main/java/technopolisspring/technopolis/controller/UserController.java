@@ -17,6 +17,7 @@ import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.model.pojos.Review;
 import technopolisspring.technopolis.model.pojos.User;
+import technopolisspring.technopolis.service.ValidationUtil;
 
 
 import javax.servlet.http.HttpSession;
@@ -34,6 +35,8 @@ public class UserController extends AbstractController {
     private ReviewDao reviewDao;
     @Autowired
     private ProductDao productDao;
+    @Autowired
+    private ValidationUtil validation;
 
 
     @PostMapping("users/login")
@@ -52,12 +55,13 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PostMapping("users/register")
-    public UserWithoutPasswordDto register(@RequestBody @Valid RegisterUserDto registerUserDto, HttpSession session) {
+    public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) {
         if(userDao.getUserByEmail(registerUserDto.getEmail()) != null){
             throw  new BadRequestException("User with this email already exists");
         }
-        if(!registerUserDto.getPassword().equals(registerUserDto.getConfirmPassword())){
-            throw new BadRequestException("Passwords don't match");
+        String checkUserMsg = validation.checkUser(registerUserDto);
+        if(checkUserMsg != null){
+            throw new InvalidArgumentsException(checkUserMsg);
         }
         User user = new User(registerUserDto);
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
@@ -84,7 +88,7 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PutMapping("users/change_password")
-    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody @Valid ChangePasswordDto changePasswordDto) {
+    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) {
         UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
@@ -105,6 +109,10 @@ public class UserController extends AbstractController {
     public UserWithoutPasswordDto editUser(@RequestBody EditUserDto editUserDto, HttpSession session) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session); // todo: validations
         editUserDto.setId(user.getId());
+        String msg = validation.checkUser(editUserDto);
+        if(msg != null){
+            throw new InvalidArgumentsException(msg);
+        }
         userDao.editUser(editUserDto);
         user.edit(editUserDto);
         return user;
