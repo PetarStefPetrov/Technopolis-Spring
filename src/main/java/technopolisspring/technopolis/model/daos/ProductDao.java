@@ -2,10 +2,10 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.dto.CreateProductDto;
-import technopolisspring.technopolis.model.dto.FilterForProductsDto;
-import technopolisspring.technopolis.model.dto.ProductInOfferDto;
+import technopolisspring.technopolis.model.dto.*;
+import technopolisspring.technopolis.model.pojos.Attribute;
 import technopolisspring.technopolis.model.pojos.IProduct;
+import technopolisspring.technopolis.model.pojos.IProductWithAttributes;
 import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.*;
@@ -19,7 +19,8 @@ public class ProductDao extends Dao {
     OfferDao offerDao;
 
     public IProduct getProductById(long productId) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, offer_id,discount_percent , a.id,a.name\n" +
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, p.sub_category_id, " +
+                "offer_id, discount_percent, a.id, a.name, value\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = offer_id\n" +
                 "LEFT JOIN `technopolis`.products_have_attriubtes as pa ON pa.product_id = p.id\n" +
@@ -32,7 +33,7 @@ public class ProductDao extends Dao {
             if(!result.next()){
                 return null;
             }
-            return getProductAccordingToOffer(result);
+            return getSingleProductAccordingToOffer(result);
         }
     }
 
@@ -197,6 +198,48 @@ public class ProductDao extends Dao {
                     offerId
             );
         }
+        return product;
+    }
+
+    IProduct getSingleProductAccordingToOffer(ResultSet result) throws SQLException {
+        long offerId = result.getLong("offer_id");
+        IProductWithAttributes product;
+        if (offerId != 0){
+            double price = result.getDouble("price");
+            double discountPercent = result.getDouble("discount_percent");
+            product = new ProductWithAttributesInOfferDto(
+                    result.getInt("p.id"),
+                    result.getString("description"),
+                    price,
+                    offerDao.calculateDiscountedPrice(price, discountPercent),
+                    result.getString("picture_url"),
+                    result.getLong("brand_id"),
+                    result.getInt("sub_category_id"),
+                    offerId
+            );
+        }
+        else {
+            product = new ProductWithAttributesDto(
+                    result.getInt("p.id"),
+                    result.getString("description"),
+                    result.getDouble("price"),
+                    result.getString("picture_url"),
+                    result.getLong("brand_id"),
+                    result.getInt("sub_category_id"),
+                    offerId
+            );
+        }
+        List<Attribute> attributes = new ArrayList<>();
+        do {
+            Attribute attribute = new Attribute(
+                    result.getLong("a.id"),
+                    result.getString("a.name"),
+                    result.getLong("p.sub_category_id"),
+                    result.getString("value")
+            );
+            attributes.add(attribute);
+        } while (result.next());
+        product.setAttributes(attributes);
         return product;
     }
 
