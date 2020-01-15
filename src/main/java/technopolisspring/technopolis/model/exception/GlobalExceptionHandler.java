@@ -1,10 +1,9 @@
-package technopolisspring.technopolis.exception;
+package technopolisspring.technopolis.model.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import technopolisspring.technopolis.model.dto.ErrorDto;
 
 import java.time.LocalDateTime;
@@ -67,16 +66,6 @@ public abstract class GlobalExceptionHandler {
         return new ErrorDto(
                 "Whoops, something went wrong!",
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                LocalDateTime.now(),
-                e.getClass().getName());
-    }
-
-    @ExceptionHandler({MethodArgumentTypeMismatchException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDto urlRequiresArguments(Exception e){
-        return new ErrorDto(
-                "Url requires arguments",
-                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
     }

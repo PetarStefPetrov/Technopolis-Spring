@@ -7,9 +7,9 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
-import technopolisspring.technopolis.exception.BadRequestException;
-import technopolisspring.technopolis.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.exception.NotFoundException;
+import technopolisspring.technopolis.model.exception.BadRequestException;
+import technopolisspring.technopolis.model.exception.InvalidArgumentsException;
+import technopolisspring.technopolis.model.exception.NotFoundException;
 import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.service.EmailService;
 
