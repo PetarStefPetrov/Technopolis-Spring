@@ -151,7 +151,7 @@ public class UserController extends AbstractController {
     public List<IProduct> getFavourites(HttpSession session,
                                         @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
+        return userDao.getFavourites(user.getId(), pageNumber);
     }
 
     @PostMapping("users/add_to_favorites/{productId}")
