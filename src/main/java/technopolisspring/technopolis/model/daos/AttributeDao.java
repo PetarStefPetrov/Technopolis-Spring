@@ -35,6 +35,9 @@ public class AttributeDao extends Dao {
     }
 
     public void addAttributeToProduct(AddAttributeToProductDto attribute, long productId) throws SQLException {
+        if (editAttribute(attribute.getId(), productId, attribute.getValue())){
+            return;
+        }
         String sql = "INSERT INTO `technopolis`.`products_have_attriubtes` " +
                 "(`product_id`, `attribute_id`, `value`) " +
                 "VALUES (?, ?, ?);";
@@ -135,4 +138,18 @@ public class AttributeDao extends Dao {
             );
         }
     }
+
+    private boolean editAttribute(long attributeId, long productId, String value) throws SQLException {
+        String sql = "UPDATE technopolis.products_have_attriubtes " +
+                "SET value = ? " +
+                "WHERE product_id = ? AND attribute_id = ?;";
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setString(1, value);
+            statement.setLong(2, productId);
+            statement.setLong(3, attributeId);
+            return statement.executeUpdate() != 0;
+        }
+    }
+
 }
