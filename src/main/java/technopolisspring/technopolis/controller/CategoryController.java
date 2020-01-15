@@ -19,20 +19,20 @@ public class CategoryController extends AbstractController {
     @SneakyThrows
     @GetMapping("categories/page")
     public Map<Long,String> allCategories(@RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        return categoryDAO.getAllCategories(pageNumber);
+        return categoryDAO.getAllCategories(validationUtil.validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
     @GetMapping("categories/{category_id}/page")
     public Map<Long,String> allSubCategoriesById(@PathVariable long category_id,
                                                  @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        return categoryDAO.getSubCategories(category_id, pageNumber);
+        return categoryDAO.getSubCategories(category_id, validationUtil.validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
     @GetMapping("brands/page")
     public Map<Long,String> getAllBrands(@RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        return categoryDAO.getAllBrands(pageNumber);
+        return categoryDAO.getAllBrands(validationUtil.validatePageNumber(pageNumber));
     }
 
 }

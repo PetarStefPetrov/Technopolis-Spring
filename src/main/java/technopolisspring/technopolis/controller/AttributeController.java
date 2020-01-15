@@ -60,7 +60,7 @@ public class AttributeController extends AbstractController {
     public List<AttributeWithoutValueDto> getAllAttributes(HttpSession session,
                                                            @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         checkIfUserIsAdmin(session);
-        return attributeDao.getAllAttributes(pageNumber);
+        return attributeDao.getAllAttributes(validationUtil.validatePageNumber(pageNumber));
     }
 
     @SneakyThrows

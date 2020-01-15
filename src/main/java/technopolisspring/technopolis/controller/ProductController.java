@@ -35,20 +35,20 @@ public class ProductController extends AbstractController {
 
     @GetMapping("products/page")
     public List<IProduct> getAllProducts(@RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber){
-        return productDao.getAllProducts(pageNumber);
+        return productDao.getAllProducts(validationUtil.validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
     @GetMapping("products/sub_categories/{sub_category_id}/page/{pageNumber}")
     public List<IProduct> getAllProductsBySubCategory(@PathVariable long sub_category_id,
                                                       @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        return productDao.getProductsBySubCategory(sub_category_id, pageNumber);
+        return productDao.getProductsBySubCategory(sub_category_id, validationUtil.validatePageNumber(pageNumber));
     }
 
     @GetMapping("products/{description}/page")
     public List<IProduct> lookForProductsByDescription(@PathVariable String description,
                                                        @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        return productDao.lookForProductsByDescription(description, pageNumber);
+        return productDao.lookForProductsByDescription(description, validationUtil.validatePageNumber(pageNumber));
     }
 
     @PostMapping("products/filters/page")
@@ -73,7 +73,7 @@ public class ProductController extends AbstractController {
         if (filterForProductsDto.getMinPrice() == 0 && filterForProductsDto.getMaxPrice() == 0){
             filterForProductsDto.setMaxPrice(Integer.MAX_VALUE);
         }
-        return productDao.getProductsWithFilters(filterForProductsDto, pageNumber);
+        return productDao.getProductsWithFilters(filterForProductsDto, validationUtil.validatePageNumber(pageNumber));
     }
 
     @GetMapping("offers/page")

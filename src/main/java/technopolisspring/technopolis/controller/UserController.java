@@ -136,14 +136,14 @@ public class UserController extends AbstractController {
     @GetMapping("users/page")
     public List<User> getAllUsers(HttpSession session, @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         checkIfUserIsAdmin(session);
-        return userDao.getAllUsers(pageNumber);
+        return userDao.getAllUsers(validationUtil.validatePageNumber(pageNumber));
     }
 
     @GetMapping("users/orders/page")
     public List<OrderWithoutProductsDto> getOrders(HttpSession session,
                                                    @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getOrders(user.getId(), pageNumber);
+        return userDao.getOrders(user.getId(), validationUtil.validatePageNumber(pageNumber));
     }
 
     @SneakyThrows
@@ -151,7 +151,7 @@ public class UserController extends AbstractController {
     public List<IProduct> getFavourites(HttpSession session,
                                         @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getFavourites(user.getId(), pageNumber);
+        return userDao.getFavourites(user.getId(), validationUtil.validatePageNumber(pageNumber));
     }
 
     @PostMapping("users/add_to_favorites/{productId}")
