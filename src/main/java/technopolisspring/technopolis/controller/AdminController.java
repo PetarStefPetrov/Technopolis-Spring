@@ -50,10 +50,15 @@ public class AdminController extends AbstractController {
     }
 
     @PostMapping("products")
-    public Product addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
+    public CreateProductDto addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        Product product = new Product(createProductDto);
-        return productDAO.addProduct(product);
+        if(!productDAO.checkForBrand(createProductDto){
+            throw new BadRequestException("Invalid brand");
+        }
+        if(!productDAO.checkForSubCategory(createProductDto)){
+            throw new BadRequestException("Invalid SubCategory");
+        }
+        return productDAO.addProduct(createProductDto);
     }
 
     @PostMapping("offers")

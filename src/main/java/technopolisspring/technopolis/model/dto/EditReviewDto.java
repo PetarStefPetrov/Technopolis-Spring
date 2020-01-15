@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class EditReviewDto {
 
-    private long id;
+    private long reviewId;
     private String title;
     private String comment;
     private long userId;
