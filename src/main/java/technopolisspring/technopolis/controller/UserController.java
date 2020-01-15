@@ -88,7 +88,8 @@ public class UserController extends AbstractController {
 
     @SneakyThrows
     @PutMapping("users/change_password")
-    public UserWithoutPasswordDto changePassword(HttpSession session, @RequestBody ChangePasswordDto changePasswordDto) {
+    public UserWithoutPasswordDto changePassword(HttpSession session,
+                                                 @RequestBody ChangePasswordDto changePasswordDto) {
         UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
@@ -131,21 +132,24 @@ public class UserController extends AbstractController {
         return checkIfUserIsLogged(session);
     }
 
+    @SneakyThrows
     @GetMapping("users/page/{pageNumber}")
-    public List<User> getAllUsers(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+    public List<User> getAllUsers(HttpSession session, @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         checkIfUserIsAdmin(session);
-        return userDao.getAllUsers(validatePageNumber(pageNumber));
+        return userDao.getAllUsers(pageNumber);
     }
 
     @GetMapping("users/orders/page/{pageNumber}")
-    public List<OrderWithoutProductsDto> getOrders(HttpSession session, @PathVariable int pageNumber) {
+    public List<OrderWithoutProductsDto> getOrders(HttpSession session,
+                                                   @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return userDao.getOrders(user.getId(), validatePageNumber(pageNumber));
+        return userDao.getOrders(user.getId(), pageNumber);
     }
 
     @SneakyThrows
     @GetMapping("users/favorites/page/{pageNumber}")
-    public List<IProduct> getFavourites(HttpSession session, @PathVariable int pageNumber) {
+    public List<IProduct> getFavourites(HttpSession session,
+                                        @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getFavourites(user.getId(), validatePageNumber(pageNumber));
     }

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class AbstractController extends GlobalExceptionHandler {
 
     protected static final String SESSION_KEY_LOGGED_USER = "logged_user";
-    protected static final int DEFAULT_PAGE = 1;
+    protected static final String DEFAULT_PAGE = "1";
     public static final String NEED_TO_BE_LOGGED_IN = "Need to be logged in";
     public static final String MUST_BE_ADMIN = "Must be admin";
     @Autowired
@@ -35,13 +35,6 @@ public class AbstractController extends GlobalExceptionHandler {
             throw new AuthorizationException(MUST_BE_ADMIN);
         }
         return user;
-    }
-
-    protected int validatePageNumber(int pageNumber){
-        if (pageNumber < 1){
-            return DEFAULT_PAGE;
-        }
-        return pageNumber;
     }
 
 }
