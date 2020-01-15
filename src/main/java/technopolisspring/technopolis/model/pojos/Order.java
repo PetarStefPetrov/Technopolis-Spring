@@ -20,19 +20,19 @@ public class Order {
     private long userId;
     private String address;
     private double price;
-    private Map<Product, Integer> products; // < product , quantity >
+    private Map<IProduct, Integer> products; // < product , quantity >
 
 
-    public Order(long userId, String address, Map<Product, Integer> products){
+    public Order(long userId, String address, Map<IProduct, Integer> products){
         this.userId = userId;
         this.address = address;
         this.products = products;
-        for (Map.Entry<Product, Integer> entry : products.entrySet()) {
+        for (Map.Entry<IProduct, Integer> entry : products.entrySet()) {
             this.price = entry.getKey().getPrice() * entry.getValue();
         }
     }
 
-    public Order(long id, long userId, String address, Map<Product, Integer> products) {
+    public Order(long id, long userId, String address, Map<IProduct, Integer> products) {
         this(userId, address, products);
         this.id = id;
     }

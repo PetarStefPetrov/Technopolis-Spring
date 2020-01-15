@@ -1,13 +1,11 @@
 package technopolisspring.technopolis.model.daos;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import technopolisspring.technopolis.model.dto.FilterForProductsDto;
-import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
-import technopolisspring.technopolis.model.dto.ReviewOfProductDto;
-import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
+import technopolisspring.technopolis.model.dto.*;
+import technopolisspring.technopolis.model.pojos.IProduct;
+import technopolisspring.technopolis.model.pojos.IProductWithReview;
 import technopolisspring.technopolis.model.pojos.Product;
-import technopolisspring.technopolis.model.pojos.Review;
-import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,14 +14,18 @@ import java.util.List;
 @Component
 public class ProductDao extends Dao {
 
-    public Product getProductById(long id) throws SQLException {
+    @Autowired
+    OfferDao offerDao;
+
+    public IProductWithReview getProductById(long id) throws SQLException {
         String sql = "SELECT r.id, r.title, r.comment,\n" +
                 "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id,\n" +
                 "u.id, u.first_name, u.last_name, u.email, u.phone, u.create_time," +
-                " u.address, u.is_admin, u.is_subscribed\n" +
-                "FROM `technopolis`.reviews AS r\n" +
-                "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
-                "JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
+                " u.address, u.is_admin, u.is_subscribed, o.discount_percent\n" +
+                "FROM `technopolis`.products AS p\n" +
+                "LEFT JOIN `technopolis`.reviews AS r ON r.product_id = p.id\n" +
+                "LEFT JOIN `technopolis`.users AS u ON r.user_id = u.id\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE p.is_deleted = 0 AND u.is_deleted = 0 AND r.product_id = ?\n";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -32,7 +34,7 @@ public class ProductDao extends Dao {
             if(!result.next()){
                 return null;
             }
-            Product product =  new Product(
+            IProductWithReview product =  new Product(
                     result.getLong("p.id"),
                     result.getString("p.description"),
                     result.getDouble("p.price"),
@@ -86,9 +88,11 @@ public class ProductDao extends Dao {
         }
     }
 
-    public List<ProductWithoutReviewsDto> getAllProducts(int pageNumber){
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
-                "FROM `technopolis`.products\n" +
+    public List<IProduct> getAllProducts(int pageNumber){
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id, " +
+                "o.discount_percent\n" +
+                "FROM `technopolis`.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE is_deleted = 0\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -97,20 +101,14 @@ public class ProductDao extends Dao {
                     preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
-                (result, i) -> new ProductWithoutReviewsDto(
-                        result.getLong("id"),
-                        result.getString("description"),
-                        result.getDouble("price"),
-                        result.getString("picture_url"),
-                        result.getLong("brand_id"),
-                        result.getLong("sub_category_id"),
-                        result.getLong("offer_id")
-        ));
+                (result, i) -> getProductWithoutReviews(result));
     }
 
-    public List<ProductWithoutReviewsDto> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
-                "FROM `technopolis`.products\n" +
+    public List<IProduct> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+                " o.discount_percent\n" +
+                "FROM `technopolis`.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE is_deleted = 0 AND sub_category_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -120,26 +118,20 @@ public class ProductDao extends Dao {
             statement.setInt(2, pageNumber * PAGE_SIZE);
             statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
             ResultSet result = statement.executeQuery();
-            List<ProductWithoutReviewsDto> products = new ArrayList<>();
+            List<IProduct> products = new ArrayList<>();
             while (result.next()) {
-                ProductWithoutReviewsDto product = new ProductWithoutReviewsDto(
-                        result.getLong("id"),
-                        result.getString("description"),
-                        result.getDouble("price"),
-                        result.getString("picture_url"),
-                        result.getLong("brand_id"),
-                        result.getLong("sub_category_id"),
-                        result.getLong("offer_id")
-                );
+                IProduct product = getProductWithoutReviews(result);
                 products.add(product);
             }
             return products;
         }
     }
 
-    public List<ProductWithoutReviewsDto> lookForProductsByDescription(String description, int pageNumber) {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
-                "FROM technopolis.products\n" +
+    public List<IProduct> lookForProductsByDescription(String description, int pageNumber) {
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+                " o.discount_percent\n" +
+                "FROM technopolis.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE is_deleted = 0 AND description LIKE ?" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -149,20 +141,14 @@ public class ProductDao extends Dao {
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
                     preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
-                (result, i) -> new ProductWithoutReviewsDto(
-                        result.getLong("id"),
-                        result.getString("description"),
-                        result.getDouble("price"),
-                        result.getString("picture_url"),
-                        result.getLong("brand_id"),
-                        result.getLong("sub_category_id"),
-                        result.getLong("offer_id")
-        ));
+                (result, i) -> getProductWithoutReviews(result));
     }
 
-    public List<ProductWithoutReviewsDto> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
-        String sql = "SELECT id, description, price, picture_url, brand_id, sub_category_id, offer_id\n" +
-                "FROM technopolis.products\n" +
+    public List<IProduct> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+                " o.discount_percent\n" +
+                "FROM technopolis.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE is_deleted = " + filterSql(filterForProductsDto) + "\n" +
                 "ORDER BY " + checkSorting(filterForProductsDto) + "\n" +
                 "LIMIT ?\n" +
@@ -173,15 +159,7 @@ public class ProductDao extends Dao {
                     preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
                     preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
-                (result, i) -> new ProductWithoutReviewsDto(
-                        result.getLong("id"),
-                        result.getString("description"),
-                        result.getDouble("price"),
-                        result.getString("picture_url"),
-                        result.getLong("brand_id"),
-                        result.getLong("sub_category_id"),
-                        result.getLong("offer_id")
-                )
+                (result, i) -> getProductWithoutReviews(result)
         );
     }
 
@@ -233,4 +211,34 @@ public class ProductDao extends Dao {
         }
     }
 
+    IProduct getProductWithoutReviews(ResultSet result) throws SQLException {
+        long offerId = result.getLong("p.offer_id");
+        IProduct product;
+        if (offerId == 0){
+            double price = result.getDouble("p.price");
+            double discountPercent = result.getDouble("o.discount_percent");
+            product = new ProductInOfferWithoutReviewsDto(
+                    result.getInt("p.id"),
+                    result.getString("p.description"),
+                    price,
+                    offerDao.calculateDiscountedPrice(price, discountPercent),
+                    result.getString("p.picture_url"),
+                    result.getLong("p.brand_id"),
+                    result.getInt("p.sub_category_id"),
+                    offerId
+            );
+        }
+        else {
+            product = new ProductWithoutReviewsDto(
+                    result.getInt("p.id"),
+                    result.getString("p.description"),
+                    result.getDouble("p.price"),
+                    result.getString("p.picture_url"),
+                    result.getLong("p.brand_id"),
+                    result.getInt("p.sub_category_id"),
+                    offerId
+            );
+        }
+        return product;
+    }
 }

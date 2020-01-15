@@ -6,6 +6,8 @@ import technopolisspring.technopolis.model.daos.AttributeDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.Attribute;
+import technopolisspring.technopolis.model.pojos.IProduct;
+import technopolisspring.technopolis.model.pojos.IProductWithReview;
 import technopolisspring.technopolis.model.pojos.Product;
 
 import javax.servlet.http.HttpSession;
@@ -22,7 +24,7 @@ public class AttributeController extends AbstractController {
     @PostMapping("products/{productId}/attributes")
      public Attribute addAttribute(@RequestBody Attribute attribute, HttpSession session, @PathVariable Long productId) throws SQLException {
         checkIfUserIsAdmin(session);
-        Product product = productDao.getProductById(productId);
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid product");
         }
@@ -37,8 +39,8 @@ public class AttributeController extends AbstractController {
     }
 
     @DeleteMapping("products/{productId}/attributes/{attributeId}/")
-    public void  removeAttribute(@PathVariable Long attributeId, @PathVariable Long productId) throws SQLException {
-        Product product = productDao.getProductById(productId);
+    public void removeAttribute(@PathVariable Long attributeId, @PathVariable Long productId) throws SQLException {
+        IProduct product = productDao.getProductById(productId);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }

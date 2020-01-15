@@ -10,7 +10,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-public class CreateProductDto implements IProduct {
+public class CreateProductDto {
 
     private long id;
     private String description;

@@ -6,6 +6,7 @@ import technopolisspring.technopolis.model.daos.OrderDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.exception.BadRequestException;
+import technopolisspring.technopolis.model.pojos.IProduct;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.Product;
 
@@ -26,7 +27,7 @@ public class OrderController extends AbstractController {
     @PostMapping("/orders")
     public Order addOrder(HttpSession session) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
+        Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             throw new BadRequestException("Basket is empty");
         }
@@ -37,12 +38,12 @@ public class OrderController extends AbstractController {
     }
 
     @PostMapping("orders/products/{product_id}")
-    public Map<Product, Integer> addProductToBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
-        Product product = productDAO.getProductById(product_id);
+    public Map<IProduct, Integer> addProductToBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
+        IProduct product = productDAO.getProductById(product_id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
+        Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             basket = new HashMap<>();
         }
@@ -58,12 +59,12 @@ public class OrderController extends AbstractController {
     }
 
     @DeleteMapping("orders/products/{product_id}")
-    public Map<Product, Integer> removeProductFromBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
-        Product product = productDAO.getProductById(product_id);
+    public Map<IProduct, Integer> removeProductFromBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
+        IProduct product = productDAO.getProductById(product_id);
         if(product == null){
             throw new BadRequestException("Invalid Product");
         }
-        Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
+        Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             throw new BadRequestException("Basket is empty");
         }
@@ -83,8 +84,8 @@ public class OrderController extends AbstractController {
     }
 
     @GetMapping("orders/products")
-    public Map<Product, Integer> getProducts(HttpSession session) {
-        Map<Product,Integer> basket = (Map<Product, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
+    public Map<IProduct, Integer> getProducts(HttpSession session) {
+        Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
             basket = new HashMap<>();
         }

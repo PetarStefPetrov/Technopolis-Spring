@@ -3,8 +3,8 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.EditUserDto;
-import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
+import technopolisspring.technopolis.model.pojos.IProduct;
 import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.User;
 
@@ -18,6 +18,10 @@ public class UserDao extends Dao {
 
     @Autowired
     OrderDao orderDao;
+    @Autowired
+    OfferDao offerDao;
+    @Autowired
+    ProductDao productDao;
 
     public void registerUser(User user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.users " +
@@ -82,11 +86,12 @@ public class UserDao extends Dao {
         }
     }
 
-    public List<ProductWithoutReviewsDto> getFavourites(long userId, int pageNumber) throws SQLException {
+    public List<IProduct> getFavourites(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, " +
-                "p.sub_category_id, p.offer_id\n" +
+                "p.sub_category_id, p.offer_id, o.discount_percent\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON p.offer_id = o.id\n" +
                 "WHERE p.is_deleted = 0 AND ulp.user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -95,18 +100,10 @@ public class UserDao extends Dao {
             statement.setLong(1, userId);
             statement.setInt(2, pageNumber * PAGE_SIZE);
             statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
-            List<ProductWithoutReviewsDto> favorites = new ArrayList<>();
+            List<IProduct> favorites = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
-                ProductWithoutReviewsDto product = new ProductWithoutReviewsDto(
-                        result.getInt("p.id"),
-                        result.getString("p.description"),
-                        result.getDouble("p.price"),
-                        result.getString("p.picture_url"),
-                        result.getLong("p.brand_id"),
-                        result.getInt("p.sub_category_id"),
-                        result.getLong("p.offer_id")
-                );
+                IProduct product = productDao.getProductWithoutReviews(result);
                 favorites.add(product);
             }
             return favorites;
