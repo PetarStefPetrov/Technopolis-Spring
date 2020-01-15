@@ -33,7 +33,7 @@ public class ProductController extends AbstractController {
         return product;
     }
 
-    @GetMapping("products/page/{pageNumber}")
+    @GetMapping("products/page")
     public List<IProduct> getAllProducts(@RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber){
         return productDao.getAllProducts(pageNumber);
     }
@@ -45,13 +45,13 @@ public class ProductController extends AbstractController {
         return productDao.getProductsBySubCategory(sub_category_id, pageNumber);
     }
 
-    @GetMapping("products/{description}/page/{pageNumber}")
+    @GetMapping("products/{description}/page")
     public List<IProduct> lookForProductsByDescription(@PathVariable String description,
                                                        @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         return productDao.lookForProductsByDescription(description, pageNumber);
     }
 
-    @PostMapping("products/filters/page/{pageNumber}")
+    @PostMapping("products/filters/page")
     public List<IProduct> getProductsWithFilters(@RequestBody FilterForProductsDto filterForProductsDto,
                                                  @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         if (    filterForProductsDto.getBrandId() == 0 &&
@@ -76,7 +76,7 @@ public class ProductController extends AbstractController {
         return productDao.getProductsWithFilters(filterForProductsDto, pageNumber);
     }
 
-    @GetMapping("offers/page/{pageNumber}")
+    @GetMapping("offers/page")
     public List<IProduct> getAllProductsInOffers(@RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         return offerDao.getAllProductsInOffers(pageNumber);
     }

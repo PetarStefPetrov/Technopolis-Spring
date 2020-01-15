@@ -56,7 +56,7 @@ public class AttributeController extends AbstractController {
      }
 
     @SneakyThrows
-    @GetMapping("attributes/page/{pageNumber}")
+    @GetMapping("attributes/page")
     public List<AttributeWithoutValueDto> getAllAttributes(HttpSession session,
                                                            @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         checkIfUserIsAdmin(session);

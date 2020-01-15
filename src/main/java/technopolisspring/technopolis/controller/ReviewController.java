@@ -36,7 +36,7 @@ public class ReviewController extends AbstractController {
     }
 
     @SneakyThrows
-    @GetMapping("users/reviews/page/{pageNumber}")
+    @GetMapping("users/reviews/page")
     public List<ReviewOfUserDto> getReviewsOfUser(HttpSession session,
                                                   @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
@@ -67,7 +67,7 @@ public class ReviewController extends AbstractController {
         return review;
     }
 
-    @GetMapping("products/{productId}/reviews/page/{pageNumber}")
+    @GetMapping("products/{productId}/reviews/page")
     public List<Review> getReviewsOfProduct(@PathVariable long productId,
                                             @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber){
         return reviewDao.getReviewsOfProduct(productId, pageNumber);

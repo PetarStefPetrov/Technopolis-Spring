@@ -21,6 +21,7 @@ public class ValidationUtil {
     private static final String INVALID_FIRST_NAME = "Invalid first name";
     private static final String INVALID_EMAIL = "Invalid email";
     private static final String INVALID_PHONE_NUMBER = "Invalid phone number";
+    private static final int MIN_PAGE_NUMBER = 1;
 
     public String checkUser(RegisterUserDto user) {
         String msg = checkEmail(user.getEmail());
@@ -123,6 +124,13 @@ public class ValidationUtil {
 
     public boolean validId(long id){
         return id >= 1;
+    }
+
+    public int validatePageNumber(int pageNumber){
+        if (pageNumber < MIN_PAGE_NUMBER){
+            return MIN_PAGE_NUMBER;
+        }
+        return pageNumber;
     }
 
 }

@@ -133,13 +133,13 @@ public class UserController extends AbstractController {
     }
 
     @SneakyThrows
-    @GetMapping("users/page/{pageNumber}")
+    @GetMapping("users/page")
     public List<User> getAllUsers(HttpSession session, @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         checkIfUserIsAdmin(session);
         return userDao.getAllUsers(pageNumber);
     }
 
-    @GetMapping("users/orders/page/{pageNumber}")
+    @GetMapping("users/orders/page")
     public List<OrderWithoutProductsDto> getOrders(HttpSession session,
                                                    @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
@@ -147,7 +147,7 @@ public class UserController extends AbstractController {
     }
 
     @SneakyThrows
-    @GetMapping("users/favorites/page/{pageNumber}")
+    @GetMapping("users/favorites/page")
     public List<IProduct> getFavourites(HttpSession session,
                                         @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
