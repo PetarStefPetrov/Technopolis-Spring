@@ -74,4 +74,28 @@ public class CategoryDao extends Dao {
         }
     }
 
+    public boolean checkForBrand(long brandId) throws SQLException {
+        String sql = "SELECT id, name\n" +
+                "FROM technopolis.brands\n" +
+                "WHERE id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, brandId);
+            ResultSet result = statement.executeQuery();
+            return result.next();
+        }
+    }
+
+    public boolean checkForSubCategory(long subCategoryId) throws SQLException {
+        String sql = "SELECT id, name, category_id\n" +
+                "FROM technopolis.sub_categories\n" +
+                "WHERE id = ?;";
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, subCategoryId);
+            ResultSet result = statement.executeQuery();
+            return result.next();
+        }
+    }
+
 }

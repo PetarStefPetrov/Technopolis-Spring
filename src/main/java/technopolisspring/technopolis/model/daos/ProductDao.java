@@ -2,6 +2,7 @@ package technopolisspring.technopolis.model.daos;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import technopolisspring.technopolis.model.dto.CreateProductDto;
 import technopolisspring.technopolis.model.dto.FilterForProductsDto;
 import technopolisspring.technopolis.model.dto.ProductInOfferDto;
 import technopolisspring.technopolis.model.pojos.IProduct;
@@ -34,7 +35,7 @@ public class ProductDao extends Dao {
         }
     }
 
-    public Product addProduct(Product product) throws SQLException {
+    public void addProduct(CreateProductDto product) throws SQLException {
         String sql = "INSERT INTO `technopolis`.`products` " +
                 "(`id`, `description`, `price`, `picture_url`, `brand_id`, `sub_category_id`) " +
                 "VALUES (?, ?, ?, ?, ?, ?);";

@@ -79,9 +79,6 @@ public class AttributeController extends AbstractController {
         if (checkAttribute != null){
             throw new BadRequestException(ALREADY_EXISTS);
         }
-        if (checkAttribute.getName().equals(attribute.getName())){
-            throw new BadRequestException(ALREADY_EXISTS);
-        }
         attributeDao.addAttribute(attribute);
         return attribute;
     }
