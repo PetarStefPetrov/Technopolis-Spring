@@ -39,10 +39,17 @@ public class ProductController extends AbstractController {
     }
 
     @SneakyThrows
-    @GetMapping("products/sub_categories/{sub_category_id}/page/{pageNumber}")
+    @GetMapping("products/sub_categories/{sub_category_id}/page")
     public List<IProduct> getAllProductsBySubCategory(@PathVariable long sub_category_id,
                                                       @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
         return productDao.getProductsBySubCategory(sub_category_id, validationUtil.validatePageNumber(pageNumber));
+    }
+
+    @SneakyThrows
+    @GetMapping("products/brands/{brandId}/page")
+    public List<IProduct> getAllProductsByBrand(@PathVariable long brandId,
+                                                      @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
+        return productDao.getProductsByBrand(brandId, validationUtil.validatePageNumber(pageNumber));
     }
 
     @GetMapping("products/{description}/page")

@@ -146,19 +146,22 @@ public class ProductDao extends Dao {
         return wayOfSorting;
     }
 
-    private String filterSql(FilterForProductsDto filterForProductsDto) {
-        StringBuilder filters = new StringBuilder();
-        long subCategoryId = filterForProductsDto.getSubCategoryId();
-        long brandId = filterForProductsDto.getBrandId();
-        if (subCategoryId != 0){
-            filters.append(" AND sub_category_id = ");
-            filters.append(subCategoryId);
-        }
-        if (brandId != 0){
-            filters.append(" AND brand_id = ");
-            filters.append(brandId);
-        }
-        return filters.toString();
+    public List<IProduct> getProductsByBrand(long brandId, int pageNumber){
+        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+                " o.discount_percent\n" +
+                "FROM technopolis.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
+                "WHERE is_deleted = 0 AND brand_id = ?\n" +
+                "LIMIT ?\n" +
+                "OFFSET ?;";
+        return jdbcTemplate.query(sql,
+                preparedStatement -> {
+                    preparedStatement.setDouble(1, brandId);
+                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
+                },
+                (result, i) -> getProductAccordingToOffer(result)
+        );
     }
 
     public boolean deleteProduct(long productId) throws SQLException {
