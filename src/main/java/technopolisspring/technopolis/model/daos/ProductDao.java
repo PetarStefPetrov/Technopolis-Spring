@@ -49,11 +49,7 @@ public class ProductDao extends Dao {
             statement.setLong(6, product.getSubCategoryId());
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
-            if(!resultSet.next()){
-                return null;
-            }
             product.setId(resultSet.getInt(1));
-            return product;
         }
     }
 
