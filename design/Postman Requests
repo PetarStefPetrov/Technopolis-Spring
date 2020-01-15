@@ -25,7 +25,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"firstName\" : \"Pesho\",\n\t\"lastName\" : \"Petrov\",\n\t\"email\" : \"petrov@gmail.com\",\n\t\"password\" : \"12345678\",\n\t\"confirmPassword\" : \"12345678\",\n\t\"phone\" : \"0891011121\",\n\t\"address\" : \"at home\"\n}"
+							"raw": "{\n\t\"firstName\" : \"Gosho\",\n\t\"lastName\" : \"Goshov\",\n\t\"email\" : \"gashov@geshov.com\",\n\t\"password\" : \"12345678\",\n\t\"confirmPassword\" : \"12345678\",\n\t\"phone\" : \"0891011121\",\n\t\"address\" : \"at home\"\n}"
 						},
 						"description": ""
 					},
@@ -72,6 +72,26 @@
 					"response": []
 				},
 				{
+					"name": "logout",
+					"request": {
+						"url": "localhost:666/users/logout",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
 					"name": "get my profile",
 					"request": {
 						"url": "localhost:666/users/profile",
@@ -92,10 +112,10 @@
 					"response": []
 				},
 				{
-					"name": "logout",
+					"name": "edit profile",
 					"request": {
-						"url": "localhost:666/users/logout",
-						"method": "POST",
+						"url": "localhost:666/users",
+						"method": "PUT",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -105,7 +125,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": ""
+							"raw": "{\n\t\"firstName\" : \"Gosho\",\n\t\"lastName\" : \"Goshov\",\n\t\"email\" : \"gashov@geshov.com\",\n\t\"phone\" : \"0891011121\",\n\t\"address\" : \"at home\"\n}"
 						},
 						"description": ""
 					},
@@ -174,7 +194,27 @@
 				{
 					"name": "get all users",
 					"request": {
-						"url": "localhost:666/users/page/1",
+						"url": {
+							"raw": "localhost:666/users/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"users",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -194,8 +234,69 @@
 				{
 					"name": "get reviews",
 					"request": {
-						"url": "localhost:666/users/reviews/page/1",
+						"url": {
+							"raw": "localhost:666/users/reviews/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"users",
+								"reviews",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "edit review",
+					"request": {
+						"url": "localhost:666/users/reviews",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\" : 2,\n\t\"title\" : \"woaaaw\",\n\t\"comment\" : \"much cheap, such offer\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "delete review",
+					"request": {
+						"url": "localhost:666/users/reviews/4",
+						"method": "DELETE",
 						"header": [
 							{
 								"key": "Content-Type",
@@ -214,7 +315,28 @@
 				{
 					"name": "get favorites",
 					"request": {
-						"url": "localhost:666/users/favorites/page/1",
+						"url": {
+							"raw": "localhost:666/users/favorites/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"users",
+								"favorites",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -234,7 +356,28 @@
 				{
 					"name": "get orders",
 					"request": {
-						"url": "localhost:666/users/orders/page/1",
+						"url": {
+							"raw": "localhost:666/users/orders/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"users",
+								"orders",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -254,7 +397,7 @@
 				{
 					"name": "add review",
 					"request": {
-						"url": "localhost:666/users/add_review/3",
+						"url": "localhost:666/users/reviews/1",
 						"method": "POST",
 						"header": [
 							{
@@ -331,7 +474,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\" : \"buy one for the price of two and get one extra\",\n\t\"discountPercent\" : 0.00,\n    \"startDate\" : \"01-01-2020 00:00:00\",\n    \"endDate\" : \"01-01-2021 00:00:00\"\n}"
+							"raw": "{\n\t\"name\" : \"Special super duper promotion\",\n\t\"discountPercent\" : 45.00,\n    \"startDate\" : \"01-01-2020 00:00:00\",\n    \"endDate\" : \"01-01-2021 00:00:00\"\n}"
 						},
 						"description": ""
 					},
@@ -360,7 +503,27 @@
 				{
 					"name": "get all products in offers",
 					"request": {
-						"url": "localhost:666/offers/page/1",
+						"url": {
+							"raw": "localhost:666/offers/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"offers",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -406,7 +569,7 @@
 				{
 					"name": "add product",
 					"request": {
-						"url": "localhost:666/orders/products/1",
+						"url": "localhost:666/orders/products/2",
 						"method": "POST",
 						"header": [
 							{
@@ -483,7 +646,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"description\" : \"IPhone 5\",\n\t\"price\" : 1000,\n\t\"pictureUrl\" : \"someUrl\",\n\t\"brandId\" : 1,\n\t\"subCategoryId\" : 1\n}"
+							"raw": "{\n\t\"description\" : \"Another Sang TV\",\n\t\"price\" : 200,\n\t\"pictureUrl\" : \"tv-sang-2-url\",\n\t\"brandId\" : \"1\",\n\t\"subCategoryId\" : 2\n}"
 						},
 						"description": ""
 					},
@@ -510,7 +673,7 @@
 					"response": []
 				},
 				{
-					"name": "add attriubte",
+					"name": "add attriubte to product",
 					"request": {
 						"url": "localhost:666/products/1/attributes",
 						"method": "POST",
@@ -523,16 +686,36 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"name\" : \"display size\",\n\t\"subCategoryId\" : 1,\n\t\"value\" : \"4.7\"\n}"
+							"raw": "{\n\t\"id\" : 1,\n\t\"value\" : \"4.7\"\n}"
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "get by id",
+					"name": "remove attriubte from product",
 					"request": {
-						"url": "localhost:666/products/3",
+						"url": "localhost:666/products/1/attributes/1\n=1\n&attributeId\n=1\n",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get product by id",
+					"request": {
+						"url": "localhost:666/products/2",
 						"method": "GET",
 						"header": [
 							{
@@ -552,7 +735,28 @@
 				{
 					"name": "look for products by description",
 					"request": {
-						"url": "localhost:666/products/10/page/1",
+						"url": {
+							"raw": "localhost:666/products/Iph/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"Iph",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -572,7 +776,69 @@
 				{
 					"name": "get all products",
 					"request": {
-						"url": "localhost:666/products/page/1",
+						"url": {
+							"raw": "localhost:666/products/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "get reviews of product",
+					"request": {
+						"url": {
+							"raw": "localhost:666/products/1/reviews/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"1",
+								"reviews",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -592,7 +858,28 @@
 				{
 					"name": "get all products with filters",
 					"request": {
-						"url": "localhost:666/products/filters/page/1",
+						"url": {
+							"raw": "localhost:666/products/filters/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"filters",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "POST",
 						"header": [
 							{
@@ -603,16 +890,38 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n\t\"minPrice\" : 2000,\n\t\"maxPrice\" : 3000,\n\t\"subCategoryId\" : 1,\n\t\"brandId\" : 1,\n\t\"sorted\" : \"defadasdasd\"\n}"
+							"raw": "{\n\t\"minPrice\" : 0,\n\t\"maxPrice\" : 3000,\n\t\"subCategoryId\" : 2,\n\t\"brandId\" : 2,\n\t\"sorted\" : \"DESC\"\n}"
 						},
 						"description": ""
 					},
 					"response": []
 				},
 				{
-					"name": "get by sub category",
+					"name": "get all by sub category",
 					"request": {
-						"url": "localhost:666/products/sub_categories/3/page/1",
+						"url": {
+							"raw": "localhost:666/products/sub_categories/1/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"sub_categories",
+								"1",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -630,9 +939,31 @@
 					"response": []
 				},
 				{
-					"name": "get reviews for product",
+					"name": "get all by brand",
 					"request": {
-						"url": "localhost:666/products/reviews/1/page/1",
+						"url": {
+							"raw": "localhost:666/products/brands/1/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"products",
+								"brands",
+								"1",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -645,7 +976,7 @@
 							"mode": "raw",
 							"raw": ""
 						},
-						"description": null
+						"description": ""
 					},
 					"response": []
 				}
@@ -658,7 +989,7 @@
 				{
 					"name": "make admin",
 					"request": {
-						"url": "localhost:666/users/make_admin",
+						"url": "localhost:666/users/make_admin/5",
 						"method": "PUT",
 						"header": [
 							{
@@ -678,7 +1009,7 @@
 				{
 					"name": "remove admin",
 					"request": {
-						"url": "localhost:666/users/remove_admin",
+						"url": "localhost:666/users/remove_admin/5",
 						"method": "PUT",
 						"header": [
 							{
@@ -702,9 +1033,30 @@
 			"description": "",
 			"item": [
 				{
-					"name": "get subcategories for category",
+					"name": "get sub categories for category",
 					"request": {
-						"url": "localhost:666/categories/1/page/1",
+						"url": {
+							"raw": "localhost:666/categories/1/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"categories",
+								"1",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -724,7 +1076,27 @@
 				{
 					"name": "get all categories",
 					"request": {
-						"url": "localhost:666/categories/page/1",
+						"url": {
+							"raw": "localhost:666/categories/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"categories",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -744,7 +1116,27 @@
 				{
 					"name": "get all brands",
 					"request": {
-						"url": "localhost:666/brands/page/1",
+						"url": {
+							"raw": "localhost:666/brands/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"brands",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -770,7 +1162,27 @@
 				{
 					"name": "get all attrubutes",
 					"request": {
-						"url": "localhost:666/attributes/page/1",
+						"url": {
+							"raw": "localhost:666/attributes/page/?pageNumber=1",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"attributes",
+								"page",
+								""
+							],
+							"query": [
+								{
+									"key": "pageNumber",
+									"value": "1",
+									"equals": true,
+									"description": ""
+								}
+							],
+							"variable": []
+						},
 						"method": "GET",
 						"header": [
 							{
@@ -788,7 +1200,27 @@
 					"response": []
 				},
 				{
-					"name": "remove attribute",
+					"name": "add attriubte",
+					"request": {
+						"url": "localhost:666/attributes",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\" : \"Resolution\",\n\t\"subCategoryId\" : 2\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "delete attribute",
 					"request": {
 						"url": "localhost:666/attributes/1",
 						"method": "DELETE",

@@ -3,13 +3,16 @@ Action map
 User
 - register
 - login / logout
-- edit password
-- get user by id (view profile)
+- edit profile
+- change password
+- view profile
 - delete user
 - subscribe / unsubscribe
 - get all users (admin)
-- get user by id (admin)
+- get user by id
 - get my reviews
+- edit review
+- delete review
 - get my favorites
 - get my orders
 - add review
@@ -31,11 +34,13 @@ Products
 - add product (admin)
 - delete product (admin)
 - add attribute (to the product) (admin)
-- get by id
+- remove attribute (from the product) (admin)
+- get product by id
 - look for products by description
 - get all products
 - get all products with filters
 - get all by sub category
+- get all by brand
 - get reviews for product
 
 Admin
@@ -49,4 +54,5 @@ Categories
 
 Attributes
 - get all attributes (admin)
+- add attribute
 - remove attribute (admin)
