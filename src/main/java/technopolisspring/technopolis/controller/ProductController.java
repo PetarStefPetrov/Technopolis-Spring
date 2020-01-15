@@ -68,6 +68,9 @@ public class ProductController extends AbstractController {
         if (filterForProductsDto.getMaxPrice() < filterForProductsDto.getMinPrice()) {
             throw new BadRequestException(INVALID_ARGUMENTS);
         }
+        if (filterForProductsDto.getMinPrice() == 0 && filterForProductsDto.getMaxPrice() == 0){
+            filterForProductsDto.setMaxPrice(Integer.MAX_VALUE);
+        }
         return productDao.getProductsWithFilters(filterForProductsDto, validatePageNumber(pageNumber));
     }
 

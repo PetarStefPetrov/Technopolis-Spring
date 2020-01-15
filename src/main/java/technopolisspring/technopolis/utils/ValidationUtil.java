@@ -120,4 +120,9 @@ public class ValidationUtil {
         }
         return null;
     }
+
+    public boolean validId(long id){
+        return id >= 1;
+    }
+
 }

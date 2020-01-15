@@ -105,4 +105,34 @@ public class AttributeDao extends Dao {
         }
     }
 
+
+    public boolean removeAttributeFromProduct(long attributeId, long productId) throws SQLException {
+        String sql = "DELETE FROM technopolis.products_have_attriubtes " +
+                "WHERE attribute_id = ? AND product_id = ?;";
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setLong(1, attributeId);
+            statement.setLong(2, productId);
+            return statement.executeUpdate() != 0;
+        }
+    }
+
+    public AttributeWithoutValueDto getAttributeByName(String name) throws SQLException {
+        String sql = "SELECT id, name, sub_category_id\n" +
+                "FROM technopolis.attributes\n" +
+                "WHERE name = ?;";
+        try(Connection connection = jdbcTemplate.getDataSource().getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql)){
+            statement.setString(1, name);
+            ResultSet result = statement.executeQuery();
+            if (!result.next()){
+                return null;
+            }
+            return new AttributeWithoutValueDto(
+                    result.getLong("id"),
+                    result.getString("name"),
+                    result.getLong("sub_category_id")
+            );
+        }
+    }
 }

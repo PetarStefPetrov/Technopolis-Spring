@@ -117,21 +117,22 @@ public class ProductDao extends Dao {
                 " o.discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
-                "WHERE is_deleted = " + filterSql(filterForProductsDto) + "\n" +
+                "WHERE is_deleted = 0 AND (price BETWEEN ? AND ?) \n" +
                 "ORDER BY " + checkSorting(filterForProductsDto) + "\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
                 preparedStatement -> {
-//                    preparedStatement.setString(1, filterSql(filterForProductsDto));
-                    preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
-                    preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
+                    preparedStatement.setDouble(1, filterForProductsDto.getMinPrice());
+                    preparedStatement.setDouble(2, filterForProductsDto.getMaxPrice());
+                    preparedStatement.setInt(3, pageNumber * PAGE_SIZE);
+                    preparedStatement.setInt(4, pageNumber * PAGE_SIZE - PAGE_SIZE);
                 },
                 (result, i) -> getProductAccordingToOffer(result)
         );
     }
 
-    private String checkSorting(FilterForProductsDto filterForProductsDto) {
+    private String checkSorting(FilterForProductsDto filterForProductsDto) { // todo: make two separate gets for those
         String sorted = filterForProductsDto.getSorted();
         String wayOfSorting = "id ASC";
         if (sorted != null && !sorted.trim().isEmpty()){
@@ -146,19 +147,9 @@ public class ProductDao extends Dao {
     }
 
     private String filterSql(FilterForProductsDto filterForProductsDto) {
-        StringBuilder filters = new StringBuilder("0");
-        double minPrice = filterForProductsDto.getMinPrice();
-        double maxPrice = filterForProductsDto.getMaxPrice();
+        StringBuilder filters = new StringBuilder();
         long subCategoryId = filterForProductsDto.getSubCategoryId();
         long brandId = filterForProductsDto.getBrandId();
-        boolean withoutPriceRange = minPrice == 0 && maxPrice == 0;
-        if (!withoutPriceRange){
-            filters.append(" AND (price BETWEEN ");
-            filters.append(minPrice);
-            filters.append(" AND ");
-            filters.append(maxPrice);
-            filters.append(")");
-        }
         if (subCategoryId != 0){
             filters.append(" AND sub_category_id = ");
             filters.append(subCategoryId);

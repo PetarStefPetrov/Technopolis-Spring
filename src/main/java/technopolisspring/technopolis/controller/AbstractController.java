@@ -5,6 +5,7 @@ import technopolisspring.technopolis.exception.AuthorizationException;
 import technopolisspring.technopolis.exception.GlobalExceptionHandler;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
+import technopolisspring.technopolis.utils.ValidationUtil;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -17,6 +18,8 @@ public class AbstractController extends GlobalExceptionHandler {
     public static final String MUST_BE_ADMIN = "Must be admin";
     @Autowired
     UserDao userDao;
+    @Autowired
+    ValidationUtil validationUtil;
 
     protected UserWithoutPasswordDto checkIfUserIsLogged(HttpSession session){
         UserWithoutPasswordDto user = (UserWithoutPasswordDto) session.getAttribute(SESSION_KEY_LOGGED_USER);
