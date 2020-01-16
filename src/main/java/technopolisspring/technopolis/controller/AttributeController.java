@@ -23,6 +23,7 @@ public class AttributeController extends AbstractController {
     private static final String SUB_CATEGORIES_MISMATCH = "Sub-category of product has to match the one of the attribute";
     private static final String ALREADY_EXISTS = "Such attribute already exists";
     private static final String INVALID_SUB_CATEGORY = "Invalid SubCategory";
+    private static final String INVALID_VALUE = "Value may contain only numbers, letters and spaces between them";
     @Autowired
     AttributeDao attributeDao;
     @Autowired
@@ -46,6 +47,9 @@ public class AttributeController extends AbstractController {
         }
         if (product.getSubCategoryId() != attributeWithoutValueDto.getSubCategoryId()){
             throw new InvalidArgumentsException(SUB_CATEGORIES_MISMATCH);
+        }
+        if (validationUtil.invalidDescription(attributeToAdd.getValue())){
+            throw new BadRequestException(INVALID_VALUE);
         }
         attributeDao.addAttributeToProduct(attributeToAdd, productId);
         return new Attribute(

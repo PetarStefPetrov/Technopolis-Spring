@@ -28,7 +28,7 @@ public class Order {
         this.address = address;
         this.products = products;
         for (Map.Entry<IProduct, Integer> entry : products.entrySet()) {
-            this.price = entry.getKey().getPrice() * entry.getValue();
+            this.price += entry.getKey().getPrice() * entry.getValue();
         }
     }
 

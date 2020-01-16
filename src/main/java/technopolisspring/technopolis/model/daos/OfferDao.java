@@ -32,7 +32,7 @@ public class OfferDao extends Dao {
     }
 
     public List<IProduct> getAllProductsInOffers(int pageNumber){
-        String sql = "SELECT p.id, 'description', price, picture_url, brand_id, sub_category_id," +
+        String sql = "SELECT p.id, 'description', price, brand_id, sub_category_id," +
                 " offer_id, discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +

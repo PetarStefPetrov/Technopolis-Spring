@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class ReviewDao extends Dao {
 
-    public boolean addReview(Review review, long productId, UserWithoutPasswordDto user) throws SQLException {
+    public void addReview(Review review, long productId, UserWithoutPasswordDto user) throws SQLException {
         String sql = "INSERT INTO `technopolis`.reviews (title, comment, product_id, user_id)\n" +
                 "VALUES (?,?,?,?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
@@ -23,12 +23,9 @@ public class ReviewDao extends Dao {
             statement.setString(2, review.getComment());
             statement.setLong(3, productId);
             statement.setLong(4, user.getId());
-            if (statement.executeUpdate() == 0){
-                return false;
-            }
+            statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             review.setId(resultSet.getInt(1));
-            return true;
         }
     }
 
@@ -59,7 +56,7 @@ public class ReviewDao extends Dao {
 
     public List<ReviewOfUserDto> getReviewsOfUser(long userId, int pageNumber) throws SQLException {
         String sql = "SELECT r.id, r.title, r.comment,\n" +
-                "p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, p.offer_id\n" +
+                "p.id, p.description, p.price, p.brand_id, p.sub_category_id, p.offer_id\n" +
                 "FROM `technopolis`.reviews AS r\n" +
                 "JOIN `technopolis`.products AS p ON r.product_id = p.id\n" +
                 "WHERE p.is_deleted = 0 AND r.user_id = ?\n" +
@@ -77,7 +74,6 @@ public class ReviewDao extends Dao {
                         result.getLong("p.id"),
                         result.getString("p.description"),
                         result.getDouble("p.price"),
-                        result.getString("p.picture_url"),
                         result.getLong("p.brand_id"),
                         result.getLong("p.sub_category_id"),
                         result.getLong("p.offer_id")

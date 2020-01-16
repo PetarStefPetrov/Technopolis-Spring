@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.exception.NotFoundException;
+import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.ReviewDao;
 import technopolisspring.technopolis.model.dto.EditReviewDto;
 import technopolisspring.technopolis.model.dto.ReviewOfUserDto;
@@ -22,16 +23,20 @@ public class ReviewController extends AbstractController {
     private static final String REVIEW_NOT_FOUND = "Review not found";
     private static final String DELETE_YOUR_OWN_REVIEWS = "You can only delete your own reviews!";
     private static final String INVALID_REVIEW = "Invalid review";
+    private static final String PRODUCT_NOT_FOUND = "Product not found";
     @Autowired
     private ReviewDao reviewDao;
+    @Autowired
+    private ProductDao productDao;
 
     @SneakyThrows
-    @PostMapping("users/reviews/{productId}")
+    @PostMapping("products/{productId}/reviews")
     public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        if(!reviewDao.addReview(review, productId, user)){
-            throw new InvalidArgumentsException(ProductController.INVALID_PRODUCT);
+        if (productDao.getProductById(productId) == null){
+            throw new NotFoundException(PRODUCT_NOT_FOUND);
         }
+        reviewDao.addReview(review, productId, user);
         return review;
     }
 

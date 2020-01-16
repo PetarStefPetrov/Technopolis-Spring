@@ -16,7 +16,6 @@ public class Product implements IProduct {
     private long id;
     private String description;
     private double price;
-    private String pictureUrl;
     private long brandId;
     private long subCategoryId;
     private long offerId;

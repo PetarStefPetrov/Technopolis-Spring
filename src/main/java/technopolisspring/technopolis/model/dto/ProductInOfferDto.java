@@ -18,7 +18,6 @@ public class ProductInOfferDto implements IProduct {
     private String description;
     private double priceBeforeDiscount;
     private double price;
-    private String pictureUrl;
     private long brandId;
     private long subCategoryId;
     private long offerId;

@@ -14,10 +14,6 @@ public interface IProduct {
 
     public void setPrice(double price);
 
-    public String getPictureUrl();
-
-    public void setPictureUrl(String pictureUrl);
-
     public long getBrandId();
 
     public void setBrandId(long brandId);

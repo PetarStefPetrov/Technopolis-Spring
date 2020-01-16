@@ -20,17 +20,15 @@ public class ProductWithAttributesDto implements IProductWithAttributes {
     private long id;
     private String description;
     private double price;
-    private String pictureUrl;
     private long brandId;
     private long subCategoryId;
     private long offerId;
     private List<Attribute> attributes;
 
-    public ProductWithAttributesDto(long id, String description, double price, String pictureUrl, long brandId, long subCategoryId, long offerId) {
+    public ProductWithAttributesDto(long id, String description, double price, long brandId, long subCategoryId, long offerId) {
         this.id = id;
         this.description = description;
         this.price = price;
-        this.pictureUrl = pictureUrl;
         this.brandId = brandId;
         this.subCategoryId = subCategoryId;
         this.offerId = offerId;

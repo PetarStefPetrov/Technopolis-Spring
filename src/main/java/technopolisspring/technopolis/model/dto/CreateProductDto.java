@@ -3,7 +3,6 @@ package technopolisspring.technopolis.model.dto;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import technopolisspring.technopolis.model.pojos.IProduct;
 
 import java.util.Objects;
 
@@ -15,7 +14,6 @@ public class CreateProductDto {
     private long id;
     private String description;
     private double price;
-    private String pictureUrl;
     private long brandId;
     private long subCategoryId;
 

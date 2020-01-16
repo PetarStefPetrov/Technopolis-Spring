@@ -1,5 +1,6 @@
 package technopolisspring.technopolis.controller;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.exception.BadRequestException;
@@ -26,6 +27,8 @@ public class AdminController extends AbstractController {
     private static final String INVALID_SUB_CATEGORY = "Invalid SubCategory";
     private static final String DOESN_T_EXIST = "Offer or product doesn't exist";
     private static final String INVALID_DISCOUNT_PERCENT = "Discount percent must be between 0 and 100, 0 not included.";
+    private static final String INVALID_DESCRIPTION = "Invalid description";
+    private static final String INVALID_PRICE = "Price must a positive number";
     @Autowired
     private UserDao userDAO;
     @Autowired
@@ -55,33 +58,45 @@ public class AdminController extends AbstractController {
         return ProductController.SUCCESS;
     }
 
+    @SneakyThrows
     @PostMapping("products")
-    public CreateProductDto addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
+    public CreateProductDto addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) {
         checkIfUserIsAdmin(session);
-        if(!categoryDao.checkForBrand(createProductDto.getBrandId())){
+        if(!categoryDao.checkForBrand(createProductDto.getBrandId())) {
             throw new BadRequestException(INVALID_BRAND);
         }
-        if(!categoryDao.checkForSubCategory(createProductDto.getSubCategoryId())){
+        if(!categoryDao.checkForSubCategory(createProductDto.getSubCategoryId())) {
             throw new BadRequestException(INVALID_SUB_CATEGORY);
+        }
+        String description = createProductDto.getDescription().trim();
+        if (description.isEmpty() || validationUtil.invalidDescription(description)) {
+            throw new BadRequestException(INVALID_DESCRIPTION);
+        }
+        if (createProductDto.getPrice() <= 0) {
+            throw new BadRequestException(INVALID_PRICE);
         }
         productDAO.addProduct(createProductDto);
         return createProductDto;
     }
 
+    @SneakyThrows
     @PostMapping("offers")
-    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
+    public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) {
         checkIfUserIsAdmin(session);
-        if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > MAX_PERCENT){
+        double discountPercent = createOfferDto.getDiscountPercent();
+        if (discountPercent <= 0 || discountPercent > MAX_PERCENT){
             throw new InvalidArgumentsException(INVALID_DISCOUNT_PERCENT);
         }
-        createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / MAX_PERCENT);
+        discountPercent /= MAX_PERCENT;
+        createOfferDto.setDiscountPercent(discountPercent);
         this.offerDao.addOffer(createOfferDto);
-        this.emailUtil.notifySubscribers(createOfferDto.getName(), createOfferDto.getDiscountPercent());
+        this.emailUtil.notifySubscribers(createOfferDto.getName(), discountPercent);
         return createOfferDto;
     }
 
+    @SneakyThrows
     @PostMapping("offers/{offerId}/products/{productId}")
-    public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) throws SQLException {
+    public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) {
         checkIfUserIsAdmin(session);
         if (!offerDao.addProductToOffer(productId, offerId)){
             throw new BadRequestException(DOESN_T_EXIST);

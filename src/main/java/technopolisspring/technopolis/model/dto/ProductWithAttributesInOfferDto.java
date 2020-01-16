@@ -21,18 +21,16 @@ public class ProductWithAttributesInOfferDto implements IProductWithAttributes {
     private String description;
     private double priceBeforeDiscount;
     private double price;
-    private String pictureUrl;
     private long brandId;
     private long subCategoryId;
     private long offerId;
     private List<Attribute> attributes;
 
-    public ProductWithAttributesInOfferDto(long id, String description, double priceBeforeDiscount, double price, String pictureUrl, long brandId, long subCategoryId, long offerId) {
+    public ProductWithAttributesInOfferDto(long id, String description, double priceBeforeDiscount, double price, long brandId, long subCategoryId, long offerId) {
         this.id = id;
         this.description = description;
         this.priceBeforeDiscount = priceBeforeDiscount;
         this.price = price;
-        this.pictureUrl = pictureUrl;
         this.brandId = brandId;
         this.subCategoryId = subCategoryId;
         this.offerId = offerId;

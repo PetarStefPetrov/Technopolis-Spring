@@ -39,15 +39,14 @@ public class ProductDao extends Dao {
 
     public void addProduct(CreateProductDto product) throws SQLException {
         String sql = "INSERT INTO `technopolis`.`products` " +
-                "(description, price, picture_url, brand_id, sub_category_id) " +
-                "VALUES (?, ?, ?, ?, ?);";
+                "(description, price, brand_id, sub_category_id) " +
+                "VALUES (?, ?, ?, ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, product.getDescription());
             statement.setDouble(2, product.getPrice());
-            statement.setString(3, product.getPictureUrl());
-            statement.setLong(4, product.getBrandId());
-            statement.setLong(5, product.getSubCategoryId());
+            statement.setLong(3, product.getBrandId());
+            statement.setLong(4, product.getSubCategoryId());
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
@@ -183,7 +182,6 @@ public class ProductDao extends Dao {
                     result.getString("description"),
                     price,
                     offerDao.calculateDiscountedPrice(price, discountPercent),
-                    result.getString("picture_url"),
                     result.getLong("brand_id"),
                     result.getInt("sub_category_id"),
                     offerId
@@ -194,7 +192,6 @@ public class ProductDao extends Dao {
                     result.getInt("p.id"),
                     result.getString("description"),
                     result.getDouble("price"),
-                    result.getString("picture_url"),
                     result.getLong("brand_id"),
                     result.getInt("sub_category_id"),
                     offerId
@@ -214,7 +211,6 @@ public class ProductDao extends Dao {
                     result.getString("description"),
                     price,
                     offerDao.calculateDiscountedPrice(price, discountPercent),
-                    result.getString("picture_url"),
                     result.getLong("brand_id"),
                     result.getInt("sub_category_id"),
                     offerId
@@ -225,7 +221,6 @@ public class ProductDao extends Dao {
                     result.getInt("p.id"),
                     result.getString("description"),
                     result.getDouble("price"),
-                    result.getString("picture_url"),
                     result.getLong("brand_id"),
                     result.getInt("sub_category_id"),
                     offerId
