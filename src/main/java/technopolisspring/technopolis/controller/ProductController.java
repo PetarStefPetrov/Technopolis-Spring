@@ -19,6 +19,7 @@ public class ProductController extends AbstractController {
     public static final String INVALID_PRODUCT = "Invalid Product";
     public static final String INVALID_ARGUMENTS = "Invalid arguments";
     public static final String SUCCESS = "Success!";
+    private static final String INVALID_DESCRIPTION = "Invalid description";
     @Autowired
     private ProductDao productDao;
     @Autowired
@@ -52,9 +53,16 @@ public class ProductController extends AbstractController {
         return productDao.getProductsByBrand(brandId, validationUtil.validatePageNumber(pageNumber));
     }
 
-    @GetMapping("products/{description}/page")
-    public List<IProduct> lookForProductsByDescription(@PathVariable String description,
+    @GetMapping("products/description/page")
+    public List<IProduct> lookForProductsByDescription(@RequestParam(required = false) String description,
                                                        @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
+        if (description == null){
+            throw new BadRequestException(INVALID_DESCRIPTION);
+        }
+        description = description.trim();
+        if (description.isEmpty() || validationUtil.invalidDescription(description)){
+            throw new BadRequestException(INVALID_DESCRIPTION);
+        }
         return productDao.lookForProductsByDescription(description, validationUtil.validatePageNumber(pageNumber));
     }
 

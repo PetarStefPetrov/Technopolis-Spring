@@ -16,11 +16,11 @@ public abstract class GlobalExceptionHandler {
     public static final String INVALID_ARGUMENTS = "Invalid arguments";
 
     @ExceptionHandler({InvalidArgumentsException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto invalidArguments(Exception e){
         return new ErrorDto(
                 e.getMessage(),
-                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
     }

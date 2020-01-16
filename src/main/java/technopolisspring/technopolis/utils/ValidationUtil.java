@@ -144,4 +144,7 @@ public class ValidationUtil {
         return pageNumber;
     }
 
+    public boolean invalidDescription(String description) {
+        return !description.matches("[a-zA-Z0-9 ]+");
+    }
 }
