@@ -41,7 +41,7 @@ public class ReviewDao extends Dao {
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, review.getTitle());
             statement.setString(2, review.getComment());
-            statement.setLong(3, review.getId());
+            statement.setLong(3, review.getReviewId());
             statement.setLong(4, review.getUserId());
             return statement.executeUpdate() != 0;
         }

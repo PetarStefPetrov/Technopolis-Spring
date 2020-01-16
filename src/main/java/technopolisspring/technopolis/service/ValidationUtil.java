@@ -12,7 +12,7 @@ public class ValidationUtil {
             "\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f" +
             "\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])";
     private static final String PASSWORD_REGEX = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=\\S+$).{8,}$";
-    private static final String PHONE_REGEX ="^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+    private static final String PHONE_REGEX ="^((\\+)|(00)|(\\*)|())[0-9]{9,14}((\\#)|())$";
     private static final String NAME_REGEX = "^[a-zA-Z._-]{3,}$";
     private static final Integer ADDRESS_LENGTH = 6;
     public String checkUser(RegisterUserDto user) {
