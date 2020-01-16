@@ -2,6 +2,7 @@ package technopolisspring.technopolis.utils;
 
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.controller.UserController;
+import technopolisspring.technopolis.model.dto.ChangePasswordDto;
 import technopolisspring.technopolis.model.dto.EditUserDto;
 import technopolisspring.technopolis.model.dto.RegisterUserDto;
 
@@ -16,7 +17,9 @@ public class ValidationUtil {
     private static final String PHONE_REGEX ="^((\\+)|(00)|(\\*)|())[0-9]{9,14}((\\#)|())$";
     private static final String NAME_REGEX = "^[a-zA-Z._-]{3,}$";
     private static final Integer ADDRESS_LENGTH = 6;
-    private static final String PASSWORD_REQUIREMENTS = "Password must have one upper and lower letter , and one number and no spaces,must be 8 symbol";
+    private static final String INVALID_ADDRESS = "Address must be at least " + ADDRESS_LENGTH + " symbols";
+    private static final String PASSWORD_REQUIREMENTS = "Password must have one upper and lower letter, " +
+            "one number and no spaces and it must be at least 8 symbols";
     private static final String INVALID_LAST_NAME = "Invalid last name";
     private static final String INVALID_FIRST_NAME = "Invalid first name";
     private static final String INVALID_EMAIL = "Invalid email";
@@ -40,7 +43,7 @@ public class ValidationUtil {
         if( msg != null){
             return msg;
         }
-        msg = checkConfirmPassword(user.getPassword(),user.getConfirmPassword());
+        msg = checkConfirmPassword(user.getPassword(), user.getConfirmPassword());
         if( msg != null){
             return msg;
         }
@@ -51,6 +54,7 @@ public class ValidationUtil {
         msg = checkAddress(user.getAddress());
         return msg;
     }
+
     public String checkUser(EditUserDto user){
         String msg = checkEmail(user.getEmail());
         if( msg != null){
@@ -70,12 +74,19 @@ public class ValidationUtil {
         }
         msg = checkAddress(user.getAddress());
         return msg;
+    }
 
+    public String checkUser(ChangePasswordDto user) {
+        String msg = checkPassword(user.getNewPassword());
+        if( msg != null){
+            return msg;
+        }
+        return msg;
     }
 
     private String checkAddress(String address) {
         if(address.length() < ADDRESS_LENGTH){
-            return "Invalid address must be" + ADDRESS_LENGTH + "symbols";
+            return INVALID_ADDRESS;
         }
         return null;
     }
@@ -87,7 +98,7 @@ public class ValidationUtil {
         return null;
     }
 
-    private String checkConfirmPassword(String password,String confirmPassword) {
+    private String checkConfirmPassword(String password, String confirmPassword) {
         if(!password.equals(confirmPassword)){
             return UserController.PASSWORDS_DONT_MATCH;
         }

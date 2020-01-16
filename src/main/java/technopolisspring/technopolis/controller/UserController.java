@@ -91,13 +91,17 @@ public class UserController extends AbstractController {
     @PutMapping("users/change_password")
     public UserWithoutPasswordDto changePassword(HttpSession session,
                                                  @RequestBody ChangePasswordDto changePasswordDto) {
-        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
+        UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session);
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
             throw new InvalidArgumentsException(WRONG_PASSWORD);
         }
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
             throw new InvalidArgumentsException(PASSWORDS_DONT_MATCH);
+        }
+        String checkUserMsg = validation.checkUser(changePasswordDto);
+        if(checkUserMsg != null){
+            throw new InvalidArgumentsException(checkUserMsg);
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());

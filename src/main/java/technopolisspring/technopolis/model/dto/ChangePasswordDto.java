@@ -12,6 +12,7 @@ import javax.validation.constraints.Pattern;
 @Setter
 @NoArgsConstructor
 public class ChangePasswordDto {
+
     private String oldPassword;
     @NotBlank
     @Length(min = 8)
