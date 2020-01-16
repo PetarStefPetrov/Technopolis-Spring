@@ -22,6 +22,7 @@ public class AttributeController extends AbstractController {
     private static final String INVALID_ATTRIBUTE_OR_PRODUCT = "Invalid attribute or product";
     private static final String SUB_CATEGORIES_MISMATCH = "Sub-category of product has to match the one of the attribute";
     private static final String ALREADY_EXISTS = "Such attribute already exists";
+    private static final String INVALID_SUB_CATEGORY = "Invalid SubCategory";
     @Autowired
     AttributeDao attributeDao;
     @Autowired
@@ -79,7 +80,7 @@ public class AttributeController extends AbstractController {
                                                  HttpSession session){
         checkIfUserIsAdmin(session);
         if(!categoryDao.checkForSubCategory(attribute.getSubCategoryId())){
-            throw new BadRequestException("Invalid SubCategory");
+            throw new BadRequestException(INVALID_SUB_CATEGORY);
         }
         AttributeWithoutValueDto checkAttribute = attributeDao.getAttributeByName(attribute.getName());
         if (checkAttribute != null){

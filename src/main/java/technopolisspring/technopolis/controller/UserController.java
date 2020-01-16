@@ -31,6 +31,7 @@ public class UserController extends AbstractController {
     private static final String WRONG_PASSWORD = "Wrong password";
     public static final String PASSWORDS_DONT_MATCH = "Passwords don't match";
     private static final String INVALID_ID = "Invalid id";
+    private static final String INVALID_PRODUCT = "Invalid Product";
     @Autowired
     private UserDao userDao;
     @Autowired
@@ -159,7 +160,7 @@ public class UserController extends AbstractController {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         IProduct product = productDao.getProductById(productId);
         if(product == null){
-            throw new BadRequestException("Invalid Product");
+            throw new BadRequestException(INVALID_PRODUCT);
         }
         if(userDao.checkIfProductAlreadyIsInFavorites(user.getId(), product.getId())){
             return product;

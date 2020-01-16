@@ -11,7 +11,6 @@ import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
 import technopolisspring.technopolis.model.dto.CreateProductDto;
-import technopolisspring.technopolis.model.pojos.Product;
 import technopolisspring.technopolis.utils.EmailUtil;
 
 import javax.servlet.http.HttpSession;
@@ -23,6 +22,10 @@ public class AdminController extends AbstractController {
     private static final String USER_NOT_FOUND = "User not found";
     private static final String INVALID_USER = "Invalid user";
     private static final int MAX_PERCENT = 100;
+    private static final String INVALID_BRAND = "Invalid brand";
+    private static final String INVALID_SUB_CATEGORY = "Invalid SubCategory";
+    private static final String DOESN_T_EXIST = "Offer or product doesn't exist";
+    private static final String INVALID_DISCOUNT_PERCENT = "Discount percent must be between 0 and 100, 0 not included.";
     @Autowired
     private UserDao userDAO;
     @Autowired
@@ -56,10 +59,10 @@ public class AdminController extends AbstractController {
     public CreateProductDto addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if(!categoryDao.checkForBrand(createProductDto.getBrandId())){
-            throw new BadRequestException("Invalid brand");
+            throw new BadRequestException(INVALID_BRAND);
         }
         if(!categoryDao.checkForSubCategory(createProductDto.getSubCategoryId())){
-            throw new BadRequestException("Invalid SubCategory");
+            throw new BadRequestException(INVALID_SUB_CATEGORY);
         }
         productDAO.addProduct(createProductDto);
         return createProductDto;
@@ -69,7 +72,7 @@ public class AdminController extends AbstractController {
     public CreateOfferDto addOffer(@RequestBody CreateOfferDto createOfferDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (createOfferDto.getDiscountPercent() <= 0 || createOfferDto.getDiscountPercent() > MAX_PERCENT){
-            throw new InvalidArgumentsException("Discount percent must be between 0 and 1, 0 not included.");
+            throw new InvalidArgumentsException(INVALID_DISCOUNT_PERCENT);
         }
         createOfferDto.setDiscountPercent(createOfferDto.getDiscountPercent() / MAX_PERCENT);
         this.offerDao.addOffer(createOfferDto);
@@ -81,7 +84,7 @@ public class AdminController extends AbstractController {
     public String addProductToOffer(@PathVariable long productId, @PathVariable long offerId, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
         if (!offerDao.addProductToOffer(productId, offerId)){
-            throw new BadRequestException("Offer or product doesn't exist");
+            throw new BadRequestException(DOESN_T_EXIST);
         }
         return ProductController.SUCCESS;
     }

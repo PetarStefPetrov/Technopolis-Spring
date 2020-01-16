@@ -11,8 +11,6 @@ public class FilterForProductsDto {
 
     private double minPrice;
     private double maxPrice;
-    private long subCategoryId;
-    private long brandId;
     private String sorted;
 
 }

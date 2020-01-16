@@ -59,19 +59,14 @@ public class ProductController extends AbstractController {
     }
 
     @PostMapping("products/filters/page")
-    public List<IProduct> getProductsWithFilters(@RequestBody FilterForProductsDto filterForProductsDto,
-                                                 @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
-        if (    filterForProductsDto.getBrandId() == 0 &&
-                filterForProductsDto.getSubCategoryId() == 0 &&
-                filterForProductsDto.getMaxPrice() == 0 &&
+    public List<IProduct> getProductsByPriceRange(@RequestBody FilterForProductsDto filterForProductsDto,
+                                                  @RequestParam(defaultValue = DEFAULT_PAGE) int pageNumber) {
+        if (    filterForProductsDto.getMaxPrice() == 0 &&
                 filterForProductsDto.getMinPrice() == 0) {
             throw new BadRequestException(INVALID_ARGUMENTS);
         }
-        if (    filterForProductsDto.getBrandId() < 0 ||
-                filterForProductsDto.getSubCategoryId() < 0 ||
-                filterForProductsDto.getMaxPrice() < 0 ||
-                filterForProductsDto.getMinPrice() < 0 ||
-                pageNumber < 1) {
+        if (    filterForProductsDto.getMaxPrice() < 0 ||
+                filterForProductsDto.getMinPrice() < 0) {
             throw new BadRequestException(INVALID_ARGUMENTS);
         }
         if (filterForProductsDto.getMaxPrice() < filterForProductsDto.getMinPrice()) {
@@ -80,7 +75,7 @@ public class ProductController extends AbstractController {
         if (filterForProductsDto.getMinPrice() == 0 && filterForProductsDto.getMaxPrice() == 0){
             filterForProductsDto.setMaxPrice(Integer.MAX_VALUE);
         }
-        return productDao.getProductsWithFilters(filterForProductsDto, validationUtil.validatePageNumber(pageNumber));
+        return productDao.getProductsByPriceRange(filterForProductsDto, validationUtil.validatePageNumber(pageNumber));
     }
 
     @GetMapping("offers/page")

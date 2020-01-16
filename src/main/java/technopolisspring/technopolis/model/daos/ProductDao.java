@@ -39,16 +39,15 @@ public class ProductDao extends Dao {
 
     public void addProduct(CreateProductDto product) throws SQLException {
         String sql = "INSERT INTO `technopolis`.`products` " +
-                "(`id`, `description`, `price`, `picture_url`, `brand_id`, `sub_category_id`) " +
-                "VALUES (?, ?, ?, ?, ?, ?);";
+                "(description, price, picture_url, brand_id, sub_category_id) " +
+                "VALUES (?, ?, ?, ?, ?);";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setLong(1, product.getId());
-            statement.setString(2, product.getDescription());
-            statement.setDouble(3, product.getPrice());
-            statement.setString(4, product.getPictureUrl());
-            statement.setLong(5, product.getBrandId());
-            statement.setLong(6, product.getSubCategoryId());
+            statement.setString(1, product.getDescription());
+            statement.setDouble(2, product.getPrice());
+            statement.setString(3, product.getPictureUrl());
+            statement.setLong(4, product.getBrandId());
+            statement.setLong(5, product.getSubCategoryId());
             statement.execute();
             ResultSet resultSet = statement.getGeneratedKeys();
             resultSet.next();
@@ -112,7 +111,7 @@ public class ProductDao extends Dao {
                 (result, i) -> getProductAccordingToOffer(result));
     }
 
-    public List<IProduct> getProductsWithFilters(FilterForProductsDto filterForProductsDto, int pageNumber) {
+    public List<IProduct> getProductsByPriceRange(FilterForProductsDto filterForProductsDto, int pageNumber) {
         String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
                 " o.discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
