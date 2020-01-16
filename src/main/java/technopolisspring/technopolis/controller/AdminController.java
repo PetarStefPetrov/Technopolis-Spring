@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.exception.NotFoundException;
+import technopolisspring.technopolis.model.daos.CategoryDao;
 import technopolisspring.technopolis.model.daos.OfferDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.daos.UserDao;
@@ -27,9 +28,11 @@ public class AdminController extends AbstractController {
     @Autowired
     private ProductDao productDAO;
     @Autowired
-    OfferDao offerDao;
+    private OfferDao offerDao;
     @Autowired
-    EmailUtil emailUtil;
+    private EmailUtil emailUtil;
+    @Autowired
+    private CategoryDao categoryDao;
 
     @PutMapping("users/make_admin/{userId}")
     public String makeAdmin(@PathVariable long userId, HttpSession session) throws SQLException {
@@ -52,13 +55,14 @@ public class AdminController extends AbstractController {
     @PostMapping("products")
     public CreateProductDto addProduct(@RequestBody CreateProductDto createProductDto, HttpSession session) throws SQLException {
         checkIfUserIsAdmin(session);
-        if(!productDAO.checkForBrand(createProductDto){
+        if(!categoryDao.checkForBrand(createProductDto.getBrandId())){
             throw new BadRequestException("Invalid brand");
         }
-        if(!productDAO.checkForSubCategory(createProductDto)){
+        if(!categoryDao.checkForSubCategory(createProductDto.getSubCategoryId())){
             throw new BadRequestException("Invalid SubCategory");
         }
-        return productDAO.addProduct(createProductDto);
+        productDAO.addProduct(createProductDto);
+        return createProductDto;
     }
 
     @PostMapping("offers")
