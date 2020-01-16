@@ -19,11 +19,12 @@ public class ProductDao extends Dao {
     OfferDao offerDao;
 
     public IProduct getProductById(long productId) throws SQLException {
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id, " +
-                "discount_percent\n" +
+        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, p.sub_category_id, offer_id,discount_percent , a.id,a.name\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = offer_id\n" +
-                "WHERE is_deleted = 0 AND p.id = ?;";
+                "LEFT JOIN `technopolis`.products_have_attriubtes as pa ON pa.product_id = p.id\n" +
+                "LEFT JOIN `technopolis`.attributes as a on a.id = pa.attribute_id\n" +
+                "WHERE is_deleted = 0 and p.id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, productId);
