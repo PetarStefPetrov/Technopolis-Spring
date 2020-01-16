@@ -4,17 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import technopolisspring.technopolis.model.pojos.Product;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewOfUserDto {
+public class AttributeWithoutValueDto {
 
     private long id;
-    private String title;
-    private String comment;
-    private Product product;
+    private String name;
+    private long subCategoryId;
 
 }

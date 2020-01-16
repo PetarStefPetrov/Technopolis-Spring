@@ -5,26 +5,23 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import technopolisspring.technopolis.model.pojos.IProduct;
-import technopolisspring.technopolis.model.pojos.IProductWithReview;
 
-import java.util.List;
 import java.util.Objects;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductInOfferDto implements IProductWithReview {
+public class ProductInOfferDto implements IProduct {
 
     private long id;
     private String description;
+    private double priceBeforeDiscount;
     private double price;
-    private double priceAfterDiscount;
     private String pictureUrl;
     private long brandId;
     private long subCategoryId;
     private long offerId;
-    private List<ReviewOfProductDto> reviews;
 
     @Override
     public boolean equals(Object o) {
@@ -42,11 +39,6 @@ public class ProductInOfferDto implements IProductWithReview {
     @Override
     public String toString() {
         return this.description;
-    }
-
-    @Override
-    public void addReview(ReviewOfProductDto review){
-        this.reviews.add(review);
     }
 
 }

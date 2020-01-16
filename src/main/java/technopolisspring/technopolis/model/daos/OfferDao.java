@@ -3,7 +3,6 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.CreateOfferDto;
-import technopolisspring.technopolis.model.dto.ProductWithoutReviewsDto;
 import technopolisspring.technopolis.model.pojos.IProduct;
 
 import java.sql.*;
@@ -33,8 +32,10 @@ public class OfferDao extends Dao {
     }
 
     public List<IProduct> getAllProductsInOffers(int pageNumber){
-        String sql = "SELECT id, 'description', price, picture_url, brand_id, sub_category_id, offer_id\n" +
-                "FROM technopolis.products\n" +
+        String sql = "SELECT p.id, 'description', price, picture_url, brand_id, sub_category_id," +
+                " offer_id, discount_percent\n" +
+                "FROM technopolis.products AS p\n" +
+                "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE is_deleted = 0 AND offer_id IS NOT NULL\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
@@ -43,7 +44,7 @@ public class OfferDao extends Dao {
             preparedStatement.setInt(1, pageNumber * PAGE_SIZE);
             preparedStatement.setInt(2, pageNumber * PAGE_SIZE - PAGE_SIZE);
         },
-                (result, i) -> productDao.getProductWithoutReviews(result));
+                (result, i) -> productDao.getProductAccordingToOffer(result));
     }
 
     public boolean addProductToOffer(long productId, long offerId) throws SQLException {
@@ -55,28 +56,6 @@ public class OfferDao extends Dao {
             statement.setLong(1, offerId);
             statement.setLong(2, productId);
             return statement.executeUpdate() != 0;
-        }
-    }
-
-    public double getProductWithDiscountedPrice(long productId) throws SQLException {
-        String sql = "SELECT discount_percent, price, offer_id\n" +
-                "FROM technopolis.offers AS o\n" +
-                "RIGHT JOIN technopolis.products AS p ON o.id = offer_id\n" +
-                "WHERE p.id = ?\n" +
-                "LIMIT 1";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setLong(1, productId);
-            ResultSet resultSet = statement.executeQuery();
-            if (!resultSet.next()) {
-                return 0.0;
-            }
-            if (resultSet.getLong("offer_id") != 0){
-                return -1;
-            }
-            double price = resultSet.getDouble("price");
-            double discountPercent = resultSet.getDouble("discount_percent");
-            return calculateDiscountedPrice(price, discountPercent);
         }
     }
 

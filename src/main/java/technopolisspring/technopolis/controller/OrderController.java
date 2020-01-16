@@ -2,13 +2,12 @@ package technopolisspring.technopolis.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.daos.OrderDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
-import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.model.pojos.IProduct;
 import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
 
 import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
@@ -19,6 +18,9 @@ import java.util.Map;
 public class OrderController extends AbstractController {
 
     public static final String SESSION_KEY_BASKET_USER = "user_basket";
+    private static final String BASKET_IS_EMPTY = "Basket is empty";
+    private static final String INVALID_PRODUCT = "Invalid Product";
+    private static final String INVALID_REQUEST = "Invalid request";
     @Autowired
     public ProductDao productDAO;
     @Autowired
@@ -29,7 +31,7 @@ public class OrderController extends AbstractController {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
-            throw new BadRequestException("Basket is empty");
+            throw new BadRequestException(BASKET_IS_EMPTY);
         }
         Order order = new Order(user.getId(), user.getAddress(), basket);
         orderDao.addOrder(order);
@@ -41,7 +43,7 @@ public class OrderController extends AbstractController {
     public Map<IProduct, Integer> addProductToBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
         IProduct product = productDAO.getProductById(product_id);
         if(product == null){
-            throw new BadRequestException("Invalid Product");
+            throw new BadRequestException(INVALID_PRODUCT);
         }
         Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
@@ -62,14 +64,14 @@ public class OrderController extends AbstractController {
     public Map<IProduct, Integer> removeProductFromBasket(@PathVariable long product_id, HttpSession session) throws SQLException {
         IProduct product = productDAO.getProductById(product_id);
         if(product == null){
-            throw new BadRequestException("Invalid Product");
+            throw new BadRequestException(INVALID_PRODUCT);
         }
         Map<IProduct, Integer> basket = (Map<IProduct, Integer>) session.getAttribute(SESSION_KEY_BASKET_USER);
         if(basket == null){
-            throw new BadRequestException("Basket is empty");
+            throw new BadRequestException(BASKET_IS_EMPTY);
         }
         if(!basket.containsKey(product)){
-            throw new BadRequestException("Invalid request");
+            throw new BadRequestException(INVALID_REQUEST);
         } else {
             int quantity = basket.get(product);
             if (quantity == 1){

@@ -3,9 +3,9 @@ package technopolisspring.technopolis.model.daos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.dto.EditUserDto;
+import technopolisspring.technopolis.model.dto.OrderWithoutProductsDto;
 import technopolisspring.technopolis.model.dto.UserWithoutPasswordDto;
 import technopolisspring.technopolis.model.pojos.IProduct;
-import technopolisspring.technopolis.model.pojos.Order;
 import technopolisspring.technopolis.model.pojos.User;
 
 import java.sql.*;
@@ -103,7 +103,7 @@ public class UserDao extends Dao {
             List<IProduct> favorites = new ArrayList<>();
             ResultSet result = statement.executeQuery();
             while (result.next()){
-                IProduct product = productDao.getProductWithoutReviews(result);
+                IProduct product = productDao.getProductAccordingToOffer(result);
                 favorites.add(product);
             }
             return favorites;
@@ -142,25 +142,24 @@ public class UserDao extends Dao {
         }
     }
 
-    public List<Order> getOrders(long userId, int pageNumber) throws SQLException {
-        String sql = "SELECT id\n" +
+    public List<OrderWithoutProductsDto> getOrders(long userId, int pageNumber) {
+        String sql = "SELECT id, address, price\n" +
                 "FROM `technopolis`.orders \n" +
                 "WHERE user_id = ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        return jdbcTemplate.query(sql, statement -> {
             statement.setLong(1, userId);
             statement.setInt(2, pageNumber * PAGE_SIZE);
             statement.setInt(3, pageNumber * PAGE_SIZE - PAGE_SIZE);
-            List<Order> orders = new ArrayList<>();
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                Order order = orderDao.getOrderById(result.getLong("id"));
-                orders.add(order);
-            }
-            return orders;
-        }
+        },
+                (result, i) -> new OrderWithoutProductsDto(
+                        result.getLong("id"),
+                        userId,
+                        result.getString("address"),
+                        result.getDouble("price")
+                )
+        );
     }
 
     public User getUserByEmail(String email) throws SQLException {

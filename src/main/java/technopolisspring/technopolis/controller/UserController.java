@@ -6,19 +6,16 @@ import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import technopolisspring.technopolis.model.daos.ProductDao;
-import technopolisspring.technopolis.model.daos.ReviewDao;
-import technopolisspring.technopolis.model.daos.UserDao;
-import technopolisspring.technopolis.model.dto.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
-import technopolisspring.technopolis.exception.NotFoundException;
-import technopolisspring.technopolis.model.pojos.*;
-import technopolisspring.technopolis.service.ValidationUtil;
-
+import technopolisspring.technopolis.model.daos.ProductDao;
+import technopolisspring.technopolis.model.daos.UserDao;
+import technopolisspring.technopolis.model.dto.*;
+import technopolisspring.technopolis.model.pojos.IProduct;
+import technopolisspring.technopolis.model.pojos.User;
+import technopolisspring.technopolis.utils.ValidationUtil;
 
 import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -26,12 +23,16 @@ import java.util.List;
 @Validated
 public class UserController extends AbstractController {
 
-    public static final String YOU_DON_T_HAVE_THIS_PRODUCT_IN_YOURS_FAVORITES = "You don't have this product, in yours favorites";
+    public static final String YOU_DONT_HAVE_THIS_PRODUCT_IN_YOUR_FAVORITES = "You don't have this product, in your favorites";
     public static final String SUCCESS = "Success!";
+    private static final String INVALID_EMAIL_OR_PASSWORD = "Invalid email or password";
+    private static final String EMAIL_ALREADY_EXISTS = "User with this email already exists";
+    private static final String NO_SUCH_USER = "There is no such user";
+    private static final String WRONG_PASSWORD = "Wrong password";
+    public static final String PASSWORDS_DONT_MATCH = "Passwords don't match";
+    private static final String INVALID_ID = "Invalid id";
     @Autowired
     private UserDao userDao;
-    @Autowired
-    private ReviewDao reviewDao;
     @Autowired
     private ProductDao productDao;
     @Autowired
@@ -42,10 +43,10 @@ public class UserController extends AbstractController {
     public UserWithoutPasswordDto login(@RequestBody LoginUserDto userDto, HttpSession session) throws SQLException {
         User user = userDao.getUserByEmail(userDto.getEmail());
         if(user == null ){
-            throw new InvalidArgumentsException("Invalid email or password");
+            throw new InvalidArgumentsException(INVALID_EMAIL_OR_PASSWORD);
         }
         if(!BCrypt.checkpw(userDto.getPassword(), user.getPassword())){
-            throw new InvalidArgumentsException("Invalid email or password");
+            throw new InvalidArgumentsException(INVALID_EMAIL_OR_PASSWORD);
         }
         UserWithoutPasswordDto userWithoutPasswordDto = new UserWithoutPasswordDto(user);
         session.setAttribute(SESSION_KEY_LOGGED_USER, userWithoutPasswordDto);
@@ -56,7 +57,7 @@ public class UserController extends AbstractController {
     @PostMapping("users/register")
     public UserWithoutPasswordDto register(@RequestBody RegisterUserDto registerUserDto, HttpSession session) {
         if(userDao.getUserByEmail(registerUserDto.getEmail()) != null){
-            throw  new BadRequestException("User with this email already exists");
+            throw  new BadRequestException(EMAIL_ALREADY_EXISTS);
         }
         String checkUserMsg = validation.checkUser(registerUserDto);
         if(checkUserMsg != null){
@@ -79,7 +80,7 @@ public class UserController extends AbstractController {
     public UserWithoutPasswordDto delete(HttpSession session) throws SQLException {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         if (!userDao.deleteUser(user.getId())){
-            throw new BadRequestException("There is no such user");
+            throw new BadRequestException(NO_SUCH_USER);
         }
         logout(session);
         return user;
@@ -91,10 +92,10 @@ public class UserController extends AbstractController {
         UserWithoutPasswordDto userInSession = checkIfUserIsLogged(session); // todo: validations
         User user = userDao.getUserById(userInSession.getId());
         if (!BCrypt.checkpw(changePasswordDto.getOldPassword(), user.getPassword())){
-            throw new InvalidArgumentsException("Wrong password");
+            throw new InvalidArgumentsException(WRONG_PASSWORD);
         }
         if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getConfirmPassword())){
-            throw new InvalidArgumentsException("Passwords don't match");
+            throw new InvalidArgumentsException(PASSWORDS_DONT_MATCH);
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String password = encoder.encode(changePasswordDto.getNewPassword());
@@ -120,7 +121,7 @@ public class UserController extends AbstractController {
     @GetMapping("users/{id}")
     public UserWithoutPasswordDto getUserById(@PathVariable long id) throws SQLException {
         if(userDao.getUserById(id) == null){
-            throw new BadRequestException("Invalid id");
+            throw new BadRequestException(INVALID_ID);
         }
         return new UserWithoutPasswordDto(userDao.getUserById(id));
     }
@@ -136,49 +137,8 @@ public class UserController extends AbstractController {
         return userDao.getAllUsers(validatePageNumber(pageNumber));
     }
 
-    @SneakyThrows
-    @PostMapping("users/reviews/{productId}")
-    public Review addReview(@RequestBody Review review, HttpSession session, @PathVariable long productId) {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        IProduct product = productDao.getProductById(productId);
-        if(product == null){
-            throw new BadRequestException("Invalid Product");
-        }
-        return reviewDao.addReview(review, productId, user);
-    }
-
-    @GetMapping("users/reviews/page/{pageNumber}")
-    public List<ReviewOfUserDto> getReviews(HttpSession session, @PathVariable int pageNumber) throws SQLException {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        return reviewDao.getReviewsOfUser(user.getId(), validatePageNumber(pageNumber));
-    }
-
-    @PutMapping("users/reviews")
-    public EditReviewDto editReview(@RequestBody EditReviewDto review, HttpSession session) throws SQLException {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        review.setUserId(user.getId());
-        if (!reviewDao.editReview(review)){
-            throw new InvalidArgumentsException("Invalid review");
-        }
-        return review;
-    }
-
-    @DeleteMapping("users/reviews/{reviewId}")
-    public Review deleteReview(HttpSession session, @PathVariable long reviewId) throws SQLException {
-        UserWithoutPasswordDto user = checkIfUserIsLogged(session);
-        Review review = reviewDao.getReviewById(reviewId);
-        if (review == null){
-            throw new NotFoundException("Review not found");
-        }
-        if (review.getUserId() != user.getId()){
-            throw new BadRequestException("You can only delete your own reviews!");
-        }
-        reviewDao.deleteReview(reviewId);
-        return review;
-    }
-
     @GetMapping("users/orders/page/{pageNumber}")
-    public List<Order> getOrders(HttpSession session, @PathVariable int pageNumber) throws SQLException {
+    public List<OrderWithoutProductsDto> getOrders(HttpSession session, @PathVariable int pageNumber) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         return userDao.getOrders(user.getId(), validatePageNumber(pageNumber));
     }
@@ -209,7 +169,7 @@ public class UserController extends AbstractController {
     public String removeFavorites(HttpSession session, @PathVariable long productId) {
         UserWithoutPasswordDto user = checkIfUserIsLogged(session);
         if(!userDao.removeFromFavorites(productId, user.getId())){
-            throw new BadRequestException(YOU_DON_T_HAVE_THIS_PRODUCT_IN_YOURS_FAVORITES);
+            throw new BadRequestException(YOU_DONT_HAVE_THIS_PRODUCT_IN_YOUR_FAVORITES);
         }
         return SUCCESS;
     }

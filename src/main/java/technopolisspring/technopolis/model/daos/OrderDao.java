@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.pojos.IProduct;
 import technopolisspring.technopolis.model.pojos.Order;
-import technopolisspring.technopolis.model.pojos.Product;
 
 import java.sql.*;
 import java.util.HashMap;
@@ -74,17 +73,20 @@ public class OrderDao extends Dao {
     }
 
     public Map<IProduct, Integer> getOrderProducts(long orderId) throws SQLException {
-        String sql = "SELECT product_id, order_id, quantity\n" +
+        String sql = "SELECT product_id, order_id, quantity, discount_percent, offer_id\n" +
                 "FROM technopolis.orders_have_products\n" +
+                "JOIN technopolis.products AS p ON product_id = p.id\n" +
+                "LEFT JOIN technopolis.offers AS o ON o.id = p.offer_id\n" +
                 "WHERE order_id = ?;";
         try (Connection connection = jdbcTemplate.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setLong(1, orderId);
             ResultSet result = statement.executeQuery();
             Map<IProduct, Integer> products = new HashMap<>();
-            while (result.next()){ //todo fix
-                products.put(productDAO.getProductById(result.getLong("product_id")),
-                                                       result.getInt("quantity"));
+            while (result.next()){
+                products.put(
+                        productDAO.getProductAccordingToOffer(result), result.getInt("quantity")
+                );
             }
             return products;
         }

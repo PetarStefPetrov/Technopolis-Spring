@@ -4,20 +4,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import technopolisspring.technopolis.model.pojos.IProduct;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductWithoutReviewsDto implements IProduct {
+public class OrderWithoutProductsDto {
 
     private long id;
-    private String description;
+    private long userId;
+    private String address;
     private double price;
-    private String pictureUrl;
-    private long brandId;
-    private long subCategoryId;
-    private long offerId;
 
 }

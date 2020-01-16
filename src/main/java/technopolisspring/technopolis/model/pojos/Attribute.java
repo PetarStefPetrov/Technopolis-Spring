@@ -16,13 +16,4 @@ public class Attribute {
     private long subCategoryId;
     private String value;
 
-    public Attribute(String name, long subCategoryId) {
-        this.name = name;
-        this.subCategoryId = subCategoryId;
-    }
-
-    public Attribute(long id, String name, long subCategoryId) {
-        this(name, subCategoryId);
-        this.id = id;
-    }
 }

@@ -1,8 +1,8 @@
-package technopolisspring.technopolis.service;
+package technopolisspring.technopolis.utils;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import technopolisspring.technopolis.model.daos.UserDao;
 import technopolisspring.technopolis.model.pojos.User;
 
@@ -12,8 +12,8 @@ import javax.mail.internet.MimeMessage;
 import java.util.List;
 import java.util.Properties;
 
-@Service
-public class EmailService {
+@Component
+public class EmailUtil {
 
     @Autowired
     UserDao userDao;
