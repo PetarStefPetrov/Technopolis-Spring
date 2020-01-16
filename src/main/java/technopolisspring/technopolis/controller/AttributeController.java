@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import technopolisspring.technopolis.exception.BadRequestException;
 import technopolisspring.technopolis.exception.InvalidArgumentsException;
 import technopolisspring.technopolis.model.daos.AttributeDao;
+import technopolisspring.technopolis.model.daos.CategoryDao;
 import technopolisspring.technopolis.model.daos.ProductDao;
 import technopolisspring.technopolis.model.dto.AddAttributeToProductDto;
 import technopolisspring.technopolis.model.dto.AttributeWithoutValueDto;
@@ -25,6 +26,8 @@ public class AttributeController extends AbstractController {
     AttributeDao attributeDao;
     @Autowired
     ProductDao productDao;
+    @Autowired
+    private CategoryDao categoryDao;
 
     @SneakyThrows
     @PostMapping("products/{productId}/attributes")
@@ -36,7 +39,6 @@ public class AttributeController extends AbstractController {
         if(product == null){
             throw new BadRequestException(ProductController.INVALID_PRODUCT);
         }
-        // check if it exists as an attribute or in the many to many if any is false return null
         AttributeWithoutValueDto attributeWithoutValueDto = attributeDao.getAttributeById(attributeToAdd.getId());
         if (attributeWithoutValueDto == null){
             throw new BadRequestException(INVALID_ATTRIBUTE_OR_PRODUCT);
@@ -75,6 +77,9 @@ public class AttributeController extends AbstractController {
     public AttributeWithoutValueDto addAttribute(@RequestBody AttributeWithoutValueDto attribute,
                                                  HttpSession session){
         checkIfUserIsAdmin(session);
+        if(!categoryDao.checkForSubCategory(attribute.getSubCategoryId())){
+            throw new BadRequestException("Invalid SubCategory");
+        }
         AttributeWithoutValueDto checkAttribute = attributeDao.getAttributeByName(attribute.getName());
         if (checkAttribute != null){
             throw new BadRequestException(ALREADY_EXISTS);
