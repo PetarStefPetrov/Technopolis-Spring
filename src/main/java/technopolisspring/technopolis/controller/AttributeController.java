@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 public class AttributeController extends AbstractController {
-
+    private static final String INVALID_ATTRIBUTE = "Invalid attribute";
     private static final String INVALID_ATTRIBUTE_OR_PRODUCT = "Invalid attribute or product";
     private static final String SUB_CATEGORIES_MISMATCH = "Sub-category of product has to match the one of the attribute";
     private static final String ALREADY_EXISTS = "Such attribute already exists";
@@ -41,7 +41,7 @@ public class AttributeController extends AbstractController {
         }
         AttributeWithoutValueDto attributeWithoutValueDto = attributeDao.getAttributeById(attributeToAdd.getId());
         if (attributeWithoutValueDto == null){
-            throw new BadRequestException(INVALID_ATTRIBUTE_OR_PRODUCT);
+            throw new BadRequestException(INVALID_ATTRIBUTE);
         }
         if (product.getSubCategoryId() != attributeWithoutValueDto.getSubCategoryId()){
             throw new InvalidArgumentsException(SUB_CATEGORIES_MISMATCH);
@@ -68,7 +68,7 @@ public class AttributeController extends AbstractController {
     public String deleteAttribute(@PathVariable long attributeId, HttpSession session) {
         checkIfUserIsAdmin(session);
         if(!attributeDao.deleteAttribute(attributeId)){
-            throw new BadRequestException(INVALID_ATTRIBUTE_OR_PRODUCT);
+            throw new BadRequestException(INVALID_ATTRIBUTE);
         }
         return ProductController.SUCCESS;
     }
