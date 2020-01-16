@@ -36,11 +36,11 @@ public abstract class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({BadRequestException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorDto badRequest(Exception e){
         return new ErrorDto(
                 e.getMessage(),
-                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
     }
@@ -60,20 +60,20 @@ public abstract class GlobalExceptionHandler {
     public ErrorDto wrongDateFormat(Exception e){
         return new ErrorDto(
                 INVALID_ARGUMENTS,
-                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.BAD_REQUEST.value(),
                 LocalDateTime.now(),
                 e.getClass().getName());
     }
 
-//    @ExceptionHandler({Exception.class})
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorDto somethingWentWrong(Exception e){
-//        return new ErrorDto(
-//                WHOOPS_SOMETHING_WENT_WRONG,
-//                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                LocalDateTime.now(),
-//                e.getClass().getName());
-//    }
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorDto somethingWentWrong(Exception e){
+        return new ErrorDto(
+                WHOOPS_SOMETHING_WENT_WRONG,
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now(),
+                e.getClass().getName());
+    }
 
     @ExceptionHandler({MethodArgumentTypeMismatchException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)

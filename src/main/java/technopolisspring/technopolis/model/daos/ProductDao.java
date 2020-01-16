@@ -100,7 +100,7 @@ public class ProductDao extends Dao {
                 " discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
-                "WHERE is_deleted = 0 AND description LIKE ?" +
+                "WHERE is_deleted = 0 AND description LIKE ?\n" +
                 "LIMIT ?\n" +
                 "OFFSET ?;";
         return jdbcTemplate.query(sql,
