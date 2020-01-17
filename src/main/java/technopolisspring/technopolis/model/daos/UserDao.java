@@ -87,7 +87,7 @@ public class UserDao extends Dao {
     }
 
     public List<IProduct> getFavourites(long userId, int pageNumber) throws SQLException {
-        String sql = "SELECT p.id, p.description, p.price, p.picture_url, p.brand_id, " +
+        String sql = "SELECT p.id, p.description, p.price, p.brand_id, " +
                 "p.sub_category_id, p.offer_id, o.discount_percent\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "JOIN `technopolis`.users_like_products AS ulp ON p.id = ulp.product_id\n" +

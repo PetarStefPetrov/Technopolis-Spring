@@ -19,7 +19,7 @@ public class ProductDao extends Dao {
     OfferDao offerDao;
 
     public IProduct getProductById(long productId) throws SQLException {
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, p.sub_category_id, " +
+        String sql = "SELECT p.id, description, price, brand_id, p.sub_category_id, " +
                 "offer_id, discount_percent, a.id, a.name, value\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = offer_id\n" +
@@ -55,7 +55,7 @@ public class ProductDao extends Dao {
     }
 
     public List<IProduct> getAllProducts(int pageNumber){
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id, " +
+        String sql = "SELECT p.id, description, price, brand_id, sub_category_id, offer_id, " +
                 "discount_percent\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = offer_id\n" +
@@ -71,7 +71,7 @@ public class ProductDao extends Dao {
     }
 
     public List<IProduct> getProductsBySubCategory(long subCategoryId, int pageNumber) throws SQLException {
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+        String sql = "SELECT p.id, description, price, brand_id, sub_category_id, offer_id," +
                 " discount_percent\n" +
                 "FROM `technopolis`.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = offer_id\n" +
@@ -94,7 +94,7 @@ public class ProductDao extends Dao {
     }
 
     public List<IProduct> lookForProductsByDescription(String description, int pageNumber) {
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+        String sql = "SELECT p.id, description, price, brand_id, sub_category_id, offer_id," +
                 " discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
@@ -111,7 +111,7 @@ public class ProductDao extends Dao {
     }
 
     public List<IProduct> getProductsByPriceRange(FilterForProductsDto filterForProductsDto, int pageNumber) {
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+        String sql = "SELECT p.id, description, price, brand_id, sub_category_id, offer_id," +
                 " o.discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
@@ -145,7 +145,7 @@ public class ProductDao extends Dao {
     }
 
     public List<IProduct> getProductsByBrand(long brandId, int pageNumber){
-        String sql = "SELECT p.id, description, price, picture_url, brand_id, sub_category_id, offer_id," +
+        String sql = "SELECT p.id, description, price, brand_id, sub_category_id, offer_id," +
                 " o.discount_percent\n" +
                 "FROM technopolis.products AS p\n" +
                 "LEFT JOIN `technopolis`.offers AS o ON o.id = p.offer_id\n" +
